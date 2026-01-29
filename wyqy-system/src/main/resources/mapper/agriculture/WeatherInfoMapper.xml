@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="wyqy.agriculture.mapper.WeatherInfoMapper">
+    
+    <resultMap type="WeatherInfo" id="WeatherInfoResult">
+        <result property="weatherId"           column="weather_id"           />
+        <result property="temperature"         column="temperature"          />
+        <result property="humidity"            column="humidity"             />
+        <result property="pressure"            column="pressure"             />
+        <result property="windSpeed"           column="wind_speed"           />
+        <result property="windDirection"       column="wind_direction"       />
+        <result property="rainfall"            column="rainfall"             />
+        <result property="lightIntensity"      column="light_intensity"      />
+        <result property="soilTemperature"     column="soil_temperature"     />
+        <result property="soilHumidity"        column="soil_humidity"        />
+        <result property="location"            column="location"             />
+        <result property="recordTime"          column="record_time"          />
+        <result property="dataSource"          column="data_source"          />
+        <result property="notes"               column="notes"                 />
+        <result property="createBy"            column="create_by"             />
+        <result property="createTime"          column="create_time"          />
+        <result property="updateBy"            column="update_by"             />
+        <result property="updateTime"          column="update_time"          />
+    </resultMap>
+
+    <sql id="selectWeatherInfoVo">
+        select weather_id, temperature, humidity, air_pressure as pressure, wind_speed, wind_direction, rainfall, light_intensity, soil_temperature, soil_moisture as soil_humidity, location, record_time, sensor_id as data_source, remark as notes, create_by, create_time, update_by, update_time from weather_info
+    </sql>
+
+    <select id="selectWeatherInfoList" parameterType="WeatherInfo" resultMap="WeatherInfoResult">
+        <include refid="selectWeatherInfoVo"/>
+        <where>  
+            <if test="temperature != null "> and temperature = #{temperature}</if>
+            <if test="humidity != null "> and humidity = #{humidity}</if>
+            <if test="pressure != null "> and pressure = #{pressure}</if>
+            <if test="windSpeed != null "> and wind_speed = #{windSpeed}</if>
+            <if test="windDirection != null  and windDirection != ''"> and wind_direction like concat('%', #{windDirection}, '%')</if>
+            <if test="rainfall != null "> and rainfall = #{rainfall}</if>
+            <if test="lightIntensity != null "> and light_intensity = #{lightIntensity}</if>
+            <if test="soilTemperature != null "> and soil_temperature = #{soilTemperature}</if>
+            <if test="soilHumidity != null "> and soil_humidity = #{soilHumidity}</if>
+            <if test="location != null  and location != ''"> and location like concat('%', #{location}, '%')</if>
+            <if test="recordTime != null "> and record_time = #{recordTime}</if>
+            <if test="dataSource != null  and dataSource != ''"> and data_source like concat('%', #{dataSource}, '%')</if>
+            <if test="notes != null  and notes != ''"> and notes like concat('%', #{notes}, '%')</if>
+        </where>
+        order by create_time desc, record_time desc
+    </select>
+    
+    <select id="selectWeatherInfoByWeatherId" parameterType="Long" resultMap="WeatherInfoResult">
+        <include refid="selectWeatherInfoVo"/>
+        where weather_id = #{weatherId}
+    </select>
+
+    <select id="selectLatestWeather" resultMap="WeatherInfoResult">
+        <include refid="selectWeatherInfoVo"/>
+        order by record_time desc limit 1
+    </select>
+        
+    <insert id="insertWeatherInfo" parameterType="WeatherInfo" useGeneratedKeys="true" keyProperty="weatherId">
+        insert into weather_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="temperature != null">temperature,</if>
+            <if test="humidity != null">humidity,</if>
+            <if test="pressure != null">air_pressure,</if>
+            <if test="windSpeed != null">wind_speed,</if>
+            <if test="windDirection != null and windDirection != ''">wind_direction,</if>
+            <if test="rainfall != null">rainfall,</if>
+            <if test="lightIntensity != null">light_intensity,</if>
+            <if test="soilTemperature != null">soil_temperature,</if>
+            <if test="soilHumidity != null">soil_moisture,</if>
+            <if test="location != null and location != ''">location,</if>
+            <if test="recordTime != null">record_time,</if>
+            <if test="dataSource != null and dataSource != ''">sensor_id,</if>
+            <if test="notes != null and notes != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="temperature != null">#{temperature},</if>
+            <if test="humidity != null">#{humidity},</if>
+            <if test="pressure != null">#{pressure},</if>
+            <if test="windSpeed != null">#{windSpeed},</if>
+            <if test="windDirection != null and windDirection != ''">#{windDirection},</if>
+            <if test="rainfall != null">#{rainfall},</if>
+            <if test="lightIntensity != null">#{lightIntensity},</if>
+            <if test="soilTemperature != null">#{soilTemperature},</if>
+            <if test="soilHumidity != null">#{soilHumidity},</if>
+            <if test="location != null and location != ''">#{location},</if>
+            <if test="recordTime != null">#{recordTime},</if>
+            <if test="dataSource != null and dataSource != ''">#{dataSource},</if>
+            <if test="notes != null and notes != ''">#{notes},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeatherInfo" parameterType="WeatherInfo">
+        update weather_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="temperature != null">temperature = #{temperature},</if>
+            <if test="humidity != null">humidity = #{humidity},</if>
+            <if test="pressure != null">air_pressure = #{pressure},</if>
+            <if test="windSpeed != null">wind_speed = #{windSpeed},</if>
+            <if test="windDirection != null and windDirection != ''">wind_direction = #{windDirection},</if>
+            <if test="rainfall != null">rainfall = #{rainfall},</if>
+            <if test="lightIntensity != null">light_intensity = #{lightIntensity},</if>
+            <if test="soilTemperature != null">soil_temperature = #{soilTemperature},</if>
+            <if test="soilHumidity != null">soil_moisture = #{soilHumidity},</if>
+            <if test="location != null and location != ''">location = #{location},</if>
+            <if test="recordTime != null">record_time = #{recordTime},</if>
+            <if test="dataSource != null and dataSource != ''">sensor_id = #{dataSource},</if>
+            <if test="notes != null and notes != ''">remark = #{notes},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where weather_id = #{weatherId}
+    </update>
+
+    <delete id="deleteWeatherInfoByWeatherId" parameterType="Long">
+        delete from weather_info where weather_id = #{weatherId}
+    </delete>
+
+    <delete id="deleteWeatherInfoByWeatherIds" parameterType="String">
+        delete from weather_info where weather_id in 
+        <foreach item="weatherId" collection="array" open="(" separator="," close=")">
+            #{weatherId}
+        </foreach>
+    </delete>
+</mapper>

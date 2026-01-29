@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="wyqy.agriculture.mapper.CropSpeciesMapper">
+    
+    <resultMap type="CropSpecies" id="CropSpeciesResult">
+        <result property="speciesId"           column="species_id"           />
+        <result property="speciesName"         column="species_name"         />
+        <result property="speciesCode"         column="species_code"         />
+        <result property="scientificName"      column="scientific_name"      />
+        <result property="category"             column="category"             />
+        <result property="growthCycle"         column="growth_period"         />
+        <result property="suitableTempMin"      column="optimal_temperature_min"      />
+        <result property="suitableTempMax"      column="optimal_temperature_max"      />
+        <result property="suitableHumidityMin"  column="optimal_humidity_min"  />
+        <result property="suitableHumidityMax"  column="optimal_humidity_max"  />
+        <result property="waterRequirement"    column="water_requirement"    />
+        <result property="fertilizerRequirement" column="fertilizer_requirement" />
+        <result property="lightRequirement"    column="light_requirement"    />
+        <result property="soilRequirement"     column="soil_requirement"     />
+        <result property="plantingDensity"     column="planting_density"     />
+        <result property="estimatedYield"      column="expected_yield"      />
+        <result property="diseaseResistance"    column="disease_resistance"    />
+        <result property="pestResistance"       column="pest_resistance"       />
+        <result property="description"         column="description"         />
+        <result property="imageUrl"            column="image_url"            />
+        <result property="status"              column="status"                />
+        <result property="notes"               column="remark"                 />
+        <result property="createBy"            column="create_by"             />
+        <result property="createTime"          column="create_time"           />
+        <result property="updateBy"            column="update_by"             />
+        <result property="updateTime"          column="update_time"           />
+    </resultMap>
+
+    <sql id="selectCropSpeciesVo">
+        select species_id, species_name, species_code, scientific_name, category, growth_period, optimal_temperature_min, optimal_temperature_max, optimal_humidity_min, optimal_humidity_max, water_requirement, fertilizer_requirement, light_requirement, soil_requirement, planting_density, expected_yield, disease_resistance, pest_resistance, description, image_url, status, create_by, create_time, update_by, update_time, remark from crop_species
+    </sql>
+
+    <select id="selectCropSpeciesList" parameterType="CropSpecies" resultMap="CropSpeciesResult">
+        <include refid="selectCropSpeciesVo"/>
+        <where>  
+            <if test="speciesName != null  and speciesName != ''"> and species_name like concat('%', #{speciesName}, '%')</if>
+            <if test="speciesCode != null  and speciesCode != ''"> and species_code = #{speciesCode}</if>
+            <if test="category != null  and category != ''"> and category = #{category}</if>
+            <if test="growthCycle != null "> and growth_period = #{growthCycle}</if>
+            <if test="suitableTempMin != null "> and optimal_temperature_min = #{suitableTempMin}</if>
+            <if test="suitableTempMax != null "> and optimal_temperature_max = #{suitableTempMax}</if>
+            <if test="suitableHumidityMin != null "> and optimal_humidity_min = #{suitableHumidityMin}</if>
+            <if test="suitableHumidityMax != null "> and optimal_humidity_max = #{suitableHumidityMax}</if>
+            <if test="waterRequirement != null  and waterRequirement != ''"> and water_requirement = #{waterRequirement}</if>
+            <if test="fertilizerRequirement != null  and fertilizerRequirement != ''"> and fertilizer_requirement = #{fertilizerRequirement}</if>
+            <if test="lightRequirement != null  and lightRequirement != ''"> and light_requirement = #{lightRequirement}</if>
+            <if test="soilRequirement != null  and soilRequirement != ''"> and soil_requirement = #{soilRequirement}</if>
+            <if test="plantingDensity != null "> and planting_density = #{plantingDensity}</if>
+            <if test="estimatedYield != null "> and expected_yield = #{estimatedYield}</if>
+            <if test="diseaseResistance != null  and diseaseResistance != ''"> and disease_resistance = #{diseaseResistance}</if>
+            <if test="pestResistance != null  and pestResistance != ''"> and pest_resistance = #{pestResistance}</if>
+            <if test="description != null  and description != ''"> and description like concat('%', #{description}, '%')</if>
+            <if test="imageUrl != null  and imageUrl != ''"> and image_url = #{imageUrl}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="notes != null  and notes != ''"> and remark like concat('%', #{notes}, '%')</if>
+        </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectCropSpeciesBySpeciesId" parameterType="Long" resultMap="CropSpeciesResult">
+        <include refid="selectCropSpeciesVo"/>
+        where species_id = #{speciesId}
+    </select>
+        
+    <insert id="insertCropSpecies" parameterType="CropSpecies" useGeneratedKeys="true" keyProperty="speciesId">
+        insert into crop_species
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="speciesName != null and speciesName != ''">species_name,</if>
+            <if test="speciesCode != null and speciesCode != ''">species_code,</if>
+            <if test="scientificName != null and scientificName != ''">scientific_name,</if>
+            <if test="category != null and category != ''">category,</if>
+            <if test="growthCycle != null">growth_period,</if>
+            <if test="suitableTempMin != null">optimal_temperature_min,</if>
+            <if test="suitableTempMax != null">optimal_temperature_max,</if>
+            <if test="suitableHumidityMin != null">optimal_humidity_min,</if>
+            <if test="suitableHumidityMax != null">optimal_humidity_max,</if>
+            <if test="waterRequirement != null and waterRequirement != ''">water_requirement,</if>
+            <if test="fertilizerRequirement != null and fertilizerRequirement != ''">fertilizer_requirement,</if>
+            <if test="lightRequirement != null and lightRequirement != ''">light_requirement,</if>
+            <if test="soilRequirement != null and soilRequirement != ''">soil_requirement,</if>
+            <if test="plantingDensity != null">planting_density,</if>
+            <if test="estimatedYield != null">expected_yield,</if>
+            <if test="diseaseResistance != null and diseaseResistance != ''">disease_resistance,</if>
+            <if test="pestResistance != null and pestResistance != ''">pest_resistance,</if>
+            <if test="description != null and description != ''">description,</if>
+            <if test="imageUrl != null and imageUrl != ''">image_url,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="notes != null and notes != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="speciesName != null and speciesName != ''">#{speciesName},</if>
+            <if test="speciesCode != null and speciesCode != ''">#{speciesCode},</if>
+            <if test="scientificName != null and scientificName != ''">#{scientificName},</if>
+            <if test="category != null and category != ''">#{category},</if>
+            <if test="growthCycle != null">#{growthCycle},</if>
+            <if test="suitableTempMin != null">#{suitableTempMin},</if>
+            <if test="suitableTempMax != null">#{suitableTempMax},</if>
+            <if test="suitableHumidityMin != null">#{suitableHumidityMin},</if>
+            <if test="suitableHumidityMax != null">#{suitableHumidityMax},</if>
+            <if test="waterRequirement != null and waterRequirement != ''">#{waterRequirement},</if>
+            <if test="fertilizerRequirement != null and fertilizerRequirement != ''">#{fertilizerRequirement},</if>
+            <if test="lightRequirement != null and lightRequirement != ''">#{lightRequirement},</if>
+            <if test="soilRequirement != null and soilRequirement != ''">#{soilRequirement},</if>
+            <if test="plantingDensity != null">#{plantingDensity},</if>
+            <if test="estimatedYield != null">#{estimatedYield},</if>
+            <if test="diseaseResistance != null and diseaseResistance != ''">#{diseaseResistance},</if>
+            <if test="pestResistance != null and pestResistance != ''">#{pestResistance},</if>
+            <if test="description != null and description != ''">#{description},</if>
+            <if test="imageUrl != null and imageUrl != ''">#{imageUrl},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="notes != null and notes != ''">#{notes},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCropSpecies" parameterType="CropSpecies">
+        update crop_species
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="speciesName != null and speciesName != ''">species_name = #{speciesName},</if>
+            <if test="speciesCode != null and speciesCode != ''">species_code = #{speciesCode},</if>
+            <if test="scientificName != null and scientificName != ''">scientific_name = #{scientificName},</if>
+            <if test="category != null and category != ''">category = #{category},</if>
+            <if test="growthCycle != null">growth_period = #{growthCycle},</if>
+            <if test="suitableTempMin != null">optimal_temperature_min = #{suitableTempMin},</if>
+            <if test="suitableTempMax != null">optimal_temperature_max = #{suitableTempMax},</if>
+            <if test="suitableHumidityMin != null">optimal_humidity_min = #{suitableHumidityMin},</if>
+            <if test="suitableHumidityMax != null">optimal_humidity_max = #{suitableHumidityMax},</if>
+            <if test="waterRequirement != null and waterRequirement != ''">water_requirement = #{waterRequirement},</if>
+            <if test="fertilizerRequirement != null and fertilizerRequirement != ''">fertilizer_requirement = #{fertilizerRequirement},</if>
+            <if test="lightRequirement != null and lightRequirement != ''">light_requirement = #{lightRequirement},</if>
+            <if test="soilRequirement != null and soilRequirement != ''">soil_requirement = #{soilRequirement},</if>
+            <if test="plantingDensity != null">planting_density = #{plantingDensity},</if>
+            <if test="estimatedYield != null">expected_yield = #{estimatedYield},</if>
+            <if test="diseaseResistance != null and diseaseResistance != ''">disease_resistance = #{diseaseResistance},</if>
+            <if test="pestResistance != null and pestResistance != ''">pest_resistance = #{pestResistance},</if>
+            <if test="description != null and description != ''">description = #{description},</if>
+            <if test="imageUrl != null and imageUrl != ''">image_url = #{imageUrl},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="notes != null and notes != ''">remark = #{notes},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where species_id = #{speciesId}
+    </update>
+
+    <delete id="deleteCropSpeciesBySpeciesId" parameterType="Long">
+        delete from crop_species where species_id = #{speciesId}
+    </delete>
+
+    <delete id="deleteCropSpeciesBySpeciesIds" parameterType="String">
+        delete from crop_species where species_id in 
+        <foreach item="speciesId" collection="array" open="(" separator="," close=")">
+            #{speciesId}
+        </foreach>
+    </delete>
+
+    <select id="countPlantingRecordsBySpeciesId" parameterType="Long" resultType="int">
+        select count(*) from planting_record where species_id = #{speciesId}
+    </select>
+</mapper>

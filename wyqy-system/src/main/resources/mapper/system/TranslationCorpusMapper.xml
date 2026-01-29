@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="wyqy.system.mapper.TranslationCorpusMapper">
+    
+    <resultMap type="TranslationCorpus" id="TranslationCorpusResult">
+        <result property="corpusId"       column="corpus_id"       />
+        <result property="sourceText"     column="source_text"     />
+        <result property="targetText"     column="target_text"     />
+        <result property="sourceLanguage" column="source_language" />
+        <result property="targetLanguage" column="target_language" />
+        <result property="domainType"     column="domain_type"     />
+        <result property="usageCount"     column="usage_count"     />
+        <result property="accuracyScore"  column="accuracy_score"  />
+        <result property="status"         column="status"          />
+        <result property="delFlag"        column="del_flag"        />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+        <result property="remark"         column="remark"          />
+    </resultMap>
+
+    <sql id="selectTranslationCorpusVo">
+        select corpus_id, source_text, target_text, source_language, target_language, domain_type, usage_count, accuracy_score, status, del_flag, create_by, create_time, update_by, update_time, remark from translation_corpus
+    </sql>
+
+    <select id="selectTranslationCorpusList" parameterType="TranslationCorpus" resultMap="TranslationCorpusResult">
+        <include refid="selectTranslationCorpusVo"/>
+        <where>  
+            <if test="sourceText != null  and sourceText != ''"> and source_text like concat('%', #{sourceText}, '%')</if>
+            <if test="targetText != null  and targetText != ''"> and target_text like concat('%', #{targetText}, '%')</if>
+            <if test="sourceLanguage != null  and sourceLanguage != ''"> and source_language = #{sourceLanguage}</if>
+            <if test="targetLanguage != null  and targetLanguage != ''"> and target_language = #{targetLanguage}</if>
+            <if test="domainType != null  and domainType != ''"> and domain_type = #{domainType}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            and del_flag = '0'
+        </where>
+        order by usage_count desc, create_time desc
+    </select>
+    
+    <select id="selectTranslationCorpusByCorpusId" parameterType="Long" resultMap="TranslationCorpusResult">
+        <include refid="selectTranslationCorpusVo"/>
+        where corpus_id = #{corpusId}
+    </select>
+
+    <select id="selectMatchingCorpus" resultMap="TranslationCorpusResult">
+        <include refid="selectTranslationCorpusVo"/>
+        where source_language = #{sourceLanguage} 
+        and target_language = #{targetLanguage}
+        and domain_type = #{domainType}
+        and status = '0'
+        and del_flag = '0'
+        and (source_text = #{sourceText} or source_text like concat('%', #{sourceText}, '%') or #{sourceText} like concat('%', source_text, '%'))
+        order by accuracy_score desc, usage_count desc
+        limit 10
+    </select>
+        
+    <insert id="insertTranslationCorpus" parameterType="TranslationCorpus" useGeneratedKeys="true" keyProperty="corpusId">
+        insert into translation_corpus
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sourceText != null and sourceText != ''">source_text,</if>
+            <if test="targetText != null and targetText != ''">target_text,</if>
+            <if test="sourceLanguage != null">source_language,</if>
+            <if test="targetLanguage != null">target_language,</if>
+            <if test="domainType != null">domain_type,</if>
+            <if test="usageCount != null">usage_count,</if>
+            <if test="accuracyScore != null">accuracy_score,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sourceText != null and sourceText != ''">#{sourceText},</if>
+            <if test="targetText != null and targetText != ''">#{targetText},</if>
+            <if test="sourceLanguage != null">#{sourceLanguage},</if>
+            <if test="targetLanguage != null">#{targetLanguage},</if>
+            <if test="domainType != null">#{domainType},</if>
+            <if test="usageCount != null">#{usageCount},</if>
+            <if test="accuracyScore != null">#{accuracyScore},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTranslationCorpus" parameterType="TranslationCorpus">
+        update translation_corpus
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sourceText != null and sourceText != ''">source_text = #{sourceText},</if>
+            <if test="targetText != null and targetText != ''">target_text = #{targetText},</if>
+            <if test="sourceLanguage != null">source_language = #{sourceLanguage},</if>
+            <if test="targetLanguage != null">target_language = #{targetLanguage},</if>
+            <if test="domainType != null">domain_type = #{domainType},</if>
+            <if test="usageCount != null">usage_count = #{usageCount},</if>
+            <if test="accuracyScore != null">accuracy_score = #{accuracyScore},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where corpus_id = #{corpusId}
+    </update>
+
+    <delete id="deleteTranslationCorpusByCorpusId" parameterType="Long">
+        update translation_corpus set del_flag = '2' where corpus_id = #{corpusId}
+    </delete>
+
+    <delete id="deleteTranslationCorpusByCorpusIds" parameterType="String">
+        update translation_corpus set del_flag = '2' where corpus_id in 
+        <foreach item="corpusId" collection="array" open="(" separator="," close=")">
+            #{corpusId}
+        </foreach>
+    </delete>
+
+    <update id="increaseUsageCount" parameterType="Long">
+        update translation_corpus set usage_count = usage_count + 1 where corpus_id = #{corpusId}
+    </update>
+
+</mapper>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="wyqy.agriculture.mapper.PlantingRecordMapper">
+    
+    <resultMap type="PlantingRecord" id="PlantingRecordResult">
+        <result property="plantingId"           column="planting_id"           />
+        <result property="landId"               column="land_id"               />
+        <result property="landName"             column="land_name"             />
+        <result property="speciesId"            column="species_id"            />
+        <result property="speciesName"          column="species_name"          />
+        <result property="plantingArea"         column="planting_area"         />
+        <result property="plantingQuantity"     column="planting_quantity"     />
+        <result property="plantingDate"         column="planting_date"         />
+        <result property="expectedHarvestDate"  column="expected_harvest_date" />
+        <result property="actualHarvestDate"    column="actual_harvest_date"   />
+        <result property="growthStage"          column="growth_stage"          />
+        <result property="healthStatus"         column="health_status"         />
+        <result property="maturity"             column="maturity"             />
+        <result property="isMature"             column="is_mature"             />
+        <result property="canHarvest"           column="can_harvest"           />
+        <result property="diseaseInfo"          column="disease_info"          />
+        <result property="pestInfo"             column="pest_info"             />
+        <result property="plantingDensity"      column="planting_density"      />
+        <result property="seedSource"           column="seed_source"           />
+        <result property="status"               column="status"                />
+        <result property="notes"                column="notes"                 />
+        <result property="createBy"             column="create_by"             />
+        <result property="createTime"           column="create_time"           />
+        <result property="updateBy"             column="update_by"             />
+        <result property="updateTime"           column="update_time"           />
+    </resultMap>
+
+    <sql id="selectPlantingRecordVo">
+        select p.planting_id, p.land_id, l.land_name, p.species_id, s.species_name, 
+               p.planting_area, p.seed_quantity as planting_quantity, p.planting_date, 
+               p.expected_harvest_date, p.actual_harvest_date, p.growth_stage, 
+               p.health_status, p.is_mature as maturity, p.is_mature, p.can_harvest, p.disease_info, p.pest_info, 
+               p.planting_density, p.seed_source, p.status, p.create_by, p.create_time, 
+               p.update_by, p.update_time, p.remark as notes
+        from planting_record p
+        left join land_info l on p.land_id = l.land_id
+        left join crop_species s on p.species_id = s.species_id
+    </sql>
+
+    <select id="selectPlantingRecordList" parameterType="PlantingRecord" resultMap="PlantingRecordResult">
+        <include refid="selectPlantingRecordVo"/>
+        <where>  
+            <if test="landId != null "> and p.land_id = #{landId}</if>
+            <if test="landName != null  and landName != ''"> and l.land_name like concat('%', #{landName}, '%')</if>
+            <if test="speciesId != null "> and p.species_id = #{speciesId}</if>
+            <if test="speciesName != null  and speciesName != ''"> and s.species_name like concat('%', #{speciesName}, '%')</if>
+            <if test="plantingArea != null "> and p.planting_area = #{plantingArea}</if>
+            <if test="plantingDate != null "> and p.planting_date = #{plantingDate}</if>
+            <if test="expectedHarvestDate != null "> and p.expected_harvest_date = #{expectedHarvestDate}</if>
+            <if test="actualHarvestDate != null "> and p.actual_harvest_date = #{actualHarvestDate}</if>
+            <if test="growthStage != null  and growthStage != ''"> and p.growth_stage = #{growthStage}</if>
+            <if test="healthStatus != null  and healthStatus != ''"> and p.health_status = #{healthStatus}</if>
+            <if test="maturity != null  and maturity != ''"> and p.is_mature = #{maturity}</if>
+            <if test="diseaseInfo != null  and diseaseInfo != ''"> and p.disease_info like concat('%', #{diseaseInfo}, '%')</if>
+            <if test="pestInfo != null  and pestInfo != ''"> and p.pest_info like concat('%', #{pestInfo}, '%')</if>
+            <if test="plantingDensity != null "> and p.planting_density = #{plantingDensity}</if>
+            <if test="seedSource != null  and seedSource != ''"> and p.seed_source = #{seedSource}</if>
+            <if test="status != null  and status != ''"> and p.status = #{status}</if>
+            <if test="notes != null  and notes != ''"> and p.remark like concat('%', #{notes}, '%')</if>
+        </where>
+        order by p.create_time desc, p.planting_date desc
+    </select>
+    
+    <select id="selectPlantingRecordByPlantingId" parameterType="Long" resultMap="PlantingRecordResult">
+        <include refid="selectPlantingRecordVo"/>
+        where p.planting_id = #{plantingId}
+    </select>
+        
+    <insert id="insertPlantingRecord" parameterType="PlantingRecord" useGeneratedKeys="true" keyProperty="plantingId">
+        insert into planting_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="landId != null">land_id,</if>
+            <if test="speciesId != null">species_id,</if>
+            <if test="plantingArea != null">planting_area,</if>
+            <if test="plantingDate != null">planting_date,</if>
+            <if test="expectedHarvestDate != null">expected_harvest_date,</if>
+            <if test="actualHarvestDate != null">actual_harvest_date,</if>
+            <if test="growthStage != null and growthStage != ''">growth_stage,</if>
+            <if test="healthStatus != null and healthStatus != ''">health_status,</if>
+            <if test="diseaseInfo != null and diseaseInfo != ''">disease_info,</if>
+            <if test="pestInfo != null and pestInfo != ''">pest_info,</if>
+            <if test="plantingDensity != null">planting_density,</if>
+            <if test="plantingQuantity != null">seed_quantity,</if>
+            <if test="seedSource != null and seedSource != ''">seed_source,</if>
+            <if test="isMature != null and isMature != ''">is_mature,</if>
+            <if test="canHarvest != null and canHarvest != ''">can_harvest,</if>
+            <if test="(isMature == null or isMature == '') and maturity != null and maturity != ''">is_mature,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="notes != null and notes != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="landId != null">#{landId},</if>
+            <if test="speciesId != null">#{speciesId},</if>
+            <if test="plantingArea != null">#{plantingArea},</if>
+            <if test="plantingDate != null">#{plantingDate},</if>
+            <if test="expectedHarvestDate != null">#{expectedHarvestDate},</if>
+            <if test="actualHarvestDate != null">#{actualHarvestDate},</if>
+            <if test="growthStage != null and growthStage != ''">#{growthStage},</if>
+            <if test="healthStatus != null and healthStatus != ''">#{healthStatus},</if>
+            <if test="diseaseInfo != null and diseaseInfo != ''">#{diseaseInfo},</if>
+            <if test="pestInfo != null and pestInfo != ''">#{pestInfo},</if>
+            <if test="plantingDensity != null">#{plantingDensity},</if>
+            <if test="plantingQuantity != null">#{plantingQuantity},</if>
+            <if test="seedSource != null and seedSource != ''">#{seedSource},</if>
+            <if test="isMature != null and isMature != ''">#{isMature},</if>
+            <if test="canHarvest != null and canHarvest != ''">#{canHarvest},</if>
+            <if test="(isMature == null or isMature == '') and maturity != null and maturity != ''">#{maturity},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="notes != null and notes != ''">#{notes},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePlantingRecord" parameterType="PlantingRecord">
+        update planting_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="landId != null">land_id = #{landId},</if>
+            <if test="speciesId != null">species_id = #{speciesId},</if>
+            <if test="plantingArea != null">planting_area = #{plantingArea},</if>
+            <if test="plantingDate != null">planting_date = #{plantingDate},</if>
+            <if test="expectedHarvestDate != null">expected_harvest_date = #{expectedHarvestDate},</if>
+            <if test="actualHarvestDate != null">actual_harvest_date = #{actualHarvestDate},</if>
+            <if test="growthStage != null and growthStage != ''">growth_stage = #{growthStage},</if>
+            <if test="healthStatus != null and healthStatus != ''">health_status = #{healthStatus},</if>
+            <if test="diseaseInfo != null and diseaseInfo != ''">disease_info = #{diseaseInfo},</if>
+            <if test="pestInfo != null and pestInfo != ''">pest_info = #{pestInfo},</if>
+            <if test="plantingDensity != null">planting_density = #{plantingDensity},</if>
+            <if test="plantingQuantity != null">seed_quantity = #{plantingQuantity},</if>
+            <if test="seedSource != null and seedSource != ''">seed_source = #{seedSource},</if>
+            <if test="isMature != null and isMature != ''">is_mature = #{isMature},</if>
+            <if test="canHarvest != null and canHarvest != ''">can_harvest = #{canHarvest},</if>
+            <if test="(isMature == null or isMature == '') and maturity != null and maturity != ''">is_mature = #{maturity},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="notes != null and notes != ''">remark = #{notes},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where planting_id = #{plantingId}
+    </update>
+
+    <delete id="deletePlantingRecordByPlantingId" parameterType="Long">
+        delete from planting_record where planting_id = #{plantingId}
+    </delete>
+
+    <delete id="deletePlantingRecordByPlantingIds" parameterType="String">
+        delete from planting_record where planting_id in 
+        <foreach item="plantingId" collection="array" open="(" separator="," close=")">
+            #{plantingId}
+        </foreach>
+    </delete>
+</mapper>

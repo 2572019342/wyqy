@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="wyqy.agriculture.mapper.LandInfoMapper">
+    
+    <resultMap type="LandInfo" id="LandInfoResult">
+        <result property="landId"               column="land_id"               />
+        <result property="landName"             column="land_name"             />
+        <result property="landCode"             column="land_code"             />
+        <result property="landArea"             column="land_area"             />
+        <result property="location"             column="location"             />
+        <result property="soilType"             column="soil_type"             />
+        <result property="soilPh"               column="soil_ph"               />
+        <result property="organicMatter"        column="organic_matter"        />
+        <result property="nitrogenContent"      column="nitrogen_content"      />
+        <result property="phosphorusContent"    column="phosphorus_content"    />
+        <result property="potassiumContent"     column="potassium_content"     />
+        <result property="irrigationMethod"     column="irrigation_method"     />
+        <result property="drainageCondition"    column="drainage_condition"    />
+        <result property="status"               column="status"                />
+        <result property="notes"                column="notes"                 />
+        <result property="createBy"             column="create_by"             />
+        <result property="createTime"           column="create_time"           />
+        <result property="updateBy"             column="update_by"             />
+        <result property="updateTime"           column="update_time"           />
+    </resultMap>
+
+    <sql id="selectLandInfoVo">
+        select land_id, land_name, land_code, area as land_area, location, soil_type, soil_ph, soil_organic_matter as organic_matter, soil_nitrogen as nitrogen_content, soil_phosphorus as phosphorus_content, soil_potassium as potassium_content, irrigation_type as irrigation_method, drainage_condition, status, create_by, create_time, update_by, update_time, remark as notes from land_info
+    </sql>
+
+    <select id="selectLandInfoList" parameterType="LandInfo" resultMap="LandInfoResult">
+        <include refid="selectLandInfoVo"/>
+        <where>  
+            <if test="landName != null  and landName != ''"> and land_name like concat('%', #{landName}, '%')</if>
+            <if test="landCode != null  and landCode != ''"> and land_code = #{landCode}</if>
+            <if test="landArea != null "> and area = #{landArea}</if>
+            <if test="location != null  and location != ''"> and location like concat('%', #{location}, '%')</if>
+            <if test="soilType != null  and soilType != ''"> and soil_type = #{soilType}</if>
+            <if test="soilPh != null "> and soil_ph = #{soilPh}</if>
+            <if test="organicMatter != null "> and soil_organic_matter = #{organicMatter}</if>
+            <if test="nitrogenContent != null "> and soil_nitrogen = #{nitrogenContent}</if>
+            <if test="phosphorusContent != null "> and soil_phosphorus = #{phosphorusContent}</if>
+            <if test="potassiumContent != null "> and soil_potassium = #{potassiumContent}</if>
+            <if test="irrigationMethod != null  and irrigationMethod != ''"> and irrigation_type = #{irrigationMethod}</if>
+            <if test="drainageCondition != null  and drainageCondition != ''"> and drainage_condition = #{drainageCondition}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectLandInfoByLandId" parameterType="Long" resultMap="LandInfoResult">
+        <include refid="selectLandInfoVo"/>
+        where land_id = #{landId}
+    </select>
+        
+    <insert id="insertLandInfo" parameterType="LandInfo" useGeneratedKeys="true" keyProperty="landId">
+        insert into land_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="landName != null and landName != ''">land_name,</if>
+            <if test="landCode != null and landCode != ''">land_code,</if>
+            <if test="landArea != null">area,</if>
+            <if test="location != null and location != ''">location,</if>
+            <if test="soilType != null and soilType != ''">soil_type,</if>
+            <if test="soilPh != null">soil_ph,</if>
+            <if test="organicMatter != null">soil_organic_matter,</if>
+            <if test="nitrogenContent != null">soil_nitrogen,</if>
+            <if test="phosphorusContent != null">soil_phosphorus,</if>
+            <if test="potassiumContent != null">soil_potassium,</if>
+            <if test="irrigationMethod != null and irrigationMethod != ''">irrigation_type,</if>
+            <if test="drainageCondition != null and drainageCondition != ''">drainage_condition,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="notes != null and notes != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="landName != null and landName != ''">#{landName},</if>
+            <if test="landCode != null and landCode != ''">#{landCode},</if>
+            <if test="landArea != null">#{landArea},</if>
+            <if test="location != null and location != ''">#{location},</if>
+            <if test="soilType != null and soilType != ''">#{soilType},</if>
+            <if test="soilPh != null">#{soilPh},</if>
+            <if test="organicMatter != null">#{organicMatter},</if>
+            <if test="nitrogenContent != null">#{nitrogenContent},</if>
+            <if test="phosphorusContent != null">#{phosphorusContent},</if>
+            <if test="potassiumContent != null">#{potassiumContent},</if>
+            <if test="irrigationMethod != null and irrigationMethod != ''">#{irrigationMethod},</if>
+            <if test="drainageCondition != null and drainageCondition != ''">#{drainageCondition},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="notes != null and notes != ''">#{notes},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateLandInfo" parameterType="LandInfo">
+        update land_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="landName != null and landName != ''">land_name = #{landName},</if>
+            <if test="landCode != null and landCode != ''">land_code = #{landCode},</if>
+            <if test="landArea != null">area = #{landArea},</if>
+            <if test="location != null and location != ''">location = #{location},</if>
+            <if test="soilType != null and soilType != ''">soil_type = #{soilType},</if>
+            <if test="soilPh != null">soil_ph = #{soilPh},</if>
+            <if test="organicMatter != null">soil_organic_matter = #{organicMatter},</if>
+            <if test="nitrogenContent != null">soil_nitrogen = #{nitrogenContent},</if>
+            <if test="phosphorusContent != null">soil_phosphorus = #{phosphorusContent},</if>
+            <if test="potassiumContent != null">soil_potassium = #{potassiumContent},</if>
+            <if test="irrigationMethod != null and irrigationMethod != ''">irrigation_type = #{irrigationMethod},</if>
+            <if test="drainageCondition != null and drainageCondition != ''">drainage_condition = #{drainageCondition},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="notes != null and notes != ''">remark = #{notes},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where land_id = #{landId}
+    </update>
+
+    <delete id="deleteLandInfoByLandId" parameterType="Long">
+        delete from land_info where land_id = #{landId}
+    </delete>
+
+    <delete id="deleteLandInfoByLandIds" parameterType="String">
+        delete from land_info where land_id in 
+        <foreach item="landId" collection="array" open="(" separator="," close=")">
+            #{landId}
+        </foreach>
+    </delete>
+</mapper>

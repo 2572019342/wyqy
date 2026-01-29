@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="wyqy.agriculture.mapper.FarmingManagementMapper">
+    
+    <resultMap type="FarmingManagement" id="FarmingManagementResult">
+        <result property="farmingId"           column="management_id"        />
+        <result property="plantingId"          column="planting_id"          />
+        <result property="landName"            column="land_name"            />
+        <result property="speciesName"         column="species_name"         />
+        <result property="managementType"     column="management_type"      />
+        <result property="managementDate"     column="management_date"      />
+        <result property="materialName"        column="material_name"        />
+        <result property="materialType"        column="material_type"        />
+        <result property="dosage"              column="dosage"               />
+        <result property="unit"                column="unit"                 />
+        <result property="method"              column="method"               />
+        <result property="purpose"             column="purpose"              />
+        <result property="effect"              column="effect"               />
+        <result property="cost"                column="cost"                 />
+        <result property="operator"            column="operator"             />
+        <result property="weatherCondition"    column="weather_condition"    />
+        <result property="nextManagementDate" column="next_management_date" />
+        <result property="notes"               column="notes"                />
+        <result property="createBy"            column="create_by"            />
+        <result property="createTime"          column="create_time"          />
+        <result property="updateBy"            column="update_by"            />
+        <result property="updateTime"          column="update_time"          />
+    </resultMap>
+
+    <sql id="selectFarmingManagementVo">
+        select f.management_id,
+               f.planting_id,
+               l.land_name,
+               s.species_name,
+               f.management_type,
+               f.management_date,
+               f.material_name,
+               f.material_type,
+               f.dosage,
+               f.unit,
+               f.method,
+               f.purpose,
+               f.effect,
+               f.cost,
+               f.operator,
+               f.weather_condition,
+               f.next_management_date,
+               f.notes,
+               f.create_by,
+               f.create_time,
+               f.update_by,
+               f.update_time
+        from farming_management f
+        left join planting_record p on f.planting_id = p.planting_id
+        left join land_info l on p.land_id = l.land_id
+        left join crop_species s on p.species_id = s.species_id
+    </sql>
+
+    <select id="selectFarmingManagementList" parameterType="FarmingManagement" resultMap="FarmingManagementResult">
+        <include refid="selectFarmingManagementVo"/>
+        <where>  
+            <if test="plantingId != null "> and f.planting_id = #{plantingId}</if>
+            <if test="managementType != null  and managementType != ''"> and f.management_type = #{managementType}</if>
+            <if test="managementDate != null "> and f.management_date = #{managementDate}</if>
+            <if test="materialName != null  and materialName != ''"> and f.material_name like concat('%', #{materialName}, '%')</if>
+            <if test="materialType != null  and materialType != ''"> and f.material_type = #{materialType}</if>
+            <if test="dosage != null "> and f.dosage = #{dosage}</if>
+            <if test="unit != null  and unit != ''"> and f.unit = #{unit}</if>
+            <if test="cost != null "> and f.cost = #{cost}</if>
+            <if test="method != null  and method != ''"> and f.method = #{method}</if>
+            <if test="purpose != null  and purpose != ''"> and f.purpose = #{purpose}</if>
+            <if test="effect != null  and effect != ''"> and f.effect = #{effect}</if>
+            <if test="operator != null  and operator != ''"> and f.operator like concat('%', #{operator}, '%')</if>
+            <if test="weatherCondition != null  and weatherCondition != ''"> and f.weather_condition = #{weatherCondition}</if>
+            <if test="nextManagementDate != null "> and f.next_management_date = #{nextManagementDate}</if>
+            <if test="notes != null  and notes != ''"> and f.notes like concat('%', #{notes}, '%')</if>
+        </where>
+        order by f.create_time desc, f.management_date desc
+    </select>
+    
+    <select id="selectFarmingManagementByFarmingId" parameterType="Long" resultMap="FarmingManagementResult">
+        <include refid="selectFarmingManagementVo"/>
+        where f.management_id = #{farmingId}
+    </select>
+        
+    <insert id="insertFarmingManagement" parameterType="FarmingManagement" useGeneratedKeys="true" keyProperty="farmingId">
+        insert into farming_management
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="plantingId != null">planting_id,</if>
+            <if test="managementType != null and managementType != ''">management_type,</if>
+            <if test="managementDate != null">management_date,</if>
+            <if test="materialName != null and materialName != ''">material_name,</if>
+            <if test="materialType != null and materialType != ''">material_type,</if>
+            <if test="dosage != null">dosage,</if>
+            <if test="unit != null and unit != ''">unit,</if>
+            <if test="method != null and method != ''">method,</if>
+            <if test="purpose != null and purpose != ''">purpose,</if>
+            <if test="effect != null and effect != ''">effect,</if>
+            <if test="cost != null">cost,</if>
+            <if test="operator != null and operator != ''">operator,</if>
+            <if test="weatherCondition != null and weatherCondition != ''">weather_condition,</if>
+            <if test="nextManagementDate != null">next_management_date,</if>
+            <if test="notes != null and notes != ''">notes,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="plantingId != null">#{plantingId},</if>
+            <if test="managementType != null and managementType != ''">#{managementType},</if>
+            <if test="managementDate != null">#{managementDate},</if>
+            <if test="materialName != null and materialName != ''">#{materialName},</if>
+            <if test="materialType != null and materialType != ''">#{materialType},</if>
+            <if test="dosage != null">#{dosage},</if>
+            <if test="unit != null and unit != ''">#{unit},</if>
+            <if test="method != null and method != ''">#{method},</if>
+            <if test="purpose != null and purpose != ''">#{purpose},</if>
+            <if test="effect != null and effect != ''">#{effect},</if>
+            <if test="cost != null">#{cost},</if>
+            <if test="operator != null and operator != ''">#{operator},</if>
+            <if test="weatherCondition != null and weatherCondition != ''">#{weatherCondition},</if>
+            <if test="nextManagementDate != null">#{nextManagementDate},</if>
+            <if test="notes != null and notes != ''">#{notes},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFarmingManagement" parameterType="FarmingManagement">
+        update farming_management
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="plantingId != null">planting_id = #{plantingId},</if>
+            <if test="managementType != null and managementType != ''">management_type = #{managementType},</if>
+            <if test="managementDate != null">management_date = #{managementDate},</if>
+            <if test="materialName != null and materialName != ''">material_name = #{materialName},</if>
+            <if test="materialType != null and materialType != ''">material_type = #{materialType},</if>
+            <if test="dosage != null">dosage = #{dosage},</if>
+            <if test="unit != null and unit != ''">unit = #{unit},</if>
+            <if test="method != null and method != ''">method = #{method},</if>
+            <if test="purpose != null and purpose != ''">purpose = #{purpose},</if>
+            <if test="effect != null and effect != ''">effect = #{effect},</if>
+            <if test="cost != null">cost = #{cost},</if>
+            <if test="operator != null and operator != ''">operator = #{operator},</if>
+            <if test="weatherCondition != null and weatherCondition != ''">weather_condition = #{weatherCondition},</if>
+            <if test="nextManagementDate != null">next_management_date = #{nextManagementDate},</if>
+            <if test="notes != null and notes != ''">notes = #{notes},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where management_id = #{farmingId}
+    </update>
+
+    <delete id="deleteFarmingManagementByFarmingId" parameterType="Long">
+        delete from farming_management where management_id = #{farmingId}
+    </delete>
+
+    <delete id="deleteFarmingManagementByFarmingIds" parameterType="String">
+        delete from farming_management where management_id in 
+        <foreach item="farmingId" collection="array" open="(" separator="," close=")">
+            #{farmingId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteFarmingManagementByPlantingIds" parameterType="String">
+        delete from farming_management where planting_id in 
+        <foreach item="plantingId" collection="array" open="(" separator="," close=")">
+            #{plantingId}
+        </foreach>
+    </delete>
+</mapper>

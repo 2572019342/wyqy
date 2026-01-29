@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="wyqy.agriculture.mapper.HarvestRecordMapper">
+    
+    <resultMap type="HarvestRecord" id="HarvestRecordResult">
+        <result property="harvestId"            column="harvest_id"            />
+        <result property="plantingId"           column="planting_id"           />
+        <result property="landName"             column="land_name"             />
+        <result property="speciesName"          column="species_name"          />
+        <result property="harvestDate"          column="harvest_date"          />
+        <result property="harvestArea"          column="harvest_area"          />
+        <result property="harvestQuantity"      column="harvest_quantity"      />
+        <result property="qualityGrade"         column="quality_grade"         />
+        <result property="unitPrice"            column="unit_price"            />
+        <result property="totalPrice"           column="total_price"           />
+        <result property="harvestMethod"        column="harvest_method"        />
+        <result property="operator"             column="operator"             />
+        <result property="storageLocation"      column="storage_location"      />
+        <result property="storageConditions"    column="storage_conditions"    />
+        <result property="buyer"                column="buyer"                 />
+        <result property="transportMethod"      column="transport_method"      />
+        <result property="notes"                column="notes"                 />
+        <result property="createBy"             column="create_by"             />
+        <result property="createTime"           column="create_time"           />
+        <result property="updateBy"             column="update_by"             />
+        <result property="updateTime"           column="update_time"           />
+    </resultMap>
+
+    <sql id="selectHarvestRecordVo">
+        select h.harvest_id, h.planting_id, l.land_name, s.species_name, h.harvest_date, 
+               h.harvest_area, h.harvest_quantity, h.quality_grade, h.unit_price, h.total_price, 
+               h.harvest_method, h.operator, h.storage_location, h.storage_conditions, 
+               h.buyer, h.transport_method, h.create_by, h.create_time, h.update_by, 
+               h.update_time, h.notes
+        from harvest_record h
+        left join planting_record p on h.planting_id = p.planting_id
+        left join land_info l on p.land_id = l.land_id
+        left join crop_species s on p.species_id = s.species_id
+    </sql>
+
+    <select id="selectHarvestRecordList" parameterType="HarvestRecord" resultMap="HarvestRecordResult">
+        <include refid="selectHarvestRecordVo"/>
+        <where>  
+            <if test="plantingId != null "> and h.planting_id = #{plantingId}</if>
+            <if test="landName != null  and landName != ''"> and l.land_name like concat('%', #{landName}, '%')</if>
+            <if test="speciesName != null  and speciesName != ''"> and s.species_name like concat('%', #{speciesName}, '%')</if>
+            <if test="harvestDate != null "> and h.harvest_date = #{harvestDate}</if>
+            <if test="harvestArea != null "> and h.harvest_area = #{harvestArea}</if>
+            <if test="harvestQuantity != null "> and h.harvest_quantity = #{harvestQuantity}</if>
+            <if test="qualityGrade != null  and qualityGrade != ''"> and h.quality_grade = #{qualityGrade}</if>
+            <if test="unitPrice != null "> and h.unit_price = #{unitPrice}</if>
+            <if test="totalPrice != null "> and h.total_price = #{totalPrice}</if>
+            <if test="harvestMethod != null  and harvestMethod != ''"> and h.harvest_method = #{harvestMethod}</if>
+            <if test="operator != null  and operator != ''"> and h.operator like concat('%', #{operator}, '%')</if>
+            <if test="storageLocation != null  and storageLocation != ''"> and h.storage_location = #{storageLocation}</if>
+            <if test="storageConditions != null  and storageConditions != ''"> and h.storage_conditions = #{storageConditions}</if>
+            <if test="buyer != null  and buyer != ''"> and h.buyer like concat('%', #{buyer}, '%')</if>
+            <if test="transportMethod != null  and transportMethod != ''"> and h.transport_method = #{transportMethod}</if>
+            <if test="inspectionResult != null  and inspectionResult != ''"> and h.inspection_result = #{inspectionResult}</if>
+            <if test="inspector != null  and inspector != ''"> and h.inspector like concat('%', #{inspector}, '%')</if>
+            <if test="inspectionTime != null "> and h.inspection_time = #{inspectionTime}</if>
+            <if test="notes != null  and notes != ''"> and h.notes like concat('%', #{notes}, '%')</if>
+        </where>
+        order by h.create_time desc, h.harvest_date desc
+    </select>
+    
+    <select id="selectHarvestRecordByHarvestId" parameterType="Long" resultMap="HarvestRecordResult">
+        <include refid="selectHarvestRecordVo"/>
+        where h.harvest_id = #{harvestId}
+    </select>
+        
+    <insert id="insertHarvestRecord" parameterType="HarvestRecord" useGeneratedKeys="true" keyProperty="harvestId">
+        insert into harvest_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="plantingId != null">planting_id,</if>
+            <if test="landName != null and landName != ''">land_name,</if>
+            <if test="speciesName != null and speciesName != ''">species_name,</if>
+            <if test="harvestDate != null">harvest_date,</if>
+            <if test="harvestArea != null">harvest_area,</if>
+            <if test="harvestQuantity != null">harvest_quantity,</if>
+            <if test="qualityGrade != null and qualityGrade != ''">quality_grade,</if>
+            <if test="unitPrice != null">unit_price,</if>
+            <if test="totalPrice != null">total_price,</if>
+            <if test="harvestMethod != null and harvestMethod != ''">harvest_method,</if>
+            <if test="operator != null and operator != ''">operator,</if>
+            <if test="storageLocation != null and storageLocation != ''">storage_location,</if>
+            <if test="storageConditions != null and storageConditions != ''">storage_conditions,</if>
+            <if test="buyer != null and buyer != ''">buyer,</if>
+            <if test="transportMethod != null and transportMethod != ''">transport_method,</if>
+            <if test="inspectionResult != null and inspectionResult != ''">inspection_result,</if>
+            <if test="inspector != null and inspector != ''">inspector,</if>
+            <if test="inspectionTime != null">inspection_time,</if>
+            <if test="notes != null and notes != ''">notes,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="plantingId != null">#{plantingId},</if>
+            <if test="landName != null and landName != ''">#{landName},</if>
+            <if test="speciesName != null and speciesName != ''">#{speciesName},</if>
+            <if test="harvestDate != null">#{harvestDate},</if>
+            <if test="harvestArea != null">#{harvestArea},</if>
+            <if test="harvestQuantity != null">#{harvestQuantity},</if>
+            <if test="qualityGrade != null and qualityGrade != ''">#{qualityGrade},</if>
+            <if test="unitPrice != null">#{unitPrice},</if>
+            <if test="totalPrice != null">#{totalPrice},</if>
+            <if test="harvestMethod != null and harvestMethod != ''">#{harvestMethod},</if>
+            <if test="operator != null and operator != ''">#{operator},</if>
+            <if test="storageLocation != null and storageLocation != ''">#{storageLocation},</if>
+            <if test="storageConditions != null and storageConditions != ''">#{storageConditions},</if>
+            <if test="buyer != null and buyer != ''">#{buyer},</if>
+            <if test="transportMethod != null and transportMethod != ''">#{transportMethod},</if>
+            <if test="inspectionResult != null and inspectionResult != ''">#{inspectionResult},</if>
+            <if test="inspector != null and inspector != ''">#{inspector},</if>
+            <if test="inspectionTime != null">#{inspectionTime},</if>
+            <if test="notes != null and notes != ''">#{notes},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHarvestRecord" parameterType="HarvestRecord">
+        update harvest_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="plantingId != null">planting_id = #{plantingId},</if>
+            <if test="landName != null and landName != ''">land_name = #{landName},</if>
+            <if test="speciesName != null and speciesName != ''">species_name = #{speciesName},</if>
+            <if test="harvestDate != null">harvest_date = #{harvestDate},</if>
+            <if test="harvestArea != null">harvest_area = #{harvestArea},</if>
+            <if test="harvestQuantity != null">harvest_quantity = #{harvestQuantity},</if>
+            <if test="qualityGrade != null and qualityGrade != ''">quality_grade = #{qualityGrade},</if>
+            <if test="unitPrice != null">unit_price = #{unitPrice},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+            <if test="harvestMethod != null and harvestMethod != ''">harvest_method = #{harvestMethod},</if>
+            <if test="operator != null and operator != ''">operator = #{operator},</if>
+            <if test="storageLocation != null and storageLocation != ''">storage_location = #{storageLocation},</if>
+            <if test="storageConditions != null and storageConditions != ''">storage_conditions = #{storageConditions},</if>
+            <if test="buyer != null and buyer != ''">buyer = #{buyer},</if>
+            <if test="transportMethod != null and transportMethod != ''">transport_method = #{transportMethod},</if>
+            <if test="inspectionResult != null and inspectionResult != ''">inspection_result = #{inspectionResult},</if>
+            <if test="inspector != null and inspector != ''">inspector = #{inspector},</if>
+            <if test="inspectionTime != null">inspection_time = #{inspectionTime},</if>
+            <if test="notes != null and notes != ''">notes = #{notes},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where harvest_id = #{harvestId}
+    </update>
+
+    <delete id="deleteHarvestRecordByHarvestId" parameterType="Long">
+        delete from harvest_record where harvest_id = #{harvestId}
+    </delete>
+
+    <delete id="deleteHarvestRecordByHarvestIds" parameterType="String">
+        delete from harvest_record where harvest_id in 
+        <foreach item="harvestId" collection="array" open="(" separator="," close=")">
+            #{harvestId}
+        </foreach>
+    </delete>
+
+    <select id="selectHarvestedPlantingIds" resultType="java.lang.Long">
+        select distinct planting_id from harvest_record
+    </select>
+
+    <delete id="deleteHarvestRecordByPlantingIds" parameterType="String">
+        delete from harvest_record where planting_id in 
+        <foreach item="plantingId" collection="array" open="(" separator="," close=")">
+            #{plantingId}
+        </foreach>
+    </delete>
+</mapper>
