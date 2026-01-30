@@ -36,7 +36,7 @@ export default {
       loading: true,
       error: false,
       errorMessage: "",
-      smartScreenUrl: "http://192.168.1.247:1145"
+      smartScreenUrl: "http://192.168.1.103:1145"
     };
   },
   created() {
