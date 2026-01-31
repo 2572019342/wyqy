@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.agriculture.mapper.AiPestDetectionMapper">
+    
+    <resultMap type="AiPestDetection" id="AiPestDetectionResult">
+        <result property="detectionId"    column="detection_id"    />
+        <result property="landId"        column="land_id"         />
+        <result property="landName"      column="land_name"       />
+        <result property="speciesId"     column="species_id"      />
+        <result property="speciesName"   column="species_name"    />
+        <result property="detectionType"  column="detection_type"  />
+        <result property="pestName"      column="pest_name"        />
+        <result property="confidence"    column="confidence"       />
+        <result property="imagePath"     column="image_path"       />
+        <result property="frameTimestamp" column="frame_timestamp" />
+        <result property="processStatus" column="process_status"   />
+        <result property="recommendation" column="recommendation"  />
+        <result property="isProcessed"   column="is_processed"     />
+        <result property="processTime"   column="process_time"     />
+        <result property="processBy"     column="process_by"       />
+        <result property="detectionTime" column="detection_time"   />
+        <result property="createBy"      column="create_by"        />
+        <result property="createTime"    column="create_time"      />
+        <result property="updateBy"      column="update_by"        />
+        <result property="updateTime"    column="update_time"      />
+        <result property="remark"        column="remark"           />
+    </resultMap>
+
+    <sql id="selectAiPestDetectionVo">
+        select detection_id, land_id, land_name, species_id, species_name, detection_type, pest_name, confidence, image_path, frame_timestamp, process_status, recommendation, is_processed, process_time, process_by, detection_time, create_by, create_time, update_by, update_time, remark from ai_pest_detection
+    </sql>
+
+    <select id="selectAiPestDetectionList" parameterType="AiPestDetection" resultMap="AiPestDetectionResult">
+        <include refid="selectAiPestDetectionVo"/>
+        <where>  
+            <if test="landId != null "> and land_id = #{landId}</if>
+            <if test="landName != null  and landName != ''"> and land_name like concat('%', #{landName}, '%')</if>
+            <if test="speciesId != null "> and species_id = #{speciesId}</if>
+            <if test="speciesName != null  and speciesName != ''"> and species_name like concat('%', #{speciesName}, '%')</if>
+            <if test="detectionType != null  and detectionType != ''"> and detection_type = #{detectionType}</if>
+            <if test="pestName != null  and pestName != ''"> and pest_name like concat('%', #{pestName}, '%')</if>
+            <if test="confidence != null "> and confidence = #{confidence}</if>
+            <if test="processStatus != null  and processStatus != ''"> and process_status = #{processStatus}</if>
+            <if test="isProcessed != null  and isProcessed != ''"> and is_processed = #{isProcessed}</if>
+            <if test="processBy != null  and processBy != ''"> and process_by like concat('%', #{processBy}, '%')</if>
+            <if test="detectionTime != null "> and detection_time = #{detectionTime}</if>
+        </where>
+        order by detection_time desc
+    </select>
+    
+    <select id="selectAiPestDetectionByDetectionId" parameterType="Long" resultMap="AiPestDetectionResult">
+        <include refid="selectAiPestDetectionVo"/>
+        where detection_id = #{detectionId}
+    </select>
+        
+    <insert id="insertAiPestDetection" parameterType="AiPestDetection" useGeneratedKeys="true" keyProperty="detectionId">
+        insert into ai_pest_detection
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="landId != null">land_id,</if>
+            <if test="landName != null and landName != ''">land_name,</if>
+            <if test="speciesId != null">species_id,</if>
+            <if test="speciesName != null and speciesName != ''">species_name,</if>
+            <if test="detectionType != null and detectionType != ''">detection_type,</if>
+            <if test="pestName != null and pestName != ''">pest_name,</if>
+            <if test="confidence != null">confidence,</if>
+            <if test="imagePath != null and imagePath != ''">image_path,</if>
+            <if test="frameTimestamp != null">frame_timestamp,</if>
+            <if test="processStatus != null and processStatus != ''">process_status,</if>
+            <if test="recommendation != null and recommendation != ''">recommendation,</if>
+            <if test="isProcessed != null and isProcessed != ''">is_processed,</if>
+            <if test="processTime != null">process_time,</if>
+            <if test="processBy != null and processBy != ''">process_by,</if>
+            <if test="detectionTime != null">detection_time,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="landId != null">#{landId},</if>
+            <if test="landName != null and landName != ''">#{landName},</if>
+            <if test="speciesId != null">#{speciesId},</if>
+            <if test="speciesName != null and speciesName != ''">#{speciesName},</if>
+            <if test="detectionType != null and detectionType != ''">#{detectionType},</if>
+            <if test="pestName != null and pestName != ''">#{pestName},</if>
+            <if test="confidence != null">#{confidence},</if>
+            <if test="imagePath != null and imagePath != ''">#{imagePath},</if>
+            <if test="frameTimestamp != null">#{frameTimestamp},</if>
+            <if test="processStatus != null and processStatus != ''">#{processStatus},</if>
+            <if test="recommendation != null and recommendation != ''">#{recommendation},</if>
+            <if test="isProcessed != null and isProcessed != ''">#{isProcessed},</if>
+            <if test="processTime != null">#{processTime},</if>
+            <if test="processBy != null and processBy != ''">#{processBy},</if>
+            <if test="detectionTime != null">#{detectionTime},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAiPestDetection" parameterType="AiPestDetection">
+        update ai_pest_detection
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="landId != null">land_id = #{landId},</if>
+            <if test="landName != null and landName != ''">land_name = #{landName},</if>
+            <if test="speciesId != null">species_id = #{speciesId},</if>
+            <if test="speciesName != null and speciesName != ''">species_name = #{speciesName},</if>
+            <if test="detectionType != null and detectionType != ''">detection_type = #{detectionType},</if>
+            <if test="pestName != null and pestName != ''">pest_name = #{pestName},</if>
+            <if test="confidence != null">confidence = #{confidence},</if>
+            <if test="imagePath != null and imagePath != ''">image_path = #{imagePath},</if>
+            <if test="frameTimestamp != null">frame_timestamp = #{frameTimestamp},</if>
+            <if test="processStatus != null and processStatus != ''">process_status = #{processStatus},</if>
+            <if test="recommendation != null and recommendation != ''">recommendation = #{recommendation},</if>
+            <if test="isProcessed != null and isProcessed != ''">is_processed = #{isProcessed},</if>
+            <if test="processTime != null">process_time = #{processTime},</if>
+            <if test="processBy != null and processBy != ''">process_by = #{processBy},</if>
+            <if test="detectionTime != null">detection_time = #{detectionTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where detection_id = #{detectionId}
+    </update>
+
+    <delete id="deleteAiPestDetectionByDetectionId" parameterType="Long">
+        delete from ai_pest_detection where detection_id = #{detectionId}
+    </delete>
+
+    <delete id="deleteAiPestDetectionByDetectionIds" parameterType="String">
+        delete from ai_pest_detection where detection_id in 
+        <foreach item="detectionId" collection="array" open="(" separator="," close=")">
+            #{detectionId}
+        </foreach>
+    </delete>
+    
+    <!-- 统计总识别次数 -->
+    <select id="countTotalDetections" resultType="int">
+        select count(*) from ai_pest_detection
+    </select>
+    
+    <!-- 根据类型统计识别次数 -->
+    <select id="countDetectionsByType" parameterType="String" resultType="int">
+        select count(*) from ai_pest_detection where detection_type = #{detectionType}
+    </select>
+    
+    <!-- 根据状态统计识别次数 -->
+    <select id="countDetectionsByStatus" parameterType="String" resultType="int">
+        select count(*) from ai_pest_detection where process_status = #{processStatus}
+    </select>
+    
+    <!-- 统计已处理数量 -->
+    <select id="countProcessedDetections" resultType="int">
+        select count(*) from ai_pest_detection where is_processed = '1'
+    </select>
+    
+    <!-- 统计今日识别数量 -->
+    <select id="countTodayDetections" resultType="int">
+        select count(*) from ai_pest_detection where DATE(detection_time) = CURDATE()
+    </select>
+    
+    <!-- 标记为已处理 -->
+    <update id="markAsProcessed" parameterType="Long">
+        update ai_pest_detection set is_processed = '1', process_time = NOW() where detection_id = #{detectionId}
+    </update>
+
+</mapper>
