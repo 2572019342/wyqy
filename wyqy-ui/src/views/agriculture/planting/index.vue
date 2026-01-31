@@ -343,7 +343,7 @@
       </el-descriptions>
     </el-dialog>
 
-    <!-- 虫害全屏警告对话框 -->
+    <!-- 光照不足提示对话框 -->
     <el-dialog 
       :visible.sync="showPestWarningDialog" 
       width="600px" 
@@ -355,10 +355,10 @@
       center>
       <div class="pest-warning-content">
         <div class="warning-icon">
-          <i class="el-icon-warning"></i>
+          <i class="el-icon-sunny"></i>
         </div>
-        <h2 class="warning-title">检测到虫害</h2>
-        <p class="warning-message">检测到虫害，请前往农事管理处理</p>
+        <h2 class="warning-title">检测到光照较低</h2>
+        <p class="warning-message">检测到光照较低，即将进行自动补光</p>
         <div v-if="currentAlert" class="alert-details">
           <div class="detail-row" v-if="currentAlert.landName">
             <i class="el-icon-location-outline"></i>
@@ -371,11 +371,11 @@
         </div>
         <div class="warning-actions">
           <el-button type="primary" size="medium" @click="handleGoToFarming" class="go-farming-btn">
-            <i class="el-icon-setting"></i>
-            前往农事管理
+            <i class="el-icon-sunny"></i>
+            确认
           </el-button>
           <el-button size="medium" @click="handleClosePestWarning" class="close-warning-btn">
-            稍后处理
+            取消
           </el-button>
         </div>
       </div>

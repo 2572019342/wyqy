@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 /**
  * 启动程序
  *
- * @author ruoyi
+ * @author wyqy
  */
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class wyqyApplication
@@ -19,3 +19,5 @@ public class wyqyApplication
         System.out.println("启动成功   ლ(´ڡ`ლ)ﾞ  \n");
     }
 }
+
+
