@@ -228,6 +228,7 @@
         <module>wyqy-quartz</module>
         <module>wyqy-generator</module>
         <module>wyqy-common</module>
+        <module>deng</module>
     </modules>
     <packaging>pom</packaging>
 

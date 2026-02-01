@@ -21,6 +21,7 @@ import wyqy.common.core.redis.RedisCache;
 import wyqy.common.enums.BusinessType;
 import wyqy.agriculture.domain.PlantingRecord;
 import wyqy.agriculture.service.IPlantingRecordService;
+import wyqy.web.service.LightAlarmService;
 import wyqy.common.utils.poi.ExcelUtil;
 import wyqy.common.core.page.TableDataInfo;
 
@@ -39,6 +40,9 @@ public class PlantingRecordController extends BaseController
     
     @Autowired
     private RedisCache redisCache;
+
+    @Autowired
+    private LightAlarmService lightAlarmService;
     
     // Redis中存储报警信息的key
     private static final String PEST_ALERT_KEY = "agriculture:pest:alert";
@@ -171,6 +175,9 @@ public class PlantingRecordController extends BaseController
             // 保存到Redis，设置24小时过期
             redisCache.setCacheObject(PEST_ALERT_KEY, alertInfo, 24 * 60 * 60, java.util.concurrent.TimeUnit.SECONDS);
             
+            // 小灯黄灯常亮（光照不足报警）
+            lightAlarmService.yellowSteady();
+            
             return success("报警已创建并同步到所有用户");
         } catch (Exception e) {
             return error("创建报警失败：" + e.getMessage());
@@ -222,6 +229,8 @@ public class PlantingRecordController extends BaseController
                 // 如果报警ID匹配，则删除报警信息（所有用户都不再显示）
                 if (currentAlertId.equals(alertId)) {
                     redisCache.deleteObject(PEST_ALERT_KEY);
+                    // 小灯熄灭（用户点击确认/取消后）
+                    lightAlarmService.turnOff();
                     return success("报警已处理，所有用户将不再显示此报警");
                 }
             }
@@ -229,6 +238,25 @@ public class PlantingRecordController extends BaseController
             return success("报警已处理");
         } catch (Exception e) {
             return error("标记已读失败：" + e.getMessage());
+        }
+    }
+    
+    /**
+     * 关闭小灯（Ctrl+4 快捷键调用）
+     */
+    @PreAuthorize("@ss.hasPermi('agriculture:planting:query')")
+    @PostMapping("/turnOffLight")
+    public AjaxResult turnOffLight()
+    {
+        try {
+            boolean ok = lightAlarmService.turnOff();
+            if (ok) {
+                return success("小灯已关闭");
+            } else {
+                return success("小灯控制不可用或已关闭");
+            }
+        } catch (Exception e) {
+            return error("关闭小灯失败：" + e.getMessage());
         }
     }
 }

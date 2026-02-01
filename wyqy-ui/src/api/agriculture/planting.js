@@ -103,3 +103,11 @@ export function markPestAlertRead(data) {
     data: data
   })
 }
+
+// 关闭小灯（Ctrl+4）
+export function turnOffLight() {
+  return request({
+    url: '/agriculture/planting/turnOffLight',
+    method: 'post'
+  })
+}

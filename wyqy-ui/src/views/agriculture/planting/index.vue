@@ -384,7 +384,7 @@
 </template>
 
 <script>
-import { listPlanting, getPlanting, delPlanting, addPlanting, updatePlanting, getPlantingStats, getLandPlantingInfo, createPestAlert, getPestAlert, markPestAlertRead } from "@/api/agriculture/planting";
+import { listPlanting, getPlanting, delPlanting, addPlanting, updatePlanting, getPlantingStats, getLandPlantingInfo, createPestAlert, getPestAlert, markPestAlertRead, turnOffLight } from "@/api/agriculture/planting";
 import { listLand } from "@/api/agriculture/land";
 import { listCropSpecies } from "@/api/agriculture/crop";
 
@@ -839,16 +839,118 @@ export default {
       if (isCtrlOrMeta && isNumberOne) {
         event.preventDefault();
         event.stopPropagation();
-        console.log('✓ 检测到 Ctrl+1，但当前有报警显示，跳过更新健康状况');
-        // 如果当前正在显示报警，不执行更新，防止重复报警
+        console.log('✓ 检测到 Ctrl+1');
+        // 如果当前正在显示报警，不执行，防止重复报警
         if (!this.showPestWarningDialog) {
-          console.log('✓ 开始更新健康状况');
-          this.updateLatestPlantingHealthStatus();
+          console.log('✓ 开始触发光照报警（不修改健康状况）');
+          this.triggerLightAlertOnly();
         }
         return false;
       }
+      
+      // 监听 Ctrl+4 键 - 关闭小灯
+      const isNumberFour = event.keyCode === 52 || event.key === '4' || event.code === 'Digit4';
+      if (isCtrlOrMeta && isNumberFour) {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log('✓ 检测到 Ctrl+4，关闭小灯');
+        this.handleTurnOffLight();
+        return false;
+      }
     },
-    /** 更新最新一条种植记录的健康状况为虫害 */
+    /** 关闭小灯（Ctrl+4） */
+    handleTurnOffLight() {
+      turnOffLight().then(() => {
+      }).catch(error => {
+        console.error('关闭小灯失败:', error);
+        this.$message.warning('关闭小灯失败');
+      });
+    },
+    triggerLightAlertOnly() {
+      console.log('开始触发光照报警（不修改健康状况）');
+      
+      if (!this.pollingEnabled) {
+        console.log('轮询已禁用，跳过报警');
+        return;
+      }
+      
+      // 如果当前正在显示报警，跳过
+      if (this.showPestWarningDialog) {
+        console.log('当前正在显示报警，跳过');
+        return;
+      }
+      
+      // 获取最新种植记录信息用于报警显示
+      listPlanting({
+        pageNum: 1,
+        pageSize: 1
+      }).then(response => {
+        if (response.rows && response.rows.length > 0) {
+          const latestPlanting = response.rows[0];
+          
+          // 创建报警并保存到Redis（会触发小灯黄灯常亮）
+          createPestAlert({
+            plantingId: latestPlanting.plantingId,
+            landName: latestPlanting.landName || '未知地块',
+            speciesName: latestPlanting.speciesName || '未知作物'
+          }).then(() => {
+            console.log('✅ 光照报警创建成功');
+            // 后端不返回 alertId，创建后立即拉取当前报警（含 alertId），用于弹窗与标记已读，避免切页回来重复弹
+            return getPestAlert();
+          }).then(res => {
+            const fallback = {
+              landName: latestPlanting.landName || '未知地块',
+              speciesName: latestPlanting.speciesName || '未知作物'
+            };
+            if (res && res.data && res.data.alertId != null) {
+              this.locallyCreatedAlertId = res.data.alertId;
+              this.showPestWarning(res.data);
+            } else {
+              this.showPestWarning(fallback);
+            }
+          }).catch(error => {
+            console.error('❌ 创建报警失败:', error);
+            this.showPestWarning({
+              landName: latestPlanting.landName || '未知地块',
+              speciesName: latestPlanting.speciesName || '未知作物'
+            });
+          });
+        } else {
+          // 没有种植记录，也可以触发报警
+          createPestAlert({
+            plantingId: null,
+            landName: '未知地块',
+            speciesName: '未知作物'
+          }).then(() => getPestAlert()).then(res => {
+            if (res && res.data && res.data.alertId != null) {
+              this.locallyCreatedAlertId = res.data.alertId;
+              this.showPestWarning(res.data);
+            } else {
+              this.showPestWarning({ landName: '未知地块', speciesName: '未知作物' });
+            }
+          }).catch(() => {
+            this.showPestWarning({ landName: '未知地块', speciesName: '未知作物' });
+          });
+        }
+      }).catch(error => {
+        console.error('获取种植记录失败:', error);
+        createPestAlert({
+          plantingId: null,
+          landName: '未知地块',
+          speciesName: '未知作物'
+        }).then(() => getPestAlert()).then(res => {
+          if (res && res.data && res.data.alertId != null) {
+            this.locallyCreatedAlertId = res.data.alertId;
+            this.showPestWarning(res.data);
+          } else {
+            this.showPestWarning({ landName: '未知地块', speciesName: '未知作物' });
+          }
+        }).catch(() => {
+          this.showPestWarning({ landName: '未知地块', speciesName: '未知作物' });
+        });
+      });
+    },
+    /** 更新最新一条种植记录的健康状况为虫害（已移至 realtime 页面 Ctrl+2 触发） */
     updateLatestPlantingHealthStatus() {
       console.log('开始更新最新种植记录的健康状况');
       
@@ -1190,27 +1292,24 @@ export default {
       console.log('拦截器已重置');
     },
     
-    /** 显示虫害全屏警告 */
     showPestWarning(alertInfo = null) {
       console.log('=== showPestWarning 被调用 ===');
       console.log('传入的报警信息:', alertInfo);
-      
-      // 使用拦截器检查
-      // if (alertInfo && !this.interceptAlert(alertInfo)) {
-      //   console.log('❌ 拦截器阻止了报警显示');
-      //   return;
-      // }
+
       
       if (alertInfo) {
         this.currentAlert = alertInfo;
         console.log('设置当前报警信息:', this.currentAlert);
+        // 立即标记为已显示（含 alertId 时），避免用户切走后返回页面时轮询再次弹出同一报警
+        const alertId = alertInfo.alertId != null ? (typeof alertInfo.alertId === 'number' ? alertInfo.alertId : parseInt(alertInfo.alertId) || alertInfo.alertId) : null;
+        if (alertId != null) {
+          this.markAlertAsDisplayed(alertId);
+        }
       }
       
       console.log('准备显示报警对话框');
       this.showPestWarningDialog = true;
-      
-      // 开始播放报警音频
-      // 使用 nextTick 确保对话框已显示（显示对话框也算用户交互的响应）
+
       this.$nextTick(() => {
         console.log('报警对话框已显示，开始播放音频');
         this.playAlarmAudio();
@@ -1268,9 +1367,6 @@ export default {
         });
       }
       
-      // 跳转到农事管理页面
-      console.log('准备跳转到农事管理页面');
-      this.$router.push('/agriculture/planting/farming');
       console.log('=== handleGoToFarming 处理完成 ===');
     },
     /** 关闭虫害警告 */

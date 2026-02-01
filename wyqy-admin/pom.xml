@@ -61,6 +61,13 @@
             <artifactId>wyqy-generator</artifactId>
         </dependency>
 
+        <!-- jSerialComm 串口通信（YX5285R 小灯控制）-->
+        <dependency>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>2.10.4</version>
+        </dependency>
+
     </dependencies>
 
     <build>

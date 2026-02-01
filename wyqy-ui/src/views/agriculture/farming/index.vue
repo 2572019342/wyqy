@@ -599,6 +599,27 @@ export default {
       });
     },
 
+    /** 获取种植管理统计数据（供统计卡片显示） */
+    getFarmingStatistics() {
+      getFarmingStats().then(response => {
+        const data = response.data || {};
+        const typeStats = data.managementTypeStats || {};
+        this.farmingStats = [
+          { icon: 'el-icon-s-operation', value: data.totalOperations ?? 0, label: '总管理次数' },
+          { icon: 'el-icon-present', value: typeStats.fertilizer ?? 0, label: '施肥次数' },
+          { icon: 'el-icon-warning', value: typeStats.pesticide ?? 0, label: '施药次数' },
+          { icon: 'el-icon-money', value: data.totalCost ?? 0, label: '总成本(元)' }
+        ];
+      }).catch(() => {
+        this.farmingStats = [
+          { icon: 'el-icon-s-operation', value: 0, label: '总管理次数' },
+          { icon: 'el-icon-present', value: 0, label: '施肥次数' },
+          { icon: 'el-icon-warning', value: 0, label: '施药次数' },
+          { icon: 'el-icon-money', value: 0, label: '总成本(元)' }
+        ];
+      });
+    },
+
     /** 查询任务列表 */
     getTaskList() {
       this.taskLoading = true;

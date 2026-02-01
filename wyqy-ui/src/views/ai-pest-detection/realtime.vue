@@ -158,6 +158,7 @@
 import { detectPest, getVideoStream, getDetectionStats, listAiPestDetection } from "@/api/agriculture/ai-pest-detection";
 import { listLand } from "@/api/agriculture/land";
 import { listCropSpecies } from "@/api/agriculture/crop";
+import { listPlanting, getPlanting, updatePlanting } from "@/api/agriculture/planting";
 
 export default {
   name: "RealtimeDetection",
@@ -423,6 +424,9 @@ export default {
           // 弹出识别结果提示框
           this.pestDetectionDialogVisible = true;
           this.getDetectionStatistics();
+          
+          // Ctrl+2 触发时修改最新种植记录的健康状况为虫害
+          this.updateLatestPlantingHealthStatus();
         } else {
           this.$message.error(response.msg || '识别失败');
         }
@@ -432,6 +436,57 @@ export default {
         // 识别完成后恢复为“监控中”状态，保持页面一直处于 AI 识别中效果
         this.isAnalyzing = true;
         this.aiStatus = { type: 'warning', text: 'AI监控中...' };
+      });
+    },
+    /** 更新最新一条种植记录的健康状况为虫害（Ctrl+2 触发） */
+    updateLatestPlantingHealthStatus() {
+      console.log('开始更新最新种植记录的健康状况为虫害');
+      
+      // 获取所有种植记录，取最新一条
+      listPlanting({
+        pageNum: 1,
+        pageSize: 100
+      }).then(response => {
+        if (response.rows && response.rows.length > 0) {
+          // 按 plantingId 降序排列，取第一条
+          const sortedList = [...response.rows].sort((a, b) => {
+            if (a.plantingId && b.plantingId) {
+              return b.plantingId - a.plantingId;
+            }
+            return 0;
+          });
+          
+          const latestPlanting = sortedList[0];
+          console.log('找到最新种植记录:', latestPlanting);
+          
+          // 获取完整的种植记录信息
+          getPlanting(latestPlanting.plantingId).then(response => {
+            const plantingRecord = response.data;
+            
+            // 更新健康状况为虫害
+            const oldHealthStatus = plantingRecord.healthStatus;
+            plantingRecord.healthStatus = 'pest';
+            
+            console.log('准备更新健康状况:', {
+              plantingId: plantingRecord.plantingId,
+              oldStatus: oldHealthStatus,
+              newStatus: plantingRecord.healthStatus
+            });
+            
+            // 调用更新API
+            updatePlanting(plantingRecord).then(() => {
+              console.log('✅ 健康状况已更新为虫害');
+            }).catch(error => {
+              console.error('❌ 更新健康状况失败:', error);
+            });
+          }).catch(error => {
+            console.error('获取种植记录详情失败:', error);
+          });
+        } else {
+          console.log('没有找到种植记录');
+        }
+      }).catch(error => {
+        console.error('获取种植记录列表失败:', error);
       });
     },
     // 获取识别类型文本
