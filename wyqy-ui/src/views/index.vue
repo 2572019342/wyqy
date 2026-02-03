@@ -138,7 +138,7 @@ export default {
           key: "crop",
           label: "作物品类",
           value: 367,
-          icon: "el-icon-vegetables",
+          icon: "el-icon-s-operation",
           theme: "agriculture",
           desc: "蔬菜、水果、粮食及经济作物"
         },
@@ -331,35 +331,63 @@ export default {
 
 <style scoped lang="scss">
 .dashboard-container {
-  padding: 20px;
-  background: #f5f7fa;
+  padding: 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   min-height: calc(100vh - 84px);
 }
 
 .dashboard-header {
-  margin-bottom: 20px;
+  margin-bottom: 28px;
 
   .welcome-panel {
-    padding: 18px 20px;
-    border-radius: 14px;
-    background: radial-gradient(circle at top left, #42b983, #1d8cf8);
+    padding: 24px 28px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
     color: #fff;
-    box-shadow: 0 12px 20px -10px rgba(29, 140, 248, 0.6);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15), 0 15px 15px -5px rgba(0, 0, 0, 0.06);
+    }
 
     .title {
-      margin: 0 0 10px;
-      font-size: 22px;
-      font-weight: 600;
+      margin: 0 0 12px;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .subtitle {
       margin: 0;
-      font-size: 14px;
-      opacity: 0.9;
+      font-size: 15px;
+      opacity: 0.95;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
 
       .highlight {
         font-weight: 600;
-        border-bottom: 1px dashed rgba(255, 255, 255, 0.7);
+        background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        padding: 0 2px;
       }
     }
   }
@@ -407,32 +435,77 @@ export default {
 }
 
 .stat-row {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .stat-card {
   display: flex;
   align-items: center;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(34, 197, 94, 0.3);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .stat-icon {
+      transform: scale(1.1);
+    }
+  }
 
   .stat-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 16px;
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 14px;
-    font-size: 22px;
+    margin-right: 16px;
+    font-size: 24px;
     color: #fff;
+    transition: transform 0.3s ease;
+    position: relative;
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.15);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      background: inherit;
+      filter: blur(8px);
+      opacity: 0.4;
+      z-index: -1;
+    }
 
     &.agriculture {
-      background: linear-gradient(135deg, #67c23a, #3eb575);
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     }
 
     &.translation {
-      background: linear-gradient(135deg, #e6a23c, #f56c6c);
+      background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
     }
   }
 
@@ -441,37 +514,59 @@ export default {
 
     .stat-label {
       font-size: 13px;
-      color: #909399;
-      margin-bottom: 4px;
+      color: #6b7280;
+      margin-bottom: 6px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .stat-value {
-      font-size: 20px;
-      font-weight: 600;
-      color: #303133;
-      margin-bottom: 2px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 4px;
       line-height: 1.2;
+      background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .stat-desc {
       font-size: 12px;
-      color: #c0c4cc;
+      color: #9ca3af;
+      line-height: 1.4;
     }
   }
 }
 
 .chart-row {
-  margin-top: 10px;
+  margin-top: 20px;
 
   .chart-card {
-    border-radius: 14px;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      border-color: rgba(34, 197, 94, 0.2);
+    }
 
     .chart-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1f2937;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+      background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+      border-radius: 16px 16px 0 0;
     }
 
     .chart-wrapper {
@@ -500,60 +595,95 @@ export default {
 
     /* AI 病虫害识别卡片样式 */
     &.pest-card {
-      border-left: 4px solid #67c23a;
+      border-left: 4px solid #10b981;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      
       .pest-header {
         .pest-title {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 10px;
           font-weight: 600;
-          color: #303133;
+          color: #1f2937;
+          font-size: 15px;
+          
           i {
-            font-size: 18px;
-            color: #67c23a;
+            font-size: 20px;
+            color: #10b981;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
           }
         }
       }
+      
       .pest-stats {
         display: flex;
         align-items: center;
         justify-content: space-around;
-        padding: 12px 16px;
-        margin-bottom: 8px;
-        background: linear-gradient(135deg, rgba(103, 194, 58, 0.08), rgba(64, 158, 255, 0.06));
-        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%);
+        border-radius: 12px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        backdrop-filter: blur(10px);
       }
+      
       .pest-stat-item {
         text-align: center;
+        transition: transform 0.2s ease;
+        
+        &:hover {
+          transform: scale(1.05);
+        }
+        
         .pest-stat-value {
           display: block;
-          font-size: 16px;
-          font-weight: 600;
-          color: #67c23a;
+          font-size: 18px;
+          font-weight: 700;
+          color: #10b981;
           line-height: 1.3;
+          text-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
         }
+        
         .pest-stat-label {
-          font-size: 11px;
-          color: #909399;
+          font-size: 12px;
+          color: #6b7280;
+          font-weight: 500;
+          margin-top: 2px;
         }
       }
+      
       .pest-stat-divider {
         width: 1px;
-        height: 28px;
-        background: rgba(144, 147, 153, 0.25);
+        height: 32px;
+        background: linear-gradient(180deg, transparent 0%, rgba(107, 114, 128, 0.3) 50%, transparent 100%);
       }
+      
       .pest-tree-wrapper {
-        max-height: 240px;
+        max-height: 260px;
+        padding: 8px;
+        background: rgba(249, 250, 251, 0.5);
+        border-radius: 8px;
+        border: 1px solid rgba(229, 231, 235, 0.3);
       }
+      
       .pest-tree {
         background: transparent;
+        
         .el-tree-node__content {
-          height: 36px;
-          border-radius: 6px;
-          margin: 2px 0;
+          height: 40px;
+          border-radius: 8px;
+          margin: 3px 0;
+          transition: all 0.2s ease;
+          border: 1px solid transparent;
         }
+        
         .el-tree-node__content:hover {
-          background: rgba(103, 194, 58, 0.08);
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%);
+          border-color: rgba(16, 185, 129, 0.2);
+          transform: translateX(2px);
         }
       }
       .custom-tree-node {
@@ -567,34 +697,46 @@ export default {
           gap: 8px;
         }
         .node-dot {
-          width: 8px;
-          height: 8px;
+          width: 10px;
+          height: 10px;
           border-radius: 50%;
           flex-shrink: 0;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          
           &.dot-pest {
-            background: linear-gradient(135deg, #e6a23c, #f56c6c);
+            background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
           }
+          
           &.dot-disease {
-            background: linear-gradient(135deg, #f56c6c, #c45656);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
           }
+          
           &.dot-record {
-            background: linear-gradient(135deg, #409eff, #67c23a);
+            background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
           }
+          
           &.dot-root {
-            background: linear-gradient(135deg, #67c23a, #3eb575);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
           }
+          
           &.dot-default {
-            background: #c0c4cc;
+            background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
           }
         }
+        
         .node-label {
-          font-size: 13px;
-          color: #606266;
+          font-size: 14px;
+          color: #374151;
+          font-weight: 500;
         }
+        
         .node-meta {
           font-size: 12px;
-          color: #67c23a;
-          font-weight: 500;
+          color: #10b981;
+          font-weight: 600;
+          background: rgba(16, 185, 129, 0.1);
+          padding: 2px 8px;
+          border-radius: 12px;
         }
       }
     }
@@ -626,11 +768,46 @@ export default {
 
 @media (max-width: 768px) {
   .dashboard-container {
-    padding: 10px;
+    padding: 16px;
   }
 
   .chart-row .chart-card .chart-wrapper {
-    height: 260px;
+    height: 280px;
+  }
+
+  .dashboard-header .welcome-panel {
+    padding: 20px;
+    
+    .title {
+      font-size: 22px;
+    }
+    
+    .subtitle {
+      font-size: 14px;
+    }
+  }
+
+  .stat-card {
+    margin-bottom: 12px;
+    
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 22px;
+    }
+    
+    .stat-content .stat-value {
+      font-size: 20px;
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 </style>

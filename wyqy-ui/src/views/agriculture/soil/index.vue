@@ -5,7 +5,7 @@
       <div class="header-content">
         <h2 class="page-title">
           <i class="el-icon-connection"></i>
-          土壤信息管理
+          土壤信息
         </h2>
         <div class="header-actions">
           <el-button type="primary" icon="el-icon-refresh" @click="getList" 
@@ -14,30 +14,7 @@
       </div>
     </div>
 
-    <!-- 地块选择 -->
-    <div class="selection-section">
-      <div class="section-card">
-        <div class="card-header">
-          <h3 class="section-title">
-            <i class="el-icon-location-outline"></i>
-            地块选择
-          </h3>
-        </div>
-        <div class="card-content">
-          <el-select v-model="selectedLandId" placeholder="请选择地块" 
-                     class="land-selector" @change="handleLandChange">
-            <el-option v-for="land in landOptions" :key="land.landId" 
-                       :label="land.landName" :value="land.landId">
-              <div class="option-item">
-                <i class="el-icon-map-location"></i>
-                <span>{{ land.landName }}</span>
-                <small>{{ land.location || '未知位置' }}</small>
-              </div>
-            </el-option>
-          </el-select>
-        </div>
-      </div>
-    </div>
+
 
     <!-- 地块列表 -->
     <div class="lands-section">
@@ -46,12 +23,7 @@
           <i class="el-icon-list"></i>
           地块信息列表
         </h3>
-        <div class="section-stats">
-          <span class="stats-item">
-            <i class="el-icon-data-analysis"></i>
-            共 {{ landList.length }} 个地块
-          </span>
-        </div>
+
       </div>
       
       <div v-loading="loading" class="lands-grid">
@@ -87,7 +59,7 @@
                         <span>土壤类型</span>
                       </div>
                       <div class="data-value">
-                        <el-tag size="mini" type="success">{{ land.soilType || '--' }}</el-tag>
+                        <span class="soil-type-text">{{ land.soilType || '--' }}</span>
                       </div>
                     </div>
                     <div class="data-item">
@@ -242,30 +214,37 @@ export default {
 <style scoped>
 /* 主容器样式 */
 .soil-container {
-  background-color: #F7F9FC;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   min-height: 100vh;
-  padding: 20px;
+  padding: 24px;
 }
 
 /* 页面头部 */
 .page-header {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border-radius: 16px;
-  padding: 24px 32px;
-  margin-bottom: 24px;
-  box-shadow: 0 8px 32px rgba(5, 117, 230, 0.3);
+  padding: 28px 32px;
+  margin-bottom: 28px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   position: relative;
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.page-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15), 0 15px 15px -5px rgba(0, 0, 0, 0.06);
 }
 
 .page-header::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: shimmer 3s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -280,70 +259,81 @@ export default {
 .page-title {
   color: white;
   margin: 0;
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 12px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  letter-spacing: 0.5px;
 }
 
 .page-title i {
-  font-size: 28px;
+  font-size: 30px;
 }
 
 .refresh-btn {
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  border-radius: 8px;
-  padding: 10px 20px;
+  border-radius: 12px;
+  padding: 12px 24px;
   font-size: 14px;
+  font-weight: 600;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .refresh-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* 选择区域 */
 .selection-section {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .section-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(5, 117, 230, 0.1);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(229, 231, 235, 0.5);
   overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(34, 197, 94, 0.2);
 }
 
 .card-header {
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  padding: 20px 24px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  backdrop-filter: blur(10px);
 }
 
 .section-title {
-  color: #1E293B;
+  color: #1f2937;
   margin: 0;
   font-size: 18px;
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .section-title i {
-  color: #0575E6;
+  color: #22c55e;
   font-size: 20px;
 }
 
 .card-content {
-  padding: 24px;
+  padding: 28px;
 }
 
 .land-selector {
@@ -352,14 +342,15 @@ export default {
 }
 
 .land-selector .el-input__inner {
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.8);
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .land-selector .el-input__inner:focus {
-  border-color: #0575E6;
-  box-shadow: 0 0 0 3px rgba(5, 117, 230, 0.1);
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .option-item {
@@ -370,31 +361,38 @@ export default {
 }
 
 .option-item i {
-  color: #0575E6;
+  color: #22c55e;
   font-size: 16px;
 }
 
 .option-item small {
-  color: #64748B;
+  color: #6b7280;
   margin-left: auto;
+  font-weight: 500;
 }
 
 /* 地块列表区域 */
 .lands-section {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(5, 117, 230, 0.1);
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lands-section:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(34, 197, 94, 0.2);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .section-stats {
@@ -405,13 +403,14 @@ export default {
 .stats-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #64748B;
+  gap: 8px;
+  color: #6b7280;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .stats-item i {
-  color: #0575E6;
+  color: #22c55e;
 }
 
 .lands-grid {
@@ -427,11 +426,11 @@ export default {
 }
 
 .land-card {
-  background: white;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 16px;
   border: 2px solid transparent;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   overflow: hidden;
   height: 100%;
@@ -441,101 +440,141 @@ export default {
 
 .land-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(5, 117, 230, 0.15);
-  border-color: rgba(5, 117, 230, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(34, 197, 94, 0.2);
 }
 
 .land-card .card-header {
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  padding: 20px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 24px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  backdrop-filter: blur(10px);
 }
 
 .land-info h4 {
-  color: #1E293B;
-  margin: 0 0 4px 0;
+  color: #1f2937;
+  margin: 0 0 6px 0;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .land-info p {
-  color: #64748B;
+  color: #6b7280;
   margin: 0;
   font-size: 12px;
+  font-weight: 500;
 }
 
 .land-icon {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 24px;
+  font-size: 26px;
+  box-shadow: 0 8px 16px -4px rgba(34, 197, 94, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.land-card:hover .land-icon {
+  transform: scale(1.1);
 }
 
 .land-card .card-body {
-  padding: 20px;
+  padding: 24px;
   flex: 1;
 }
 
 .data-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 20px;
 }
 
 .data-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  transition: all 0.3s ease;
+}
+
+.data-item:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 163, 74, 0.02) 100%);
+  border-color: rgba(34, 197, 94, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.1);
 }
 
 .data-label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 12px;
-  color: #64748B;
-  font-weight: 500;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .data-label i {
   font-size: 14px;
-  color: #0575E6;
+  color: #22c55e;
 }
 
 .data-value {
   font-size: 14px;
-  font-weight: 600;
-  color: #1E293B;
+  font-weight: 700;
+  color: #1f2937;
   word-break: break-word;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 土壤类型文字样式 */
+.soil-type-text {
+  color: #000000 !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
 }
 
 .land-card .card-footer {
-  padding: 16px 20px;
-  border-top: 1px solid #f1f5f9;
-  background: #f8fafc;
+  padding: 20px 24px;
+  border-top: 1px solid rgba(229, 231, 235, 0.5);
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 0 0 16px 16px;
 }
 
 .view-btn {
   width: 100%;
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   color: white;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.3s ease;
+  padding: 12px 20px;
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
 }
 
 .view-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.3), 0 10px 10px -5px rgba(34, 197, 94, 0.1);
 }
 
 /* 抽屉样式 */
@@ -544,16 +583,18 @@ export default {
 }
 
 .soil-drawer .el-drawer__header {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: white;
-  padding: 24px 32px;
+  padding: 28px 32px;
   margin-bottom: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .soil-drawer .el-drawer__title {
   color: white;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .drawer-content {
@@ -563,9 +604,10 @@ export default {
 }
 
 .drawer-header {
-  padding: 24px 32px;
-  background: #f8fafc;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  backdrop-filter: blur(10px);
 }
 
 .land-summary {
@@ -577,80 +619,100 @@ export default {
 .summary-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 32px;
+  box-shadow: 0 8px 16px -4px rgba(34, 197, 94, 0.3);
 }
 
 .summary-info h3 {
-  color: #1E293B;
-  margin: 0 0 4px 0;
+  color: #1f2937;
+  margin: 0 0 6px 0;
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .summary-info p {
-  color: #64748B;
+  color: #6b7280;
   margin: 0;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .drawer-body {
   padding: 32px;
   flex: 1;
   overflow-y: auto;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
 }
 
 .soil-descriptions {
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .soil-descriptions .el-descriptions__header {
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
 }
 
 .soil-descriptions .el-descriptions-item__label {
-  background: #f8fafc;
-  color: #1E293B;
-  font-weight: 500;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  color: #1f2937;
+  font-weight: 600;
 }
 
 .desc-value {
-  color: #64748B;
-  font-weight: 500;
+  color: #6b7280;
+  font-weight: 600;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .drawer-footer {
   padding: 24px 32px;
-  background: #f8fafc;
-  border-top: 1px solid #f1f5f9;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-top: 1px solid rgba(229, 231, 235, 0.5);
   text-align: right;
 }
 
 .close-btn {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  color: #64748B;
-  padding: 10px 20px;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+  color: #6b7280;
+  padding: 12px 24px;
   transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .close-btn:hover {
-  border-color: #0575E6;
-  color: #0575E6;
-  background: rgba(5, 117, 230, 0.05);
+  border-color: #22c55e;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
 }
 
 /* 空状态 */
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 16px;
+  border: 2px dashed rgba(156, 163, 175, 0.3);
+  margin: 20px 0;
 }
 
 /* 响应式设计 */
@@ -696,14 +758,12 @@ export default {
 }
 
 /* 动画效果 */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
+@keyframes shimmer {
+  0% {
+    transform: rotate(0deg);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  100% {
+    transform: rotate(360deg);
   }
 }
 
@@ -715,4 +775,15 @@ export default {
 .land-card:nth-child(2) { animation-delay: 0.2s; }
 .land-card:nth-child(3) { animation-delay: 0.3s; }
 .land-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>

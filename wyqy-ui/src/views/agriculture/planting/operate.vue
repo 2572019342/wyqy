@@ -78,9 +78,9 @@
                     <i class="el-icon-location-outline"></i>
                     {{ land.landName }}
                   </div>
-                  <el-tag :type="land.status === '0' ? 'success' : 'danger'" size="mini">
-                    {{ land.status === '0' ? '可用' : '停用' }}
-                  </el-tag>
+                  <div class="land-status">
+                    <span class="status-text">{{ land.status === '0' ? '可用' : '停用' }}</span>
+                  </div>
                 </div>
                 <div class="land-details">
                   <div class="detail-item">
@@ -110,6 +110,14 @@
         </div>
       </div>
 
+      <!-- 固定底部操作栏 -->
+      <div class="fixed-bottom-actions" v-show="currentStep === 0 && selectedLandId">
+        <el-button type="primary" @click="nextStep" class="fixed-next-btn">
+          <i class="el-icon-right"></i>
+          下一步：选择作物
+        </el-button>
+      </div>
+
       <!-- 步骤2: 选择作物 -->
       <div v-if="currentStep === 1" class="step-content">
         <h3 class="step-title">选择种植作物</h3>
@@ -122,7 +130,9 @@
                     <i class="el-icon-plant"></i>
                     {{ crop.speciesName }}
                   </div>
-                  <el-tag :type="getCategoryType(crop.category)" size="mini">{{ crop.category || '--' }}</el-tag>
+                  <div class="crop-category">
+                    <span class="category-text">{{ crop.category || '--' }}</span>
+                  </div>
                 </div>
                 <div class="crop-details">
                   <div class="detail-item">
@@ -150,6 +160,18 @@
           <el-button @click="prevStep" class="prev-btn">上一步</el-button>
           <el-button type="primary" @click="nextStep" :disabled="!selectedCropId" class="next-btn">下一步</el-button>
         </div>
+      </div>
+
+      <!-- 固定底部操作栏 -->
+      <div class="fixed-bottom-actions" v-if="currentStep === 1 && selectedCropId">
+        <el-button @click="prevStep" class="fixed-prev-btn">
+          <i class="el-icon-back"></i>
+          上一步：选择地块
+        </el-button>
+        <el-button type="primary" @click="nextStep" class="fixed-next-btn">
+          下一步：设置参数
+          <i class="el-icon-right"></i>
+        </el-button>
       </div>
 
       <!-- 步骤3: 设置参数 -->
@@ -208,6 +230,18 @@
         </div>
       </div>
 
+      <!-- 固定底部操作栏 -->
+      <div class="fixed-bottom-actions" v-if="currentStep === 2">
+        <el-button @click="prevStep" class="fixed-prev-btn">
+          <i class="el-icon-back"></i>
+          上一步：选择作物
+        </el-button>
+        <el-button type="primary" @click="nextStep" class="fixed-next-btn">
+          下一步：确认种植
+          <i class="el-icon-right"></i>
+        </el-button>
+      </div>
+
       <!-- 步骤4: 确认种植 -->
       <div v-if="currentStep === 3" class="step-content">
         <h3 class="step-title">确认种植信息</h3>
@@ -228,6 +262,18 @@
           <el-button @click="prevStep" class="prev-btn">上一步</el-button>
           <el-button type="primary" @click="confirmPlanting" :loading="submitting" class="confirm-btn">确认种植</el-button>
         </div>
+      </div>
+
+      <!-- 固定底部操作栏 -->
+      <div class="fixed-bottom-actions" v-if="currentStep === 3">
+        <el-button @click="prevStep" class="fixed-prev-btn">
+          <i class="el-icon-back"></i>
+          上一步：设置参数
+        </el-button>
+        <el-button type="primary" @click="confirmPlanting" :loading="submitting" class="fixed-confirm-btn">
+          <i class="el-icon-check"></i>
+          确认种植
+        </el-button>
       </div>
     </div>
   </div>
@@ -570,23 +616,29 @@ export default {
 <style scoped>
 /* 主容器样式 */
 .operate-container {
-  background-color: #F7F9FC;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   min-height: 100vh;
-  padding: 20px;
+  padding: 24px;
 }
 
 /* 向导卡片样式 */
 .wizard-card {
-  background: white;
+  background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wizard-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: white;
-  padding: 24px 32px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
@@ -599,22 +651,25 @@ export default {
 .card-title {
   color: white;
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 12px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  letter-spacing: 0.5px;
 }
 
 .card-title i {
-  font-size: 24px;
+  font-size: 26px;
 }
 
 .steps-wrapper {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 24px;
   backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .wizard-steps {
@@ -660,17 +715,26 @@ export default {
 
 /* 步骤内容样式 */
 .step-content {
-  padding: 32px;
-  background: white;
+  padding: 36px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
 }
 
 /* 搜索筛选区域样式 */
 .search-filter-wrapper {
-  margin-bottom: 24px;
-  padding: 20px;
-  background: #F8FAFC;
-  border-radius: 12px;
-  border: 1px solid #E2E8F0;
+  margin-bottom: 28px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-filter-wrapper:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .search-input,
@@ -679,57 +743,59 @@ export default {
 }
 
 .search-input >>> .el-input__inner {
-  border-radius: 8px;
-  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.8);
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .search-input >>> .el-input__inner:focus {
-  border-color: #0575E6;
-  box-shadow: 0 0 0 3px rgba(5, 117, 230, 0.1);
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .filter-select >>> .el-input__inner {
-  border-radius: 8px;
-  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.8);
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .filter-select >>> .el-input__inner:focus {
-  border-color: #0575E6;
-  box-shadow: 0 0 0 3px rgba(5, 117, 230, 0.1);
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .search-actions {
-  margin-top: 16px;
+  margin-top: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
 }
 
 .search-result-count {
-  color: #64748B;
+  color: #6b7280;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .step-title {
-  margin-bottom: 24px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1E293B;
+  margin-bottom: 28px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .step-title::before {
   content: '';
   width: 4px;
-  height: 20px;
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  height: 24px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border-radius: 2px;
 }
 
@@ -740,26 +806,28 @@ export default {
 
 .land-card, .crop-card {
   cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
   border: 2px solid transparent;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  overflow: hidden;
 }
 
 .land-card:hover, .crop-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(5, 117, 230, 0.15);
-  border-color: rgba(5, 117, 230, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(34, 197, 94, 0.2);
 }
 
 .land-card.card-selected, .crop-card.card-selected {
-  border-color: #0575E6;
-  background: linear-gradient(135deg, rgba(5, 117, 230, 0.05) 0%, rgba(0, 242, 96, 0.05) 100%);
-  box-shadow: 0 4px 16px rgba(5, 117, 230, 0.2);
+  border-color: #22c55e;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 163, 74, 0.05) 100%);
+  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.15), 0 10px 10px -5px rgba(34, 197, 94, 0.05);
 }
 
 .land-card >>> .el-card__body {
-  padding: 20px;
+  padding: 24px;
 }
 
 .land-info, .crop-info {
@@ -772,123 +840,135 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .land-name, .crop-name {
   font-size: 16px;
-  font-weight: 600;
-  color: #1E293B;
+  font-weight: 700;
+  color: #1f2937;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .land-name i, .crop-name i {
-  color: #0575E6;
+  color: #22c55e;
   font-size: 18px;
 }
 
 .land-details, .crop-details {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .detail-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 14px;
-  color: #64748B;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .detail-item i {
-  color: #0575E6;
+  color: #22c55e;
   font-size: 16px;
 }
 
 /* 表单样式 */
 .form-wrapper {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .form-wrapper .el-form-item__label {
-  color: #1E293B;
-  font-weight: 500;
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .form-input,
 .form-number,
 .form-date-picker,
 .form-textarea {
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.8);
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .form-input:focus,
 .form-number:focus,
 .form-date-picker:focus,
 .form-textarea:focus {
-  border-color: #0575E6;
-  box-shadow: 0 0 0 3px rgba(5, 117, 230, 0.1);
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 /* 确认信息样式 */
 .confirm-descriptions {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .confirm-descriptions >>> .el-descriptions__label {
-  color: #1E293B;
-  font-weight: 500;
+  color: #1f2937;
+  font-weight: 600;
 }
 
 .confirm-descriptions >>> .el-descriptions__content {
-  color: #64748B;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 /* 步骤操作按钮 */
 .step-actions {
   text-align: center;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #f1f5f9;
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .prev-btn {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  color: #64748B;
-  padding: 10px 24px;
-  font-weight: 500;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+  color: #6b7280;
+  padding: 12px 28px;
+  font-weight: 600;
   transition: all 0.3s ease;
-  margin-right: 12px;
+  margin-right: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .prev-btn:hover {
-  border-color: #0575E6;
-  color: #0575E6;
-  background: rgba(5, 117, 230, 0.05);
+  border-color: #22c55e;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
 }
 
 .next-btn, .confirm-btn {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   color: white;
-  padding: 10px 24px;
-  font-weight: 500;
+  padding: 12px 28px;
+  font-weight: 600;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
 }
 
 .next-btn:hover, .confirm-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.3), 0 10px 10px -5px rgba(34, 197, 94, 0.1);
 }
 
 .next-btn:disabled, .confirm-btn:disabled {
@@ -900,45 +980,159 @@ export default {
 /* 空状态样式 */
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
-  color: #94a3b8;
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 16px;
+  border: 2px dashed rgba(156, 163, 175, 0.3);
+  margin: 20px 0;
 }
 
 .empty-state i {
-  font-size: 64px;
-  margin-bottom: 16px;
-  opacity: 0.5;
+  font-size: 72px;
+  margin-bottom: 20px;
+  opacity: 0.6;
+  color: #22c55e;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .empty-state p {
   font-size: 16px;
   margin: 0;
+  font-weight: 500;
+  color: #6b7280;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .operate-container {
-    padding: 12px;
+    padding: 16px;
   }
   
   .card-header {
-    padding: 20px 24px;
+    padding: 24px 28px;
   }
   
   .step-content {
-    padding: 20px;
+    padding: 24px;
   }
   
   .step-actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
   }
   
   .prev-btn, .next-btn, .confirm-btn {
     width: 100%;
     margin: 0;
   }
+}
+
+/* 状态文字样式 */
+.status-text,
+.category-text {
+  color: #000000 !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+}
+
+/* 固定底部操作栏样式 */
+.fixed-bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  padding: 16px 24px;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fixed-next-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 12px;
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.fixed-next-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.06);
+}
+
+.fixed-next-btn i {
+  margin-right: 8px;
+}
+
+.fixed-prev-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-right: 16px;
+}
+
+.fixed-prev-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.06);
+}
+
+.fixed-prev-btn i {
+  margin-right: 8px;
+}
+
+.fixed-confirm-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 12px;
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.fixed-confirm-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.06);
+}
+
+.fixed-confirm-btn i {
+  margin-right: 8px;
+}
+
+/* 为固定底部操作栏预留空间 */
+.step-content {
+  padding: 36px 36px 100px 36px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
 }
 
 /* 动画效果 */

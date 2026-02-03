@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <h2>🏞️ 地块信息管理111</h2>
+    <h2>🏞️ 地块信息管理</h2>
     
     <!-- 查询条件 -->
     <el-card class="mb20">

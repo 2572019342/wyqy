@@ -1,7 +1,7 @@
 <template>
   <div class="realtime-detection-container" @keydown="handleKeyDown" tabindex="0">
     <!-- AI识别状态概览 -->
-    <el-row :gutter="20" class="mb20">
+    <el-row :gutter="20" class="mb20 stats-row">
       <el-col :span="6" v-for="(stat, index) in detectionStats" :key="index">
         <div class="stat-card" :class="'stat-card-' + index" @click="handleStatClick(stat, index)">
           <div class="stat-content">
@@ -13,7 +13,7 @@
               <div class="stat-label">{{ stat.label }}</div>
             </div>
           </div>
-          <div class="stat-glow"></div>
+          <div class="stat-decoration"></div>
         </div>
       </el-col>
     </el-row>
@@ -29,7 +29,7 @@
               <span>智农AI实时监控</span>
             </div>
             <div class="header-status">
-              <el-tag :type="aiStatus.type" size="mini">{{ aiStatus.text }}</el-tag>
+              <span class="status-tag" :class="'status-' + aiStatus.type">{{ aiStatus.text }}</span>
             </div>
           </div>
           <div class="video-container">
@@ -79,7 +79,7 @@
               <span>最近识别结果</span>
             </div>
             <div class="header-status" v-if="recentDetections && recentDetections.length">
-              <el-tag size="mini" type="success">共 {{ recentDetections.length }} 条</el-tag>
+              <span class="count-badge">共 {{ recentDetections.length }} 条</span>
             </div>
           </div>
 
@@ -217,7 +217,7 @@ export default {
     // 启动定时刷新
     this.startAutoRefresh();
 
-    // 进入页面后自动进入“AI正在识别”状态（等同于点击“开始识别”）
+    // 进入页面后自动进入"AI正在识别"状态（等同于点击"开始识别"）
     this.startAnalysis();
   },
   beforeDestroy() {
@@ -252,7 +252,7 @@ export default {
           {
             value: data.pestDetections || 0,
             label: '虫害识别',
-            icon: 'el-icon-bug'
+            icon: 'el-icon-warning'
           },
           {
             value: data.diseaseDetections || 0,
@@ -307,7 +307,7 @@ export default {
         this.startAnalysis();
       }
     },
-    // 开始分析（进入“AI 正在识别”状态）
+    // 开始分析（进入"AI 正在识别"状态）
     startAnalysis() {
       this.isAnalyzing = true;
       this.aiStatus = { type: 'warning', text: 'AI监控中...' };
@@ -405,7 +405,7 @@ export default {
     // 快速识别（Ctrl+2），不再强制选择地块和作物
     quickDetect() {
       // 每次按下 Ctrl+2 都执行一次识别，并在完成后弹出结果
-      // 将状态短暂切换为“AI识别中...”，识别结束后恢复为“AI监控中...”
+      // 将状态短暂切换为"AI识别中..."，识别结束后恢复为"AI监控中..."
       this.isAnalyzing = true;
       this.aiStatus = { type: 'warning', text: 'AI识别中...' };
 
@@ -433,7 +433,7 @@ export default {
       }).catch(() => {
         this.$message.error('识别失败');
       }).finally(() => {
-        // 识别完成后恢复为“监控中”状态，保持页面一直处于 AI 识别中效果
+        // 识别完成后恢复为"监控中"状态，保持页面一直处于 AI 识别中效果
         this.isAnalyzing = true;
         this.aiStatus = { type: 'warning', text: 'AI监控中...' };
       });
@@ -509,9 +509,9 @@ export default {
     },
     // 获取置信度颜色
     getConfidenceColor(confidence) {
-      if (confidence >= 0.8) return '#67c23a';
-      if (confidence >= 0.6) return '#e6a23c';
-      return '#f56c6c';
+      if (confidence >= 0.8) return '#2E7D32';
+      if (confidence >= 0.6) return '#E65100';
+      return '#C62828';
     },
     // 格式化置信度
     formatConfidence(percentage) {
@@ -538,7 +538,7 @@ export default {
 <style scoped>
 .realtime-detection-container {
   padding: 24px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 50%, #e0f2f1 100%);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
@@ -552,46 +552,69 @@ export default {
   left: 0;
   right: 0;
   height: 260px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.08) 0%, rgba(102, 187, 106, 0.08) 100%);
   z-index: 0;
   pointer-events: none;
 }
 
-/* 统计卡片样式 - 与主界面统一 */
+/* 统计卡片样式 */
+.stats-row {
+  position: relative;
+  z-index: 1;
+}
+
 .stat-card {
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 18px;
+  border-radius: 16px;
   padding: 24px 20px;
   color: white;
   cursor: pointer;
   transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 1;
 }
 
 .stat-card:hover {
   transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 16px 36px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
 }
 
 .stat-card-0 {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.3);
+}
+
+.stat-card-0:hover {
+  box-shadow: 0 16px 36px rgba(46, 125, 50, 0.4);
 }
 
 .stat-card-1 {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
+  box-shadow: 0 8px 24px rgba(230, 81, 0, 0.3);
+}
+
+.stat-card-1:hover {
+  box-shadow: 0 16px 36px rgba(230, 81, 0, 0.4);
 }
 
 .stat-card-2 {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: linear-gradient(135deg, #C62828 0%, #EF5350 100%);
+  box-shadow: 0 8px 24px rgba(198, 40, 40, 0.3);
+}
+
+.stat-card-2:hover {
+  box-shadow: 0 16px 36px rgba(198, 40, 40, 0.4);
 }
 
 .stat-card-3 {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: linear-gradient(135deg, #0277BD 0%, #4FC3F7 100%);
+  box-shadow: 0 8px 24px rgba(2, 119, 189, 0.3);
+}
+
+.stat-card-3:hover {
+  box-shadow: 0 16px 36px rgba(2, 119, 189, 0.4);
 }
 
 .stat-content {
@@ -602,11 +625,21 @@ export default {
 }
 
 .stat-icon {
-  font-size: 36px;
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-right: 16px;
-  opacity: 0.95;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  backdrop-filter: blur(10px);
   transition: transform 0.3s ease;
+}
+
+.stat-icon i {
+  font-size: 28px;
+  color: white;
 }
 
 .stat-card:hover .stat-icon {
@@ -616,7 +649,7 @@ export default {
 .stat-value {
   font-size: 30px;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   letter-spacing: -0.5px;
 }
@@ -628,22 +661,17 @@ export default {
   letter-spacing: 0.3px;
 }
 
-.stat-glow {
+.stat-decoration {
   position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  animation: stat-glow 3s ease-in-out infinite alternate;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
 }
 
-@keyframes stat-glow {
-  from { transform: scale(0.8); opacity: 0.5; }
-  to { transform: scale(1.2); opacity: 0.85; }
-}
-
-/* 视频卡片样式 - 统一为玻璃卡片风格（自适应填满屏幕剩余高度） */
+/* 视频卡片样式 */
 .video-card {
   height: calc(100vh - 260px);
   border-radius: 16px;
@@ -660,7 +688,7 @@ export default {
 }
 
 .video-card >>> .el-card__header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
   color: white;
   padding: 18px 24px;
   border-bottom: none;
@@ -669,7 +697,7 @@ export default {
 .video-card >>> .el-card__body {
   padding: 20px;
   background: #ffffff;
-  height: calc(100% - 60px); /* 预留头部高度，使内容区充满 */
+  height: calc(100% - 60px);
   box-sizing: border-box;
 }
 
@@ -693,6 +721,34 @@ export default {
   color: rgba(255, 255, 255, 0.95);
 }
 
+.header-status .status-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-tag.status-success {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.status-tag.status-warning {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.status-tag.status-info {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.status-tag.status-danger {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
 .video-container {
   height: 100%;
   display: flex;
@@ -702,7 +758,7 @@ export default {
 .video-wrapper {
   flex: 1;
   position: relative;
-  background: #000;
+  background: #1a1a1a;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
@@ -740,20 +796,21 @@ export default {
 .loading-spinner i {
   font-size: 32px;
   margin-bottom: 10px;
+  color: #66BB6A;
 }
 
 .ai-indicator {
   position: absolute;
   top: 20px;
   left: 20px;
-  background: linear-gradient(135deg, rgba(255, 0, 0, 0.9) 0%, rgba(238, 90, 111, 0.9) 100%);
+  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
   color: white;
   padding: 10px 16px;
   border-radius: 24px;
   display: flex;
   align-items: center;
   animation: ai-pulse 1.5s infinite;
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.4);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10;
@@ -774,13 +831,13 @@ export default {
 }
 
 @keyframes ai-pulse {
-  0%, 100% { opacity: 0.8; }
+  0%, 100% { opacity: 0.9; }
   50% { opacity: 1; }
 }
 
 @keyframes ai-scan {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+  50% { transform: scale(1.3); }
 }
 
 /* 识别结果叠加层 */
@@ -792,37 +849,41 @@ export default {
 
 .detection-box {
   background: rgba(255,255,255,0.95);
-  border-radius: 10px;
-  padding: 12px 14px;
-  border-left: 4px solid #409eff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border-left: 4px solid #2E7D32;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   min-width: 220px;
+  backdrop-filter: blur(10px);
 }
 
 .detection-pest {
-  border-left-color: #e6a23c;
+  border-left-color: #E65100;
+  background: linear-gradient(135deg, rgba(255, 243, 224, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
 }
 
 .detection-disease {
-  border-left-color: #f56c6c;
+  border-left-color: #C62828;
+  background: linear-gradient(135deg, rgba(255, 235, 238, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
 }
 
 .detection-healthy {
-  border-left-color: #67c23a;
+  border-left-color: #2E7D32;
+  background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
 }
 
 .detection-label {
   font-weight: 600;
   margin-bottom: 4px;
-  color: #303133;
+  color: #2c3e50;
 }
 
 .detection-confidence {
   font-size: 12px;
-  color: #909399;
+  color: #666;
 }
 
-/* 右侧控制卡片：跟随左侧高度，信息拉满屏幕 */
+/* 右侧控制卡片 */
 .control-panel {
   height: calc(100vh - 260px);
   border-radius: 16px;
@@ -837,7 +898,7 @@ export default {
 }
 
 .control-panel >>> .el-card__header {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #5D4037 0%, #8D6E63 100%);
   color: white;
   padding: 16px 22px;
   border-bottom: none;
@@ -852,35 +913,26 @@ export default {
   box-sizing: border-box;
 }
 
+.count-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 12px;
+  color: white;
+}
+
 .recent-results {
   height: 100%;
   overflow-y: auto;
 }
 
-.results-title {
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: #1a1a1a;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.results-title::before {
-  content: '';
-  width: 4px;
-  height: 18px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 2px;
-}
-
 .result-item {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-  border-left: 4px solid #409eff;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border-left: 4px solid #2E7D32;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   cursor: pointer;
@@ -889,72 +941,88 @@ export default {
 .result-item:hover {
   transform: translateX(4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
 }
 
 .result-pest {
-  border-left-color: #e6a23c;
-  background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%);
+  border-left-color: #E65100;
+  background: linear-gradient(135deg, #FFF8E1 0%, #ffffff 100%);
+}
+
+.result-pest:hover {
+  background: linear-gradient(135deg, #FFF3E0 0%, #ffffff 100%);
 }
 
 .result-disease {
-  border-left-color: #f56c6c;
-  background: linear-gradient(135deg, #ffebee 0%, #ffffff 100%);
+  border-left-color: #C62828;
+  background: linear-gradient(135deg, #FFEBEE 0%, #ffffff 100%);
+}
+
+.result-disease:hover {
+  background: linear-gradient(135deg, #FFCDD2 0%, #ffffff 100%);
 }
 
 .result-healthy {
-  border-left-color: #67c23a;
-  background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
+  border-left-color: #2E7D32;
+  background: linear-gradient(135deg, #E8F5E9 0%, #ffffff 100%);
+}
+
+.result-healthy:hover {
+  background: linear-gradient(135deg, #C8E6C9 0%, #ffffff 100%);
 }
 
 .result-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .result-type {
   font-weight: 600;
-  font-size: 12px;
+  font-size: 13px;
+  color: #2c3e50;
 }
 
 .result-confidence {
   font-size: 12px;
-  color: #909399;
+  color: #666;
+  background: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 
 .result-name {
   font-weight: 600;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
+  color: #2c3e50;
 }
 
 .result-time {
   font-size: 12px;
-  color: #909399;
+  color: #999;
 }
 
 .no-results {
   text-align: center;
-  color: #909399;
-  padding: 32px 20px;
+  color: #999;
+  padding: 40px 20px;
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
   border-radius: 12px;
-  border: 2px dashed #e4e7ed;
+  border: 2px dashed #e0e0e0;
 }
 
 .no-results i {
-  font-size: 40px;
+  font-size: 48px;
   margin-bottom: 12px;
-  opacity: 0.55;
-  color: #c0c4cc;
+  opacity: 0.4;
+  color: #bdbdbd;
 }
 
-/* 识别结果提示框样式（识别到虫害/病害） */
+/* 识别结果提示框样式 */
 .pest-detection-dialog >>> .el-dialog {
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 24px 60px rgba(255, 0, 0, 0.35);
+  box-shadow: 0 24px 60px rgba(198, 40, 40, 0.35);
 }
 
 .pest-detection-dialog >>> .el-dialog__header {
@@ -963,7 +1031,7 @@ export default {
 
 .pest-detection-dialog >>> .el-dialog__body {
   padding: 0;
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  background: linear-gradient(135deg, #E65100 0%, #FF6D00 100%);
 }
 
 .pest-detection-content {
@@ -1002,7 +1070,7 @@ export default {
   font-size: 32px;
   font-weight: 700;
   margin: 0 0 24px 0;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
   position: relative;
   z-index: 1;
 }
@@ -1011,7 +1079,7 @@ export default {
   margin: 24px 0;
   padding: 18px 20px;
   background: rgba(255, 255, 255, 0.16);
-  border-radius: 12px;
+  border-radius: 14px;
   backdrop-filter: blur(10px);
   position: relative;
   z-index: 1;
@@ -1072,21 +1140,21 @@ export default {
 }
 
 .confirm-btn {
-  background: white;
-  color: #ff6b6b;
-  border: none;
-  border-radius: 28px;
-  padding: 13px 38px;
-  font-size: 16px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  background: white !important;
+  color: #E65100 !important;
+  border: none !important;
+  border-radius: 28px !important;
+  padding: 13px 38px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25) !important;
 }
 
 .confirm-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3);
-  background: #f8f9fa;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3) !important;
+  background: #f8f9fa !important;
 }
 
 .confirm-btn i {
@@ -1124,7 +1192,7 @@ export default {
 }
 
 .mb20:last-of-type {
-  margin-bottom: 0; /* 去掉底部多余留白，让内容更贴近底部 */
+  margin-bottom: 0;
 }
 
 /* 响应式设计 */
@@ -1146,7 +1214,6 @@ export default {
     margin-bottom: 16px;
   }
 
-  /* 小屏下用固定高度，避免超出视口太多 */
   .video-card,
   .control-panel {
     height: 420px;

@@ -10,10 +10,7 @@
                 <i class="el-icon-cloudy"></i>
                 实时天气监测
               </h3>
-              <el-button class="refresh-btn" @click="refreshWeather" :loading="loading">
-                <i class="el-icon-refresh"></i>
-                刷新
-              </el-button>
+
             </div>
           </div>
           <el-row :gutter="20" v-loading="loading" class="weather-content">
@@ -129,7 +126,7 @@
                     <span>风向</span>
                   </div>
                   <div class="data-value">
-                    <el-tag size="mini" type="info">{{ item.windDirection || '--' }}</el-tag>
+                    <span class="wind-direction-text">{{ item.windDirection || '--' }}</span>
                   </div>
                 </div>
                 <div class="data-item">
@@ -617,35 +614,44 @@ export default {
 <style scoped>
 /* 主容器样式 */
 .weather-container {
-  background-color: #F7F9FC;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   min-height: 100vh;
-  padding: 20px;
+  padding: 24px;
 }
 
 /* 天气卡片样式 */
 .weather-card {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border-radius: 16px;
   padding: 0;
-  box-shadow: 0 8px 32px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.weather-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15), 0 15px 15px -5px rgba(0, 0, 0, 0.06);
 }
 
 .weather-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: shimmer 3s ease-in-out infinite;
   pointer-events: none;
 }
 
 .card-header {
-  padding: 24px 32px;
+  padding: 28px 32px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  backdrop-filter: blur(10px);
 }
 
 .header-content {
@@ -657,11 +663,13 @@ export default {
 .card-title {
   color: white;
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 12px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  letter-spacing: 0.5px;
 }
 
 .card-title i {
@@ -672,11 +680,13 @@ export default {
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  border-radius: 8px;
-  padding: 8px 16px;
+  border-radius: 12px;
+  padding: 10px 18px;
   font-size: 14px;
+  font-weight: 500;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .refresh-btn:hover {
@@ -686,33 +696,36 @@ export default {
 }
 
 .weather-content {
-  padding: 24px 32px;
+  padding: 28px 32px;
 }
 
 .weather-item {
   display: flex;
   align-items: center;
-  padding: 24px;
+  padding: 28px;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
+  border-radius: 16px;
   backdrop-filter: blur(20px);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .weather-item:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
   background: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .weather-icon {
-  font-size: 48px;
-  margin-right: 20px;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 52px;
+  margin-right: 24px;
+  color: rgba(255, 255, 255, 0.95);
   transition: transform 0.3s ease;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .weather-item:hover .weather-icon {
@@ -726,21 +739,28 @@ export default {
 
 .weather-title {
   font-size: 16px;
-  opacity: 0.9;
-  margin-bottom: 8px;
-  font-weight: 500;
+  opacity: 0.95;
+  margin-bottom: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .weather-value {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 6px;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .weather-desc {
   font-size: 14px;
-  opacity: 0.8;
+  opacity: 0.85;
+  font-weight: 500;
 }
 
 .item-decoration {
@@ -760,53 +780,67 @@ export default {
 
 /* 搜索区域样式 */
 .search-section {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(5, 117, 230, 0.1);
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-section:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(34, 197, 94, 0.2);
 }
 
 .search-input,
 .date-picker {
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.8);
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .search-input:focus,
 .date-picker:focus {
-  border-color: #0575E6;
-  box-shadow: 0 0 0 3px rgba(5, 117, 230, 0.1);
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .search-btn {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   color: white;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.3s ease;
+  padding: 10px 20px;
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
 }
 
 .search-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.3), 0 10px 10px -5px rgba(34, 197, 94, 0.1);
 }
 
 .reset-btn {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  color: #64748B;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+  color: #6b7280;
   transition: all 0.3s ease;
+  padding: 10px 20px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .reset-btn:hover {
-  border-color: #0575E6;
-  color: #0575E6;
-  background: rgba(5, 117, 230, 0.05);
+  border-color: #22c55e;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.05);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
 }
 
 /* 操作按钮样式 */
@@ -815,53 +849,55 @@ export default {
 }
 
 .action-btn {
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
+  padding: 10px 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .add-btn {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: white;
 }
 
 .add-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.3), 0 10px 10px -5px rgba(34, 197, 94, 0.1);
 }
 
 .edit-btn {
-  background: #10b981;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
 }
 
 .edit-btn:hover {
-  background: #059669;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.3), 0 10px 10px -5px rgba(16, 185, 129, 0.1);
 }
 
 .delete-btn {
-  background: #ef4444;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
 }
 
 .delete-btn:hover {
-  background: #dc2626;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.3), 0 10px 10px -5px rgba(239, 68, 68, 0.1);
 }
 
 .export-btn {
-  background: #FFB300;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
 }
 
 .export-btn:hover {
-  background: #f59e0b;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 179, 0, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(245, 158, 11, 0.3), 0 10px 10px -5px rgba(245, 158, 11, 0.1);
 }
 
 /* 表格样式 */
@@ -932,24 +968,27 @@ export default {
 }
 
 .weather-data-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid transparent;
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: #ffffff;
+  overflow: hidden;
 }
 
 .weather-data-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(5, 117, 230, 0.15);
-  border-color: rgba(5, 117, 230, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(34, 197, 94, 0.2);
 }
 
 .weather-data-card.card-selected {
-  border-color: #0575E6;
-  background: linear-gradient(135deg, rgba(5, 117, 230, 0.05) 0%, rgba(0, 242, 96, 0.05) 100%);
+  border-color: #22c55e;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 163, 74, 0.05) 100%);
+  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.15), 0 10px 10px -5px rgba(34, 197, 94, 0.05);
 }
 
 .weather-data-card >>> .el-card__body {
@@ -963,9 +1002,10 @@ export default {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 20px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  backdrop-filter: blur(10px);
 }
 
 .card-checkbox {
@@ -979,16 +1019,16 @@ export default {
   gap: 8px;
   font-size: 16px;
   font-weight: 600;
-  color: #1E293B;
+  color: #1f2937;
 }
 
 .card-title i {
-  color: #0575E6;
+  color: #22c55e;
   font-size: 18px;
 }
 
 .card-body {
-  padding: 20px;
+  padding: 24px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -997,91 +1037,132 @@ export default {
 .data-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
 .data-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  transition: all 0.3s ease;
+}
+
+.data-item:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 163, 74, 0.02) 100%);
+  border-color: rgba(34, 197, 94, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.1);
 }
 
 .data-label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 12px;
-  color: #64748B;
-  font-weight: 500;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .data-label i {
   font-size: 14px;
-  color: #0575E6;
+  color: #22c55e;
 }
 
 .data-value {
   font-size: 14px;
-  font-weight: 600;
-  color: #1E293B;
+  font-weight: 700;
+  color: #1f2937;
   word-break: break-word;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 风向文字样式 */
+.weather-data-card .wind-direction-text {
+  color: #000000 !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
 }
 
 .card-footer {
   margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid #f1f5f9;
+  padding-top: 20px;
+  border-top: 1px solid rgba(229, 231, 235, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 0 0 16px 16px;
 }
 
 .record-time {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 12px;
-  color: #64748B;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .record-time i {
-  color: #0575E6;
+  color: #22c55e;
 }
 
 .card-actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
 }
 
 .card-actions .action-btn {
   flex: 1;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 12px;
-  padding: 8px 12px;
-  transition: all 0.3s ease;
+  padding: 10px 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
 .card-actions .action-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.15);
 }
 
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
-  color: #94a3b8;
+  padding: 80px 20px;
+  color: #9ca3af;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 16px;
+  border: 2px dashed rgba(156, 163, 175, 0.3);
+  margin: 20px 0;
 }
 
 .empty-state i {
-  font-size: 64px;
-  margin-bottom: 16px;
-  opacity: 0.5;
+  font-size: 72px;
+  margin-bottom: 20px;
+  opacity: 0.6;
+  color: #22c55e;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .empty-state p {
   font-size: 16px;
   margin: 0;
+  font-weight: 500;
+  color: #6b7280;
 }
 
 /* 响应式设计 */
@@ -1109,28 +1190,33 @@ export default {
 /* 对话框样式 */
 .weather-dialog {
   border-radius: 16px;
+  overflow: hidden;
 }
 
 .weather-dialog .el-dialog__header {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: white;
   border-radius: 16px 16px 0 0;
-  padding: 24px 32px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .weather-dialog .el-dialog__title {
   color: white;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .weather-dialog .el-dialog__body {
   padding: 32px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
 }
 
 .dialog-form .el-form-item__label {
-  color: #1E293B;
-  font-weight: 500;
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .form-input,
@@ -1138,9 +1224,10 @@ export default {
 .form-select,
 .form-date-picker,
 .form-textarea {
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.8);
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .form-input:focus,
@@ -1148,45 +1235,51 @@ export default {
 .form-select:focus,
 .form-date-picker:focus,
 .form-textarea:focus {
-  border-color: #0575E6;
-  box-shadow: 0 0 0 3px rgba(5, 117, 230, 0.1);
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .dialog-footer {
   text-align: right;
   padding: 24px 32px;
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   border-radius: 0 0 16px 16px;
+  border-top: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .cancel-btn {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  color: #64748B;
-  padding: 10px 20px;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+  color: #6b7280;
+  padding: 12px 24px;
   transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .cancel-btn:hover {
-  border-color: #0575E6;
-  color: #0575E6;
-  background: rgba(5, 117, 230, 0.05);
+  border-color: #22c55e;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   color: white;
-  padding: 10px 20px;
-  font-weight: 500;
+  padding: 12px 24px;
+  font-weight: 600;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.3), 0 10px 10px -5px rgba(34, 197, 94, 0.1);
 }
 
 /* 通用样式 */
@@ -1228,14 +1321,12 @@ export default {
 }
 
 /* 动画效果 */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
+@keyframes shimmer {
+  0% {
+    transform: rotate(0deg);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  100% {
+    transform: rotate(360deg);
   }
 }
 
@@ -1247,4 +1338,15 @@ export default {
 .weather-item:nth-child(2) { animation-delay: 0.2s; }
 .weather-item:nth-child(3) { animation-delay: 0.3s; }
 .weather-item:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>

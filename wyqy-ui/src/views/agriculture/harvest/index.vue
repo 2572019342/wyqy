@@ -1,11 +1,11 @@
 <template>
   <div class="harvest-container">
     <!-- 采摘统计概览 -->
-    <el-row :gutter="20" class="mb20">
+    <el-row :gutter="20" class="mb20 stats-row">
       <el-col :span="6" v-for="(stat, index) in harvestStats" :key="index">
         <div class="stat-card" :class="'stat-card-' + index" @click="handleStatClick(stat, index)">
           <div class="stat-content">
-            <div class="stat-icon">
+            <div class="stat-icon-wrapper">
               <i :class="stat.icon"></i>
             </div>
             <div class="stat-info">
@@ -13,7 +13,7 @@
               <div class="stat-label">{{ stat.label }}</div>
             </div>
           </div>
-          <div class="stat-glow"></div>
+          <div class="stat-decoration"></div>
         </div>
       </el-col>
     </el-row>
@@ -22,8 +22,11 @@
     <div class="harvestable-card">
       <div class="card-header">
         <div class="header-title">
-          <i class="el-icon-shopping-bag-2"></i>
+          <div class="header-icon">
+            <i class="el-icon-shopping-bag-2"></i>
+          </div>
           <span>可采摘列表</span>
+          <span class="header-badge" v-if="harvestablePlantings.length > 0">{{ harvestablePlantings.length }}</span>
         </div>
       </div>
       <div class="table-section">
@@ -32,30 +35,32 @@
           <el-table-column label="作物名称" align="center" prop="speciesName" min-width="120" />
           <el-table-column label="种植日期" align="center" prop="plantingDate" width="120">
             <template slot-scope="scope">
-              <span>{{ parseTime(scope.row.plantingDate, '{y}-{m}-{d}') }}</span>
+              <span class="date-text">{{ parseTime(scope.row.plantingDate, '{y}-{m}-{d}') }}</span>
             </template>
           </el-table-column>
           <el-table-column label="种植面积(亩)" align="center" prop="plantingArea" min-width="120" />
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="120">
             <template slot-scope="scope">
-              <el-button size="mini" type="primary" icon="el-icon-collection" @click="handleHarvest(scope.row)" class="action-link">采摘</el-button>
+              <el-button size="mini" type="primary" icon="el-icon-collection" @click="handleHarvest(scope.row)" class="harvest-btn">采摘</el-button>
             </template>
           </el-table-column>
         </el-table>
         <div v-if="harvestablePlantings.length === 0 && !harvestableLoading" class="empty-state">
-          <i class="el-icon-document"></i>
+          <div class="empty-icon">
+            <i class="el-icon-document"></i>
+          </div>
           <p>暂无可采摘的作物</p>
         </div>
       </div>
     </div>
 
-
-
     <!-- 采摘记录列表 -->
     <div class="harvest-list-card">
       <div class="card-header">
         <div class="header-title">
-          <i class="el-icon-s-order"></i>
+          <div class="header-icon">
+            <i class="el-icon-s-order"></i>
+          </div>
           <span>采摘记录列表</span>
         </div>
       </div>
@@ -120,31 +125,41 @@
           <el-table-column label="作物名称" align="center" prop="speciesName" min-width="120" />
           <el-table-column label="采摘时间" align="center" prop="harvestDate" width="180">
             <template slot-scope="scope">
-              <span>{{ parseTime(scope.row.harvestDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+              <span class="date-text">{{ parseTime(scope.row.harvestDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
             </template>
           </el-table-column>
           <el-table-column label="采摘面积(亩)" align="center" prop="harvestArea" min-width="120" />
-          <el-table-column label="采摘数量(kg)" align="center" prop="harvestQuantity" min-width="120" />
+          <el-table-column label="采摘数量(kg)" align="center" prop="harvestQuantity" min-width="120">
+            <template slot-scope="scope">
+              <span class="quantity-text">{{ scope.row.harvestQuantity }}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="质量等级" align="center" prop="qualityGrade" min-width="100">
             <template slot-scope="scope">
-              <el-tag :type="getQualityGradeType(scope.row.qualityGrade)" size="small">{{ scope.row.qualityGrade }}</el-tag>
+              <span class="quality-tag" :class="'quality-' + getQualityGradeType(scope.row.qualityGrade)">{{ scope.row.qualityGrade }}</span>
             </template>
           </el-table-column>
           <el-table-column label="单价(元/kg)" align="center" prop="unitPrice" min-width="120" />
-          <el-table-column label="总价(元)" align="center" prop="totalPrice" min-width="120" />
+          <el-table-column label="总价(元)" align="center" prop="totalPrice" min-width="120">
+            <template slot-scope="scope">
+              <span class="price-text">{{ scope.row.totalPrice }}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="操作人员" align="center" prop="operator" min-width="100" />
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
             <template slot-scope="scope">
-              <el-button size="mini" type="primary" icon="el-icon-view" @click="handleView(scope.row)" class="action-link">查看</el-button>
-              <el-button size="mini" type="success" icon="el-icon-edit" @click="handleUpdate(scope.row)" 
-                         v-hasPermi="['agriculture:harvest:edit']" class="action-link">修改</el-button>
-              <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)" 
-                         v-hasPermi="['agriculture:harvest:remove']" class="action-link">删除</el-button>
+              <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row)" class="action-link view-link">查看</el-button>
+              <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" 
+                         v-hasPermi="['agriculture:harvest:edit']" class="action-link edit-link">修改</el-button>
+              <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" 
+                         v-hasPermi="['agriculture:harvest:remove']" class="action-link delete-link">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
         <div v-if="harvestList.length === 0 && !loading" class="empty-state">
-          <i class="el-icon-document"></i>
+          <div class="empty-icon">
+            <i class="el-icon-document"></i>
+          </div>
           <p>暂无数据</p>
         </div>
       </div>
@@ -160,7 +175,7 @@
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body 
                class="harvest-dialog" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px" class="dialog-form">
-        <el-row>
+        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="种植记录" prop="plantingId">
               <el-select v-model="form.plantingId" placeholder="请选择种植记录" class="form-select" style="width: 100%">
@@ -175,7 +190,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="采摘面积(亩)" prop="harvestArea">
               <el-input-number v-model="form.harvestArea" :precision="2" :step="0.1" :min="0" class="form-number" style="width: 100%" />
@@ -198,7 +213,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="单价(元/kg)" prop="unitPrice">
               <el-input-number v-model="form.unitPrice" :precision="2" :step="0.01" :min="0" class="form-number" style="width: 100%" />
@@ -219,7 +234,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="存储位置" prop="storageLocation">
               <el-input v-model="form.storageLocation" placeholder="请输入存储位置" class="form-input" />
@@ -231,7 +246,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="收购方" prop="buyer">
               <el-input v-model="form.buyer" placeholder="请输入收购方" class="form-input" />
@@ -259,7 +274,7 @@
 
     <!-- 查看采摘详情对话框 -->
     <el-dialog title="采摘详情" :visible.sync="viewOpen" width="800px" append-to-body 
-               class="harvest-dialog" :close-on-click-modal="false">
+               class="harvest-dialog view-dialog" :close-on-click-modal="false">
       <el-descriptions :column="2" border v-if="currentHarvest" class="dialog-descriptions">
         <el-descriptions-item label="地块名称">{{ currentHarvest.landName || '--' }}</el-descriptions-item>
         <el-descriptions-item label="作物名称">{{ currentHarvest.speciesName || '--' }}</el-descriptions-item>
@@ -267,10 +282,12 @@
         <el-descriptions-item label="采摘面积">{{ currentHarvest.harvestArea || '--' }} 亩</el-descriptions-item>
         <el-descriptions-item label="采摘数量">{{ currentHarvest.harvestQuantity || '--' }} kg</el-descriptions-item>
         <el-descriptions-item label="质量等级">
-          <el-tag :type="getQualityGradeType(currentHarvest.qualityGrade)">{{ currentHarvest.qualityGrade || '--' }}</el-tag>
+          <span class="quality-tag" :class="'quality-' + getQualityGradeType(currentHarvest.qualityGrade)">{{ currentHarvest.qualityGrade || '--' }}</span>
         </el-descriptions-item>
         <el-descriptions-item label="单价">{{ currentHarvest.unitPrice || '--' }} 元/kg</el-descriptions-item>
-        <el-descriptions-item label="总价">{{ currentHarvest.totalPrice || '--' }} 元</el-descriptions-item>
+        <el-descriptions-item label="总价">
+          <span class="price-highlight">{{ currentHarvest.totalPrice || '--' }} 元</span>
+        </el-descriptions-item>
         <el-descriptions-item label="采摘方式">{{ currentHarvest.harvestMethod || '--' }}</el-descriptions-item>
         <el-descriptions-item label="操作人员">{{ currentHarvest.operator || '--' }}</el-descriptions-item>
         <el-descriptions-item label="存储位置">{{ currentHarvest.storageLocation || '--' }}</el-descriptions-item>
@@ -698,44 +715,46 @@ export default {
 <style scoped>
 /* 主容器样式 */
 .harvest-container {
-  background-color: #F7F9FC;
+  background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 50%, #FFF8E1 100%);
   min-height: 100vh;
-  padding: 20px;
+  padding: 24px;
+}
+
+/* 统计卡片行样式 */
+.stats-row {
+  margin-bottom: 24px;
 }
 
 /* 统计卡片样式 */
 .stat-card {
   position: relative;
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
-  color: white;
-  border: none;
   border-radius: 16px;
   padding: 0;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(5, 117, 230, 0.4);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .stat-card-0 {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
 }
 
 .stat-card-1 {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5D4037 0%, #8D6E63 100%);
 }
 
 .stat-card-2 {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
 }
 
 .stat-card-3 {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: linear-gradient(135deg, #0277BD 0%, #4FC3F7 100%);
 }
 
 .stat-content {
@@ -744,13 +763,24 @@ export default {
   padding: 24px;
   position: relative;
   z-index: 2;
+  color: white;
 }
 
-.stat-icon {
-  font-size: 48px;
-  margin-right: 20px;
-  opacity: 0.9;
-  animation: float 3s ease-in-out infinite;
+.stat-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.stat-icon-wrapper i {
+  font-size: 28px;
+  color: white;
 }
 
 .stat-info {
@@ -759,53 +789,47 @@ export default {
 
 .stat-value {
   font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-weight: 700;
+  margin-bottom: 4px;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .stat-label {
-  font-size: 16px;
+  font-size: 14px;
   opacity: 0.9;
   font-weight: 500;
 }
 
-.stat-glow {
+.stat-decoration {
   position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  animation: rotate 10s linear infinite;
+  top: -30%;
+  right: -10%;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 1;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* 卡片样式 */
-.harvestable-card, .harvest-list-card {
+/* 卡片通用样式 */
+.harvestable-card,
+.harvest-list-card {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  margin-top: 20px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(46, 125, 50, 0.1);
 }
 
 .card-header {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
-  color: white;
-  padding: 20px 24px;
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+  padding: 20px 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid rgba(46, 125, 50, 0.1);
 }
 
 .header-title {
@@ -813,169 +837,282 @@ export default {
   align-items: center;
   font-size: 18px;
   font-weight: 600;
+  color: #2E7D32;
   gap: 12px;
 }
 
-.header-title i {
-  font-size: 20px;
+.header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-icon i {
+  font-size: 18px;
+  color: white;
+}
+
+.header-badge {
+  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  min-width: 24px;
+  text-align: center;
 }
 
 /* 搜索区域样式 */
 .search-section {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(5, 117, 230, 0.1);
+  background: #FAFAFA;
+  padding: 20px 28px;
+  border-bottom: 1px solid #E8EEF4;
 }
 
-.search-input,
-.search-select {
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+.search-input >>> .el-input__inner,
+.search-select >>> .el-input__inner {
+  border-radius: 10px;
+  border: 2px solid #E8EEF4;
   transition: all 0.3s ease;
+  height: 38px;
 }
 
-.search-input:focus,
-.search-select:focus {
-  border-color: #0575E6;
-  box-shadow: 0 0 0 3px rgba(5, 117, 230, 0.1);
+.search-input >>> .el-input__inner:focus,
+.search-select >>> .el-input__inner:focus {
+  border-color: #2E7D32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
 }
 
 .search-btn {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   color: white;
-  font-weight: 500;
+  font-weight: 600;
+  padding: 10px 20px;
   transition: all 0.3s ease;
 }
 
 .search-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);
 }
 
 .reset-btn {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  color: #64748B;
+  border: 2px solid #E8EEF4;
+  border-radius: 10px;
+  color: #5D4037;
+  font-weight: 500;
+  padding: 10px 20px;
   transition: all 0.3s ease;
 }
 
 .reset-btn:hover {
-  border-color: #0575E6;
-  color: #0575E6;
-  background: rgba(5, 117, 230, 0.05);
+  border-color: #2E7D32;
+  color: #2E7D32;
+  background: rgba(46, 125, 50, 0.05);
 }
 
 /* 操作按钮区域 */
 .action-section {
-  padding: 20px 24px;
+  padding: 20px 28px;
   background: white;
   border-bottom: 1px solid #E8EEF4;
 }
 
 .action-btn {
-  border-radius: 8px;
-  font-weight: 500;
+  border-radius: 10px;
+  font-weight: 600;
   transition: all 0.3s ease;
   border: none;
+  padding: 10px 16px;
 }
 
 .add-btn {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
   color: white;
 }
 
 .add-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);
 }
 
 .edit-btn {
-  background: #10b981;
+  background: linear-gradient(135deg, #0277BD 0%, #4FC3F7 100%);
   color: white;
 }
 
 .edit-btn:hover {
-  background: #059669;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 6px 20px rgba(2, 119, 189, 0.3);
 }
 
 .delete-btn {
-  background: #ef4444;
+  background: linear-gradient(135deg, #C62828 0%, #EF5350 100%);
   color: white;
 }
 
 .delete-btn:hover {
-  background: #dc2626;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 6px 20px rgba(198, 40, 40, 0.3);
 }
 
 .export-btn {
-  background: #FFB300;
+  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
   color: white;
 }
 
 .export-btn:hover {
-  background: #f59e0b;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 179, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(230, 81, 0, 0.3);
 }
 
 /* 表格区域 */
 .table-section {
-  padding: 0 24px;
+  padding: 0 28px 28px;
 }
 
 .modern-table {
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
+  margin-top: 16px;
 }
 
 .modern-table >>> .el-table__header {
-  background: linear-gradient(90deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
 }
 
 .modern-table >>> .el-table__header th {
-  color: white;
+  background: transparent;
+  color: #2E7D32;
   font-weight: 600;
   border: none;
   padding: 16px 12px;
+  font-size: 14px;
 }
 
 .modern-table >>> .el-table__body tr {
   transition: all 0.3s ease;
 }
 
-.modern-table >>> .el-table__body tr:hover {
-  background-color: #F8FAFF;
+.modern-table >>> .el-table__body tr:hover > td {
+  background-color: #F1F8E9 !important;
 }
 
+.modern-table >>> .el-table__body td {
+  border-bottom: 1px solid #E8EEF4;
+  padding: 14px 12px;
+}
+
+.date-text {
+  color: #5D4037;
+  font-size: 13px;
+}
+
+.quantity-text {
+  color: #2E7D32;
+  font-weight: 600;
+}
+
+.price-text {
+  color: #E65100;
+  font-weight: 700;
+}
+
+/* 质量等级标签 */
+.quality-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.quality-success {
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+  color: #2E7D32;
+}
+
+.quality-primary {
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  color: #0277BD;
+}
+
+.quality-warning {
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+  color: #E65100;
+}
+
+.quality-info {
+  background: linear-gradient(135deg, #ECEFF1 0%, #CFD8DC 100%);
+  color: #546E7A;
+}
+
+.quality-danger {
+  background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+  color: #C62828;
+}
+
+/* 采摘按钮 */
+.harvest-btn {
+  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.harvest-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.3);
+}
+
+/* 操作链接样式 */
 .action-link {
-  margin: 0 4px;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 6px;
   font-weight: 500;
   transition: all 0.3s ease;
-  border: none;
 }
 
-.action-link:hover {
-  transform: scale(1.05);
+.view-link {
+  color: #0277BD;
+}
+
+.view-link:hover {
+  background: rgba(2, 119, 189, 0.1);
+}
+
+.edit-link {
+  color: #2E7D32;
+}
+
+.edit-link:hover {
+  background: rgba(46, 125, 50, 0.1);
+}
+
+.delete-link {
+  color: #C62828;
+}
+
+.delete-link:hover {
+  background: rgba(198, 40, 40, 0.1);
 }
 
 /* 分页区域 */
 .pagination-section {
-  padding: 20px 24px;
+  padding: 20px 28px;
   display: flex;
   justify-content: center;
-  background: white;
+  background: #FAFAFA;
   border-top: 1px solid #E8EEF4;
 }
 
@@ -986,111 +1123,159 @@ export default {
   color: #94a3b8;
 }
 
-.empty-state i {
-  font-size: 64px;
-  margin-bottom: 16px;
-  opacity: 0.5;
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.empty-icon i {
+  font-size: 36px;
+  color: #66BB6A;
 }
 
 .empty-state p {
   font-size: 16px;
   margin: 0;
+  color: #5D4037;
 }
 
 /* 对话框样式 */
-.harvest-dialog {
-  border-radius: 16px;
+.harvest-dialog >>> .el-dialog {
+  border-radius: 20px;
+  overflow: hidden;
 }
 
-.harvest-dialog .el-dialog__header {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
-  color: white;
-  border-radius: 16px 16px 0 0;
+.harvest-dialog >>> .el-dialog__header {
+  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
   padding: 24px 32px;
+  margin: 0;
 }
 
-.harvest-dialog .el-dialog__title {
+.harvest-dialog >>> .el-dialog__title {
   color: white;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
 }
 
-.harvest-dialog .el-dialog__body {
+.harvest-dialog >>> .el-dialog__headerbtn .el-dialog__close {
+  color: white;
+  font-size: 20px;
+}
+
+.harvest-dialog >>> .el-dialog__body {
   padding: 32px;
+  background: white;
 }
 
 .dialog-form .el-form-item__label {
-  color: #1E293B;
-  font-weight: 500;
+  color: #2E7D32;
+  font-weight: 600;
 }
 
-.form-input,
-.form-number,
-.form-select,
-.form-date-picker,
-.form-textarea {
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+.form-input >>> .el-input__inner,
+.form-select >>> .el-input__inner,
+.form-date-picker >>> .el-input__inner {
+  border-radius: 10px;
+  border: 2px solid #E8EEF4;
   transition: all 0.3s ease;
 }
 
-.form-input:focus,
-.form-number:focus,
-.form-select:focus,
-.form-date-picker:focus,
-.form-textarea:focus {
-  border-color: #0575E6;
-  box-shadow: 0 0 0 3px rgba(5, 117, 230, 0.1);
+.form-input >>> .el-input__inner:focus,
+.form-select >>> .el-input__inner:focus,
+.form-date-picker >>> .el-input__inner:focus {
+  border-color: #2E7D32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+.form-number >>> .el-input__inner {
+  border-radius: 10px;
+  border: 2px solid #E8EEF4;
+}
+
+.form-number >>> .el-input__inner:focus {
+  border-color: #2E7D32;
+}
+
+.form-textarea >>> .el-textarea__inner {
+  border-radius: 10px;
+  border: 2px solid #E8EEF4;
+  transition: all 0.3s ease;
+}
+
+.form-textarea >>> .el-textarea__inner:focus {
+  border-color: #2E7D32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+/* 详情对话框样式 */
+.view-dialog >>> .el-dialog__header {
+  background: linear-gradient(135deg, #0277BD 0%, #4FC3F7 100%);
 }
 
 .dialog-descriptions {
-  padding: 20px 0;
+  margin-top: 0;
 }
 
 .dialog-descriptions >>> .el-descriptions__label {
-  color: #1E293B;
-  font-weight: 500;
+  background: #F1F8E9;
+  color: #2E7D32;
+  font-weight: 600;
+  width: 120px;
 }
 
 .dialog-descriptions >>> .el-descriptions__content {
-  color: #64748B;
+  color: #5D4037;
+}
+
+.price-highlight {
+  color: #E65100;
+  font-weight: 700;
+  font-size: 16px;
 }
 
 .dialog-footer {
   text-align: right;
   padding: 24px 32px;
-  background: #f8fafc;
-  border-radius: 0 0 16px 16px;
+  background: #FAFAFA;
+  border-top: 1px solid #E8EEF4;
 }
 
 .cancel-btn {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  color: #64748B;
-  padding: 10px 20px;
+  border: 2px solid #E8EEF4;
+  border-radius: 10px;
+  color: #5D4037;
+  padding: 12px 24px;
+  font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .cancel-btn:hover {
-  border-color: #0575E6;
-  color: #0575E6;
-  background: rgba(5, 117, 230, 0.05);
+  border-color: #2E7D32;
+  color: #2E7D32;
+  background: rgba(46, 125, 50, 0.05);
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #0575E6 0%, #00F260 100%);
+  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   color: white;
-  padding: 10px 20px;
-  font-weight: 500;
+  padding: 12px 24px;
+  font-weight: 600;
   transition: all 0.3s ease;
+  margin-left: 12px;
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(5, 117, 230, 0.3);
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);
 }
 
 /* 间距样式 */
@@ -1105,11 +1290,19 @@ export default {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .harvest-container {
-    padding: 12px;
+    padding: 16px;
   }
   
   .stat-card {
     margin-bottom: 16px;
+  }
+  
+  .stat-content {
+    padding: 20px;
+  }
+  
+  .stat-value {
+    font-size: 24px;
   }
   
   .card-header {
