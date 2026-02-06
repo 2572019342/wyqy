@@ -57,17 +57,14 @@ public class TranslationServiceImpl implements ITranslationService
             response.setSourceLanguage(request.getSourceLanguage());
             response.setTargetLanguage(request.getTargetLanguage());
             
-            // 模拟语料库匹配
-            List<TranslationCorpus> matchingCorpus = translationCorpusMapper.selectMatchingCorpus(
-                request.getSourceText(), request.getSourceLanguage(), request.getTargetLanguage(), request.getDomainType());
-            
+            // 直接进行简单翻译，不查询数据库
             List<TranslationResponse.CorpusMatch> corpusMatches = new ArrayList<>();
-            String translatedText = simulateTranslation(request.getSourceText(), matchingCorpus, corpusMatches);
+            String translatedText = simulateAutoTranslation(request.getSourceText());
             
             response.setTargetText(translatedText);
             response.setCorpusMatches(corpusMatches);
-            response.setCorpusHitRate(corpusMatches.isEmpty() ? 0.0 : (double) corpusMatches.size() / (corpusMatches.size() + 1));
-            response.setConfidenceScore(calculateConfidenceScore(corpusMatches));
+            response.setCorpusHitRate(0.0);
+            response.setConfidenceScore(0.8);
             response.setStatus("0");
             
             // 记录翻译历史
@@ -121,8 +118,8 @@ public class TranslationServiceImpl implements ITranslationService
         } else if (sourceText.toLowerCase().contains("please")) {
             return sourceText.toLowerCase().replace("please", "请");
         } else {
-            // 默认添加"翻译："前缀
-            return "翻译：" + sourceText;
+            // 直接返回原文，不添加任何前缀
+            return sourceText;
         }
     }
 

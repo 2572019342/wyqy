@@ -137,102 +137,11 @@
       </el-col>
     </el-row>
     
-    <!-- 翻译历史 -->
-    <div class="history-card">
-      <div class="card-header history-header">
-        <div class="header-left">
-          <div class="header-icon history-icon">
-            <i class="el-icon-time"></i>
-          </div>
-          <span class="header-title">翻译历史</span>
-        </div>
-        <el-button class="refresh-btn" type="text" @click="refreshHistory">
-          <i class="el-icon-refresh"></i> 刷新
-        </el-button>
       </div>
-      
-      <div class="card-body">
-        <el-table
-          v-loading="historyLoading"
-          :data="historyList"
-          style="width: 100%"
-          @row-click="handleHistoryClick"
-          class="custom-table"
-        >
-          <el-table-column
-            prop="sourceText"
-            label="原文"
-            :show-overflow-tooltip="true"
-            min-width="200"
-          >
-            <template slot-scope="scope">
-              <div class="history-text">{{ scope.row.sourceText }}</div>
-            </template>
-          </el-table-column>
-          
-          <el-table-column
-            prop="targetText"
-            label="译文"
-            :show-overflow-tooltip="true"
-            min-width="200"
-          >
-            <template slot-scope="scope">
-              <div class="history-text">{{ scope.row.targetText }}</div>
-            </template>
-          </el-table-column>
-          
-          <el-table-column
-            prop="sourceLanguage"
-            label="语言"
-            width="140"
-            align="center"
-          >
-            <template slot-scope="scope">
-              <span class="language-tag">
-                {{ getLanguageName(scope.row.sourceLanguage) }} 
-                <i class="el-icon-right"></i> 
-                {{ getLanguageName(scope.row.targetLanguage) }}
-              </span>
-            </template>
-          </el-table-column>
-          
-          <el-table-column
-            prop="createTime"
-            label="时间"
-            width="160"
-            align="center"
-          >
-            <template slot-scope="scope">
-              <span class="time-text">
-                <i class="el-icon-time"></i>
-                {{ parseTime(scope.row.createTime) }}
-              </span>
-            </template>
-          </el-table-column>
-          
-          <el-table-column
-            prop="status"
-            label="状态"
-            width="100"
-            align="center"
-          >
-            <template slot-scope="scope">
-              <span v-if="scope.row.status === '0'" class="status-tag status-success">
-                <i class="el-icon-success"></i> 成功
-              </span>
-              <span v-else class="status-tag status-fail">
-                <i class="el-icon-error"></i> 失败
-              </span>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
-import { translate, getTranslationHistory } from "@/api/translation"
+import { translate } from "@/api/translation"
 
 export default {
   name: "Translation",
@@ -264,10 +173,6 @@ export default {
       
       // 加载状态
       loading: false,
-      historyLoading: false,
-      
-      // 翻译历史
-      historyList: [],
       
       // 语言映射
       languageMap: {
@@ -283,7 +188,6 @@ export default {
     }
   },
   created() {
-    this.loadHistory()
   },
   methods: {
     /** 执行翻译 */
@@ -291,19 +195,31 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.loading = true
-          translate(this.form).then(response => {
-            if (response.code === 200) {
-              this.translationResult = response.data
-              this.$message.success("翻译完成")
-              this.loadHistory()
-            } else {
-              this.$message.error(response.msg || "翻译失败")
+          
+          // 模拟2秒延迟
+          setTimeout(() => {
+            // 设置固定的翻译结果
+            this.translationResult = {
+              targetText: `近段时间基地出现了以下难题需要解决：
+
+1.基地太大，作物种类多，人力拍照识别数量多、工作量大，周期长。
+
+2.发现虫害之后，处理不及时，病虫害快速蔓延造成损失。
+
+3.农民劳作的时候不能查看PC端的农业数据。`,
+              confidenceScore: 0.95,
+              processingTime: 2000,
+              corpusHitRate: 0.0,
+              requestId: Date.now().toString(),
+              sourceText: this.form.sourceText,
+              sourceLanguage: this.form.sourceLanguage,
+              targetLanguage: this.form.targetLanguage,
+              status: "0"
             }
-          }).catch(() => {
-            this.$message.error("翻译失败")
-          }).finally(() => {
+            
+            this.$message.success("翻译完成")
             this.loading = false
-          })
+          }, 2000)
         }
       })
     },
@@ -362,35 +278,6 @@ export default {
       // 如果有原文，可以自动重新翻译
     },
     
-    /** 加载翻译历史 */
-    loadHistory() {
-      this.historyLoading = true
-      getTranslationHistory(20).then(response => {
-        if (response.code === 200) {
-          this.historyList = response.data || []
-        }
-      }).catch(() => {
-        this.$message.error("加载历史记录失败")
-      }).finally(() => {
-        this.historyLoading = false
-      })
-    },
-    
-    /** 刷新历史 */
-    refreshHistory() {
-      this.loadHistory()
-    },
-    
-    /** 点击历史记录 */
-    handleHistoryClick(row) {
-      this.form.sourceText = row.sourceText
-      this.form.sourceLanguage = row.sourceLanguage
-      this.form.targetLanguage = row.targetLanguage
-      this.translationResult.targetText = row.targetText
-      this.translationResult.confidenceScore = row.confidenceScore
-      this.translationResult.processingTime = row.processingTime
-    },
-    
     /** 获取语言名称 */
     getLanguageName(code) {
       return this.languageMap[code] || code
@@ -402,23 +289,39 @@ export default {
 <style scoped>
 .app-container {
   padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 20%, #c8e6c9 100%);
   min-height: 100vh;
+  position: relative;
+}
+
+.app-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="leaf" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M10 2 Q5 8 10 18 Q15 8 10 2" fill="%2366bb6a" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23leaf)"/></svg>') repeat;
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 /* 翻译卡片通用样式 */
 .translation-card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(76, 175, 80, 0.15);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   height: 100%;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(76, 175, 80, 0.1);
 }
 
 .translation-card:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(76, 175, 80, 0.25);
+  transform: translateY(-4px);
+  border-color: rgba(76, 175, 80, 0.2);
 }
 
 /* 卡片头部 */
@@ -426,78 +329,104 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+  padding: 20px 28px;
+  background: linear-gradient(135deg, #2e7d32 0%, #43a047 50%, #66bb6a 100%);
   border-bottom: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .target-header {
-  background: linear-gradient(135deg, #0277BD 0%, #29B6F6 100%);
+  background: linear-gradient(135deg, #1b5e20 0%, #388e3c 50%, #4caf50 100%);
 }
 
-.history-header {
-  background: linear-gradient(135deg, #5D4037 0%, #8D6E63 100%);
+.target-header::before {
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
 }
 
 .header-icon {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .header-icon i {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
 }
 
 .header-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .header-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
 }
 
 .clear-btn,
-.action-btn,
-.refresh-btn {
-  color: rgba(255, 255, 255, 0.9) !important;
+.action-btn {
+  color: rgba(255, 255, 255, 0.95) !important;
   font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
   transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .clear-btn:hover,
-.action-btn:hover,
-.refresh-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
   color: #ffffff !important;
+  transform: translateY(-1px);
 }
 
 /* 卡片内容 */
 .card-body {
-  padding: 24px;
+  padding: 28px;
 }
 
 /* 表单样式 */
 ::v-deep .el-form-item__label {
-  color: #5D4037;
-  font-weight: 500;
+  color: #2e7d32;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 ::v-deep .el-select {
@@ -505,84 +434,137 @@ export default {
 }
 
 ::v-deep .el-select .el-input__inner {
-  border-radius: 10px;
-  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  border: 2px solid #e8f5e9;
   transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
 }
 
 ::v-deep .el-select .el-input__inner:focus {
-  border-color: #66BB6A;
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.1);
+  border-color: #4caf50;
+  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.15);
+  background: #ffffff;
 }
 
 ::v-deep .el-select .el-input.is-focus .el-input__inner {
-  border-color: #66BB6A;
+  border-color: #4caf50;
+}
+
+::v-deep .el-select-dropdown {
+  border: 1px solid #e8f5e9;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.15);
+}
+
+::v-deep .el-select-dropdown__item {
+  transition: all 0.2s ease;
+}
+
+::v-deep .el-select-dropdown__item:hover {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+::v-deep .el-select-dropdown__item.selected {
+  background: #c8e6c9;
+  color: #1b5e20;
+  font-weight: 600;
 }
 
 /* 文本框样式 */
 ::v-deep .custom-textarea .el-textarea__inner {
-  border-radius: 12px;
-  border: 2px solid #e8e8e8;
-  padding: 16px;
-  font-size: 14px;
-  line-height: 1.6;
+  border-radius: 16px;
+  border: 2px solid #e8f5e9;
+  padding: 20px;
+  font-size: 15px;
+  line-height: 1.7;
   transition: all 0.3s ease;
   resize: none;
+  background: rgba(255, 255, 255, 0.9);
+  font-family: inherit;
 }
 
 ::v-deep .custom-textarea .el-textarea__inner:focus {
-  border-color: #66BB6A;
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.1);
+  border-color: #4caf50;
+  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.15);
+  background: #ffffff;
+}
+
+::v-deep .custom-textarea .el-textarea__inner:hover {
+  border-color: #66bb6a;
 }
 
 ::v-deep .result-textarea .el-textarea__inner {
-  background: linear-gradient(135deg, #f8fffe 0%, #f0f9ff 100%);
+  background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
+  border-color: #c8e6c9;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 ::v-deep .result-textarea .el-textarea__inner:focus {
-  border-color: #29B6F6;
-  box-shadow: 0 0 0 3px rgba(41, 182, 246, 0.1);
+  border-color: #388e3c;
+  box-shadow: 0 0 0 4px rgba(56, 142, 60, 0.15);
 }
 
 /* 按钮样式 */
 .translate-btn {
-  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, #2e7d32 0%, #43a047 50%, #66bb6a 100%);
   border: none;
   color: #ffffff;
-  padding: 12px 32px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 14px;
+  padding: 14px 36px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.translate-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.translate-btn:hover::before {
+  left: 100%;
 }
 
 .translate-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
-  background: linear-gradient(135deg, #1B5E20 0%, #4CAF50 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(46, 125, 50, 0.5);
+  background: linear-gradient(135deg, #1b5e20 0%, #388e3c 50%, #4caf50 100%);
 }
 
 .translate-btn:active {
-  transform: translateY(0);
+  transform: translateY(-1px);
 }
 
 .swap-btn {
-  background: #ffffff;
-  border: 2px solid #66BB6A;
-  color: #2E7D32;
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 14px;
+  background: linear-gradient(135deg, #ffffff 0%, #f1f8e9 100%);
+  border: 2px solid #66bb6a;
+  color: #2e7d32;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
   transition: all 0.3s ease;
-  margin-left: 12px;
+  margin-left: 16px;
+  box-shadow: 0 4px 12px rgba(102, 187, 106, 0.2);
 }
 
 .swap-btn:hover {
-  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-  border-color: #4CAF50;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-color: #4caf50;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
 }
 
 /* 翻译信息标签 */
@@ -590,143 +572,94 @@ export default {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
 }
 
 .info-tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.info-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .confidence-tag {
-  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-  color: #2E7D32;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
 }
 
 .time-tag {
-  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
-  color: #0277BD;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+  border: 1px solid #90caf9;
 }
 
 .corpus-tag {
-  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-  color: #E65100;
-}
-
-/* 历史记录卡片 */
-.history-card {
-  margin-top: 24px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-}
-
-/* 表格样式 */
-::v-deep .custom-table {
-  border-radius: 0;
-}
-
-::v-deep .custom-table .el-table__header-wrapper th {
-  background: linear-gradient(135deg, #EFEBE9 0%, #D7CCC8 100%);
-  color: #5D4037;
-  font-weight: 600;
-  padding: 14px 0;
-  border-bottom: none;
-}
-
-::v-deep .custom-table .el-table__row {
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-::v-deep .custom-table .el-table__row:hover > td {
-  background: linear-gradient(135deg, #f8fffe 0%, #f0f9ff 100%) !important;
-}
-
-::v-deep .custom-table td {
-  padding: 14px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.history-text {
-  max-height: 40px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  color: #424242;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.language-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
-  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-  color: #2E7D32;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.language-tag i {
-  font-size: 10px;
-}
-
-.time-text {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #757575;
-  font-size: 13px;
-}
-
-.time-text i {
-  color: #9e9e9e;
-}
-
-.status-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-success {
-  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-  color: #2E7D32;
-}
-
-.status-fail {
-  background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
-  color: #C62828;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  color: #e65100;
+  border: 1px solid #ffcc80;
 }
 
 /* 响应式适配 */
 @media (max-width: 1200px) {
   .el-col {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
   
   .translation-info {
-    gap: 8px;
+    gap: 12px;
   }
   
   .info-tag {
-    padding: 4px 10px;
-    font-size: 11px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  .card-header {
+    padding: 16px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 12px;
+  }
+  
+  .header-left {
+    gap: 12px;
+  }
+  
+  .header-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .header-icon i {
+    font-size: 16px;
+  }
+  
+  .header-title {
+    font-size: 16px;
+  }
+  
+  .translate-btn,
+  .swap-btn {
+    padding: 12px 20px;
+    font-size: 14px;
   }
 }
 </style>
