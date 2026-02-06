@@ -20,7 +20,9 @@ import wyqy.common.core.domain.AjaxResult;
 import wyqy.common.core.redis.RedisCache;
 import wyqy.common.enums.BusinessType;
 import wyqy.agriculture.domain.PlantingRecord;
+import wyqy.agriculture.domain.FarmingManagement;
 import wyqy.agriculture.service.IPlantingRecordService;
+import wyqy.agriculture.service.IFarmingManagementService;
 import wyqy.web.service.LightAlarmService;
 import wyqy.common.utils.poi.ExcelUtil;
 import wyqy.common.core.page.TableDataInfo;
@@ -37,6 +39,9 @@ public class PlantingRecordController extends BaseController
 {
     @Autowired
     private IPlantingRecordService plantingRecordService;
+    
+    @Autowired
+    private IFarmingManagementService farmingManagementService;
     
     @Autowired
     private RedisCache redisCache;
@@ -258,5 +263,73 @@ public class PlantingRecordController extends BaseController
         } catch (Exception e) {
             return error("关闭小灯失败：" + e.getMessage());
         }
+    }
+
+    /**
+     * 查询种植农事管理列表
+     */
+    @PreAuthorize("@ss.hasPermi('agriculture:planting:farming:query')")
+    @GetMapping("/farming/list")
+    public TableDataInfo farmingList(FarmingManagement farmingManagement)
+    {
+        startPage();
+        List<FarmingManagement> list = farmingManagementService.selectFarmingManagementList(farmingManagement);
+        return getDataTable(list);
+    }
+
+    /**
+     * 导出种植农事管理列表
+     */
+    @PreAuthorize("@ss.hasPermi('agriculture:planting:farming:export')")
+    @Log(title = "种植农事管理", businessType = BusinessType.EXPORT)
+    @PostMapping("/farming/export")
+    public void farmingExport(HttpServletResponse response, FarmingManagement farmingManagement)
+    {
+        List<FarmingManagement> list = farmingManagementService.selectFarmingManagementList(farmingManagement);
+        ExcelUtil<FarmingManagement> util = new ExcelUtil<FarmingManagement>(FarmingManagement.class);
+        util.exportExcel(response, list, "种植农事管理数据");
+    }
+
+    /**
+     * 获取种植农事管理详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('agriculture:planting:farming:query')")
+    @GetMapping(value = "/farming/{farmingId}")
+    public AjaxResult getFarmingInfo(@PathVariable("farmingId") Long farmingId)
+    {
+        return AjaxResult.success(farmingManagementService.selectFarmingManagementByFarmingId(farmingId));
+    }
+
+    /**
+     * 新增种植农事管理
+     */
+    @PreAuthorize("@ss.hasPermi('agriculture:planting:farming:add')")
+    @Log(title = "种植农事管理", businessType = BusinessType.INSERT)
+    @PostMapping("/farming")
+    public AjaxResult addFarming(@RequestBody FarmingManagement farmingManagement)
+    {
+        return toAjax(farmingManagementService.insertFarmingManagement(farmingManagement));
+    }
+
+    /**
+     * 修改种植农事管理
+     */
+    @PreAuthorize("@ss.hasPermi('agriculture:planting:farming:edit')")
+    @Log(title = "种植农事管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/farming")
+    public AjaxResult editFarming(@RequestBody FarmingManagement farmingManagement)
+    {
+        return toAjax(farmingManagementService.updateFarmingManagement(farmingManagement));
+    }
+
+    /**
+     * 删除种植农事管理
+     */
+    @PreAuthorize("@ss.hasPermi('agriculture:planting:farming:remove')")
+    @Log(title = "种植农事管理", businessType = BusinessType.DELETE)
+	@DeleteMapping("/farming/{farmingIds}")
+    public AjaxResult removeFarming(@PathVariable Long[] farmingIds)
+    {
+        return toAjax(farmingManagementService.deleteFarmingManagementByFarmingIds(farmingIds));
     }
 }

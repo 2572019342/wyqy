@@ -59,7 +59,7 @@ public class TranslationController extends BaseController
     /**
      * 查询翻译记录列表
      */
-    @PreAuthorize("@ss.hasPermi('system:translation:list')")
+    @PreAuthorize("@ss.hasPermi('translation:record:list')")
     @GetMapping("/record/list")
     public TableDataInfo list(TranslationRecord translationRecord)
     {
@@ -71,7 +71,7 @@ public class TranslationController extends BaseController
     /**
      * 导出翻译记录列表
      */
-    @PreAuthorize("@ss.hasPermi('system:translation:export')")
+    @PreAuthorize("@ss.hasPermi('translation:record:export')")
     @Log(title = "翻译记录", businessType = BusinessType.EXPORT)
     @PostMapping("/record/export")
     public void export(HttpServletResponse response, TranslationRecord translationRecord)
@@ -84,7 +84,7 @@ public class TranslationController extends BaseController
     /**
      * 获取翻译记录详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:translation:query')")
+    @PreAuthorize("@ss.hasPermi('translation:record:detail')")
     @GetMapping("/record/{recordId}")
     public AjaxResult getInfo(@PathVariable("recordId") Long recordId)
     {
@@ -94,7 +94,7 @@ public class TranslationController extends BaseController
     /**
      * 删除翻译记录
      */
-    @PreAuthorize("@ss.hasPermi('system:translation:remove')")
+    @PreAuthorize("@ss.hasPermi('translation:record:remove')")
     @Log(title = "翻译记录", businessType = BusinessType.DELETE)
     @DeleteMapping("/record/{recordIds}")
     public AjaxResult remove(@PathVariable Long[] recordIds)
@@ -119,7 +119,7 @@ public class TranslationController extends BaseController
     /**
      * 查询语料库列表
      */
-    @PreAuthorize("@ss.hasPermi('system:corpus:list')")
+    @PreAuthorize("@ss.hasPermi('translation:corpus:list')")
     @GetMapping("/corpus/list")
     public TableDataInfo corpusList(TranslationCorpus translationCorpus)
     {
@@ -131,7 +131,7 @@ public class TranslationController extends BaseController
     /**
      * 获取语料库详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:corpus:query')")
+    @PreAuthorize("@ss.hasPermi('translation:corpus:query')")
     @GetMapping("/corpus/{corpusId}")
     public AjaxResult getCorpusInfo(@PathVariable("corpusId") Long corpusId)
     {
@@ -141,7 +141,7 @@ public class TranslationController extends BaseController
     /**
      * 新增语料库
      */
-    @PreAuthorize("@ss.hasPermi('system:corpus:add')")
+    @PreAuthorize("@ss.hasPermi('translation:corpus:add')")
     @Log(title = "语料库", businessType = BusinessType.INSERT)
     @PostMapping("/corpus")
     public AjaxResult addCorpus(@RequestBody TranslationCorpus translationCorpus)
@@ -152,7 +152,7 @@ public class TranslationController extends BaseController
     /**
      * 修改语料库
      */
-    @PreAuthorize("@ss.hasPermi('system:corpus:edit')")
+    @PreAuthorize("@ss.hasPermi('translation:corpus:edit')")
     @Log(title = "语料库", businessType = BusinessType.UPDATE)
     @PutMapping("/corpus")
     public AjaxResult editCorpus(@RequestBody TranslationCorpus translationCorpus)
@@ -163,7 +163,7 @@ public class TranslationController extends BaseController
     /**
      * 删除语料库
      */
-    @PreAuthorize("@ss.hasPermi('system:corpus:remove')")
+    @PreAuthorize("@ss.hasPermi('translation:corpus:remove')")
     @Log(title = "语料库", businessType = BusinessType.DELETE)
     @DeleteMapping("/corpus/{corpusIds}")
     public AjaxResult removeCorpus(@PathVariable Long[] corpusIds)

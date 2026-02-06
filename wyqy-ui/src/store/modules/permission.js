@@ -31,6 +31,10 @@ const componentMap = {
   'agriculture/harvest/index': () => import('@/views/agriculture/harvest/index.vue'),
   // 兼容可能的组件路径，将 planting/farming 映射到农事管理页面
   'agriculture/planting/farming': () => import('@/views/agriculture/farming/index.vue'),
+  
+  // 病虫害识别模块
+  'agriculture/pest-detection/photo': () => import('@/views/agriculture/pest-detection/photo.vue'),
+  'agriculture/pest-detection/records': () => import('@/views/agriculture/pest-detection/records.vue'),
 
   // ===== 系统管理模块 =====
   'system/user/index': () => import('@/views/system/user/index.vue'),

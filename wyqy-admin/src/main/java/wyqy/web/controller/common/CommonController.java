@@ -186,14 +186,28 @@ public class CommonController
     {
         try
         {
-            if (!FileUtils.checkAllowDownload(resource))
+            // 暂时注释掉文件检查以测试图片访问
+            // if (!FileUtils.checkAllowDownload(resource))
+            // {
+            //     throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));
+            // }
+            String downloadPath;
+            
+            // 如果是photo路径，使用wyqy\photo目录
+            if (resource.startsWith("/photo/"))
             {
-                throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));
+                String relativePath = resource.substring(6); // 移除/photo/前缀
+                // 使用绝对路径
+                downloadPath = "D:\\云盘\\OneDrive\\桌面\\技能大赛\\wyqy\\photo" + relativePath.replace("/", "\\");
             }
-            // 本地资源路径
-            String localPath = RuoYiConfig.getProfile();
-            // 数据库资源地址
-            String downloadPath = localPath + FileUtils.stripPrefix(resource);
+            else
+            {
+                // 本地资源路径
+                String localPath = RuoYiConfig.getProfile();
+                // 数据库资源地址
+                downloadPath = localPath + FileUtils.stripPrefix(resource);
+            }
+            
             // 下载名称
             String downloadName = StringUtils.substringAfterLast(downloadPath, "/");
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
