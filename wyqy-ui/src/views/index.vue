@@ -16,7 +16,6 @@
  
     </el-row>
 
-    <!-- 指标总览（静态演示数据） -->
     <el-row :gutter="20" class="stat-row">
       <el-col :xs="12" :sm="6" v-for="card in statCards" :key="card.key">
         <el-card shadow="hover" class="stat-card">
@@ -34,7 +33,6 @@
       </el-col>
     </el-row>
 
-    <!-- 中部：农业饼图 + AI 病虫害识别 -->
     <el-row :gutter="20" class="chart-row">
       <el-col :xs="24" :md="14">
         <el-card shadow="hover" class="chart-card">
@@ -97,7 +95,6 @@
       </el-col>
     </el-row>
 
-    <!-- 底部：翻译工作量趋势折线图 -->
     <el-row :gutter="20" class="chart-row">
       <el-col :xs="24">
         <el-card shadow="hover" class="chart-card">

@@ -100,7 +100,7 @@
               <span class="wave-emoji">👋</span>
               <span>欢迎回来</span>
             </div>
-            <h2 class="form-title">登录您的账户</h2>
+            <h2 class="form-title">登录您的账户</h2> 
             <p class="form-subtitle">请输入您的凭据以继续访问系统</p>
           </div>
           
