@@ -11,7 +11,7 @@
  Target Server Version : 80040
  File Encoding         : 65001
 
- Date: 06/02/2026 15:28:26
+ Date: 02/03/2026 18:09:23
 */
 
 SET NAMES utf8mb4;
@@ -150,7 +150,7 @@ CREATE TABLE `farming_management`  (
   INDEX `idx_management_date`(`management_date` ASC) USING BTREE,
   INDEX `idx_management_type`(`management_type` ASC) USING BTREE,
   CONSTRAINT `fk_farming_planting` FOREIGN KEY (`planting_id`) REFERENCES `planting_record` (`planting_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '种植管理表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '种植管理表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of farming_management
@@ -182,6 +182,7 @@ INSERT INTO `farming_management` VALUES (24, 25, 'fertilizer', '2026-01-26 12:04
 INSERT INTO `farming_management` VALUES (25, 25, 'pesticide', '2026-01-26 12:12:46', NULL, '农药', 0.00, 'kg', NULL, '防治病虫害', NULL, 0.00, NULL, NULL, NULL, '紧急处理：健康状态:serious', '', '2026-01-26 12:13:34', '', '2026-01-26 12:13:34');
 INSERT INTO `farming_management` VALUES (26, 25, 'pesticide', '2026-01-26 12:13:34', '农药001', '农药', 0.30, 'g', '滴灌', '防治病虫害', NULL, 0.02, NULL, NULL, NULL, '紧急处理：健康状态:serious', '', '2026-01-26 12:14:13', '', '2026-01-26 12:14:12');
 INSERT INTO `farming_management` VALUES (27, 27, 'pesticide', '2026-01-26 12:19:12', '农药001', '农药', 0.30, 'g', '滴灌2', '防治病虫害', '滴灌处理病虫', 0.00, NULL, NULL, NULL, '滴灌处理病虫', '', '2026-01-26 12:19:54', '', '2026-01-26 12:19:53');
+INSERT INTO `farming_management` VALUES (28, 32, 'pesticide', '2026-02-07 13:47:46', '11', '农药', 10000.00, 'kg', NULL, '防治病虫害', NULL, 0.00, NULL, NULL, NULL, '紧急处理：健康状态:pest', '', '2026-02-07 13:48:10', '', '2026-02-07 13:48:09');
 
 -- ----------------------------
 -- Table structure for farming_task
@@ -206,7 +207,7 @@ CREATE TABLE `farming_task`  (
   INDEX `idx_task_status`(`status` ASC) USING BTREE,
   INDEX `idx_task_type`(`task_type` ASC) USING BTREE,
   CONSTRAINT `fk_task_planting` FOREIGN KEY (`planting_id`) REFERENCES `planting_record` (`planting_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 53 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '农事待办任务表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 56 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '农事待办任务表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of farming_task
@@ -262,7 +263,10 @@ INSERT INTO `farming_task` VALUES (48, 30, 'pesticide', '病虫害待处理', '�
 INSERT INTO `farming_task` VALUES (49, 31, 'pesticide', '病虫害待处理', '健康状态:pest', '1', 'admin', '2026-02-03 13:10:00', 'admin', '2026-02-02 14:42:18', 'admin', '2026-02-03 13:10:00', NULL);
 INSERT INTO `farming_task` VALUES (50, 32, 'pesticide', '病虫害待处理', '健康状态:serious', '1', 'admin', '2026-02-03 13:27:34', 'admin', '2026-02-03 13:27:07', 'admin', '2026-02-03 13:27:34', NULL);
 INSERT INTO `farming_task` VALUES (51, 32, 'pesticide', '病虫害待处理', '健康状态:pest', '1', 'admin', '2026-02-03 13:28:11', 'admin', '2026-02-03 13:28:02', 'admin', '2026-02-03 13:28:11', NULL);
-INSERT INTO `farming_task` VALUES (52, 32, 'pesticide', '病虫害待处理', '健康状态:pest', '0', NULL, NULL, 'admin', '2026-02-03 13:50:37', '', '2026-02-03 13:50:36', NULL);
+INSERT INTO `farming_task` VALUES (52, 32, 'pesticide', '病虫害待处理', '健康状态:pest', '1', 'wyqy', '2026-02-07 13:48:14', 'admin', '2026-02-03 13:50:37', 'wyqy', '2026-02-07 13:48:14', NULL);
+INSERT INTO `farming_task` VALUES (53, 33, 'pesticide', '病虫害待处理', '健康状态:pest', '1', 'admin', '2026-03-02 16:54:57', 'admin', '2026-02-08 14:47:29', 'admin', '2026-03-02 16:54:57', NULL);
+INSERT INTO `farming_task` VALUES (54, 34, 'pesticide', '病虫害待处理', '健康状态:pest', '1', 'admin', '2026-03-02 16:54:55', 'admin', '2026-02-17 03:01:01', 'admin', '2026-03-02 16:54:55', NULL);
+INSERT INTO `farming_task` VALUES (55, 34, 'pesticide', '病虫害待处理', '健康状态:pest', '1', 'admin', '2026-03-02 17:14:01', 'admin', '2026-03-02 17:13:46', 'admin', '2026-03-02 17:14:01', NULL);
 
 -- ----------------------------
 -- Table structure for gen_table
@@ -360,7 +364,7 @@ CREATE TABLE `harvest_record`  (
   INDEX `idx_planting_id`(`planting_id` ASC) USING BTREE,
   INDEX `idx_harvest_date`(`harvest_date` ASC) USING BTREE,
   CONSTRAINT `fk_harvest_planting` FOREIGN KEY (`planting_id`) REFERENCES `planting_record` (`planting_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '采摘记录表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '采摘记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of harvest_record
@@ -388,6 +392,7 @@ INSERT INTO `harvest_record` VALUES (21, 20, '2026-03-20 08:30:00', 1.40, 4200.0
 INSERT INTO `harvest_record` VALUES (22, 21, '2026-12-08 09:30:00', 0.25, 375.00, '特等', 12.00, 4500.00, '人工采摘', '仓库R区', '常温保存', '水果超市', '冷藏车', '李师傅', '榴莲品质上乘', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00');
 INSERT INTO `harvest_record` VALUES (23, 22, '2026-02-23 10:30:00', 1.60, 1600.00, '一等', 3.00, 4800.00, '人工采摘', '仓库S区', '常温保存', '蔬菜批发市场', '货车运输', '王师傅', '豆角新鲜', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00');
 INSERT INTO `harvest_record` VALUES (24, 23, '2026-12-03 11:30:00', 0.45, 360.00, '特等', 7.00, 2520.00, '人工采摘', '仓库T区', '常温保存', '水果超市', '冷藏车', '赵师傅', '龙眼清甜', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00');
+INSERT INTO `harvest_record` VALUES (28, 31, '2026-02-07 13:48:24', 0.40, 0.00, '特等', 0.00, 0.00, NULL, NULL, NULL, NULL, NULL, '11', NULL, '', '2026-02-07 13:48:32', '', '2026-02-07 13:48:32');
 
 -- ----------------------------
 -- Table structure for land_info
@@ -415,7 +420,7 @@ CREATE TABLE `land_info`  (
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`land_id`) USING BTREE,
   UNIQUE INDEX `uk_land_code`(`land_code` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 119 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '地块信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 120 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '地块信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of land_info
@@ -467,7 +472,7 @@ INSERT INTO `land_info` VALUES (95, '中区四十五号地块', 'LAND045', 12.20
 INSERT INTO `land_info` VALUES (96, '东区四十六号地块', 'LAND046', 19.30, '农场东区西南', '黏壤土', 6.10, 3.90, 139.50, 55.80, 118.70, '沟灌', '良好', '0', 'admin', '2026-01-22 19:01:48', '', '2026-01-22 19:01:48', NULL);
 INSERT INTO `land_info` VALUES (97, '西区四十七号地块', 'LAND047', 8.10, '农场西区中央', '壤质砂土', 7.80, 1.60, 93.10, 36.20, 78.90, '滴灌', '一般', '0', 'admin', '2026-01-22 19:01:48', '', '2026-01-22 19:01:48', NULL);
 INSERT INTO `land_info` VALUES (98, '南区四十八号地块', 'LAND048', 18.60, '农场南区中央', '砂质黏土', 6.80, 6.10, 145.30, 59.90, 124.60, '喷灌', '良好', '0', 'admin', '2026-01-22 19:01:48', '', '2026-01-26 10:15:28', NULL);
-INSERT INTO `land_info` VALUES (99, '东区四十九号地块', 'LAND049', 12.80, '农场东区西北角', '壤土', 6.60, 2.85, 121.30, 46.50, 100.20, '滴灌', '良好', '0', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
+INSERT INTO `land_info` VALUES (99, '东区四十九号地块', 'LAND049', 12.80, '农场东区西北角', '壤土', 6.60, 2.85, 121.30, 46.50, 100.20, '滴灌', '良好', '0', 'admin', '2026-01-26 12:00:00', '', '2026-02-07 13:45:43', NULL);
 INSERT INTO `land_info` VALUES (100, '西区五十号地块', 'LAND050', 9.50, '农场西区东南角', '沙壤土', 7.15, 2.15, 106.80, 40.60, 89.30, '喷灌', '一般', '0', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
 INSERT INTO `land_info` VALUES (101, '南区五十一号地块', 'LAND051', 15.20, '农场南区西南角', '粉砂壤土', 6.55, 2.75, 123.60, 45.20, 97.80, '喷灌', '良好', '0', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
 INSERT INTO `land_info` VALUES (102, '北区五十二号地块', 'LAND052', 17.60, '农场北区东北角', '壤质砂土', 7.35, 1.65, 89.40, 36.20, 79.60, '滴灌', '较差', '0', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
@@ -487,6 +492,7 @@ INSERT INTO `land_info` VALUES (115, '西区六十五号地块', 'LAND065', 6.80
 INSERT INTO `land_info` VALUES (116, '南区六十六号地块', 'LAND066', 13.60, '农场南区中央', '壤黏土', 6.55, 3.15, 126.20, 48.90, 106.40, '滴灌', '良好', '0', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
 INSERT INTO `land_info` VALUES (117, '北区六十七号地块', 'LAND067', 21.80, '农场北区中央', '砂土', 8.05, 0.95, 69.20, 26.10, 59.20, '漫灌', '较差', '0', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
 INSERT INTO `land_info` VALUES (118, '中区六十八号地块', 'LAND068', 10.90, '农场中区中央', '粉壤土', 6.95, 2.60, 113.80, 44.00, 90.30, '喷灌', '良好', '0', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
+INSERT INTO `land_info` VALUES (119, '114514', '114514', 0.00, '114514', '粉砂壤土', 7.00, 0.00, 0.00, 0.00, 0.00, '滴灌', '较差', '0', '', '2026-02-07 13:46:17', '', '2026-02-07 13:46:30', '测试用例');
 
 -- ----------------------------
 -- Table structure for pest_detection_record
@@ -517,7 +523,7 @@ CREATE TABLE `pest_detection_record`  (
   INDEX `idx_detection_type`(`detection_type` ASC) USING BTREE,
   INDEX `idx_process_status`(`process_status` ASC) USING BTREE,
   INDEX `idx_detection_time`(`detection_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '病虫害识别记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '病虫害识别记录表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of pest_detection_record
@@ -561,7 +567,7 @@ CREATE TABLE `planting_record`  (
   INDEX `idx_planting_date`(`planting_date` ASC) USING BTREE,
   CONSTRAINT `fk_planting_land` FOREIGN KEY (`land_id`) REFERENCES `land_info` (`land_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `fk_planting_species` FOREIGN KEY (`species_id`) REFERENCES `crop_species` (`species_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '种植记录表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 35 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '种植记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of planting_record
@@ -597,7 +603,9 @@ INSERT INTO `planting_record` VALUES (28, 63, 4, '2026-01-26', '2026-01-28', NUL
 INSERT INTO `planting_record` VALUES (29, 99, 6, '2026-01-27', '2026-01-30', NULL, 0.50, 1500.00, NULL, NULL, '成熟期', 'healthy', NULL, NULL, '1', '0', '0', '', '2026-01-27 20:39:33', 'admin', '2026-02-03 13:10:04', NULL);
 INSERT INTO `planting_record` VALUES (30, 99, 4, '2026-01-31', '2026-01-31', NULL, 0.40, 25200.00, NULL, NULL, '播种期', 'healthy', NULL, NULL, '0', '0', '0', '', '2026-01-31 16:32:46', 'admin', '2026-02-03 13:10:02', NULL);
 INSERT INTO `planting_record` VALUES (31, 99, 4, '2026-02-02', '2026-02-03', NULL, 0.40, 25200.00, NULL, NULL, '成熟期', 'healthy', NULL, NULL, '1', '1', '0', '', '2026-02-02 14:40:08', 'admin', '2026-02-03 13:10:00', NULL);
-INSERT INTO `planting_record` VALUES (32, 102, 10, '2026-02-03', '2026-02-03', NULL, 0.30, 30200.00, NULL, NULL, '播种期', 'healthy', NULL, NULL, '0', '0', '0', '', '2026-02-03 13:09:32', 'admin', '2026-02-06 15:24:35', NULL);
+INSERT INTO `planting_record` VALUES (32, 102, 10, '2026-02-03', '2026-02-03', NULL, 0.30, 30200.00, NULL, NULL, '播种期', 'healthy', NULL, NULL, '0', '0', '0', '', '2026-02-03 13:09:32', 'wyqy', '2026-02-07 13:48:14', NULL);
+INSERT INTO `planting_record` VALUES (33, 119, 8, '2026-02-07', '2026-02-07', NULL, 0.10, 100.00, NULL, NULL, '播种期', 'healthy', NULL, NULL, '0', '0', '0', '', '2026-02-07 13:47:39', 'admin', '2026-03-02 16:54:57', NULL);
+INSERT INTO `planting_record` VALUES (34, 99, 4, '2026-02-17', '2026-02-17', NULL, 0.50, 25000.00, NULL, NULL, '播种期', 'healthy', NULL, NULL, '0', '0', '0', '', '2026-02-17 02:58:17', 'admin', '2026-03-02 17:14:01', NULL);
 
 -- ----------------------------
 -- Table structure for qrtz_blob_triggers
@@ -866,7 +874,7 @@ CREATE TABLE `sys_dept`  (
   `update_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '更新者',
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`dept_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 200 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '部门表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 201 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '部门表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_dept
@@ -881,6 +889,7 @@ INSERT INTO `sys_dept` VALUES (106, 101, '0,100,101', '财务部门', 4, '若依
 INSERT INTO `sys_dept` VALUES (107, 101, '0,100,101', '运维部门', 5, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', '2026-01-22 16:24:52', '', NULL);
 INSERT INTO `sys_dept` VALUES (108, 102, '0,100,102', '市场部门', 1, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', '2026-01-22 16:24:52', '', NULL);
 INSERT INTO `sys_dept` VALUES (109, 102, '0,100,102', '财务部门', 2, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', '2026-01-22 16:24:52', '', NULL);
+INSERT INTO `sys_dept` VALUES (200, 100, '0,100', 'wyqy', 1, NULL, NULL, NULL, '0', '0', 'admin', '2026-03-02 17:53:13', 'admin', '2026-03-02 17:53:16');
 
 -- ----------------------------
 -- Table structure for sys_dict_data
@@ -1034,7 +1043,7 @@ CREATE TABLE `sys_logininfor`  (
   PRIMARY KEY (`info_id`) USING BTREE,
   INDEX `idx_sys_logininfor_s`(`status` ASC) USING BTREE,
   INDEX `idx_sys_logininfor_lt`(`login_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 169 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 226 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_logininfor
@@ -1108,6 +1117,63 @@ INSERT INTO `sys_logininfor` VALUES (165, 'wyqy', '127.0.0.1', '内网IP', 'Edge
 INSERT INTO `sys_logininfor` VALUES (166, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-06 15:17:22');
 INSERT INTO `sys_logininfor` VALUES (167, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '退出成功', '2026-02-06 15:20:47');
 INSERT INTO `sys_logininfor` VALUES (168, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-06 15:20:48');
+INSERT INTO `sys_logininfor` VALUES (169, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-06 15:32:55');
+INSERT INTO `sys_logininfor` VALUES (170, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '退出成功', '2026-02-06 15:32:55');
+INSERT INTO `sys_logininfor` VALUES (171, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '退出成功', '2026-02-06 15:38:48');
+INSERT INTO `sys_logininfor` VALUES (172, 'admin', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-06 15:38:51');
+INSERT INTO `sys_logininfor` VALUES (173, 'admin', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '退出成功', '2026-02-06 15:38:59');
+INSERT INTO `sys_logininfor` VALUES (174, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-06 15:39:16');
+INSERT INTO `sys_logininfor` VALUES (175, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '退出成功', '2026-02-06 16:32:22');
+INSERT INTO `sys_logininfor` VALUES (176, 'admin', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-06 16:32:26');
+INSERT INTO `sys_logininfor` VALUES (177, 'admin', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '退出成功', '2026-02-06 16:32:34');
+INSERT INTO `sys_logininfor` VALUES (178, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-06 16:32:41');
+INSERT INTO `sys_logininfor` VALUES (179, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '退出成功', '2026-02-06 16:43:48');
+INSERT INTO `sys_logininfor` VALUES (180, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-06 16:44:10');
+INSERT INTO `sys_logininfor` VALUES (181, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '退出成功', '2026-02-06 16:50:48');
+INSERT INTO `sys_logininfor` VALUES (182, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-06 16:53:00');
+INSERT INTO `sys_logininfor` VALUES (183, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-07 13:45:28');
+INSERT INTO `sys_logininfor` VALUES (184, 'wyqy', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-08 13:19:50');
+INSERT INTO `sys_logininfor` VALUES (185, 'admin', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-08 14:07:28');
+INSERT INTO `sys_logininfor` VALUES (186, 'admin', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-08 14:43:07');
+INSERT INTO `sys_logininfor` VALUES (187, 'admin', '192.168.1.102', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-08 14:43:59');
+INSERT INTO `sys_logininfor` VALUES (188, 'admin', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-12 00:17:14');
+INSERT INTO `sys_logininfor` VALUES (189, 'admin', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-12 00:18:48');
+INSERT INTO `sys_logininfor` VALUES (190, 'admin', '127.0.0.1', '内网IP', 'Edge 144', 'Windows >=10', '0', '登录成功', '2026-02-15 21:04:24');
+INSERT INTO `sys_logininfor` VALUES (191, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-02-17 02:57:10');
+INSERT INTO `sys_logininfor` VALUES (192, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-02-17 03:03:06');
+INSERT INTO `sys_logininfor` VALUES (193, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-02-25 17:37:01');
+INSERT INTO `sys_logininfor` VALUES (194, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-02-25 17:37:51');
+INSERT INTO `sys_logininfor` VALUES (195, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-02-25 17:37:53');
+INSERT INTO `sys_logininfor` VALUES (196, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 15:45:12');
+INSERT INTO `sys_logininfor` VALUES (197, 'admin', '192.168.1.103', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:02:58');
+INSERT INTO `sys_logininfor` VALUES (198, 'admin', '192.168.1.103', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 17:15:10');
+INSERT INTO `sys_logininfor` VALUES (199, 'wyqy', '192.168.1.103', '内网IP', 'Edge 145', 'Windows >=10', '1', '用户不存在/密码错误', '2026-03-02 17:15:19');
+INSERT INTO `sys_logininfor` VALUES (200, 'wyqy', '192.168.1.103', '内网IP', 'Edge 145', 'Windows >=10', '1', '用户不存在/密码错误', '2026-03-02 17:15:22');
+INSERT INTO `sys_logininfor` VALUES (201, 'wyqy', '192.168.1.103', '内网IP', 'Edge 145', 'Windows >=10', '1', '用户不存在/密码错误', '2026-03-02 17:15:25');
+INSERT INTO `sys_logininfor` VALUES (202, 'wyqy', '192.168.1.103', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:15:30');
+INSERT INTO `sys_logininfor` VALUES (203, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:44:32');
+INSERT INTO `sys_logininfor` VALUES (204, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 17:54:10');
+INSERT INTO `sys_logininfor` VALUES (205, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:54:18');
+INSERT INTO `sys_logininfor` VALUES (206, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 17:54:48');
+INSERT INTO `sys_logininfor` VALUES (207, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:54:53');
+INSERT INTO `sys_logininfor` VALUES (208, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 17:56:56');
+INSERT INTO `sys_logininfor` VALUES (209, 'wyqy', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '1', '用户不存在/密码错误', '2026-03-02 17:57:04');
+INSERT INTO `sys_logininfor` VALUES (210, 'wyqy', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:57:08');
+INSERT INTO `sys_logininfor` VALUES (211, 'wyqy', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 17:57:14');
+INSERT INTO `sys_logininfor` VALUES (212, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:57:18');
+INSERT INTO `sys_logininfor` VALUES (213, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 17:57:39');
+INSERT INTO `sys_logininfor` VALUES (214, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:57:46');
+INSERT INTO `sys_logininfor` VALUES (215, 'admin', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 17:58:49');
+INSERT INTO `sys_logininfor` VALUES (216, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:58:55');
+INSERT INTO `sys_logininfor` VALUES (217, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 17:59:18');
+INSERT INTO `sys_logininfor` VALUES (218, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 17:59:33');
+INSERT INTO `sys_logininfor` VALUES (219, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 17:59:39');
+INSERT INTO `sys_logininfor` VALUES (220, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 18:00:00');
+INSERT INTO `sys_logininfor` VALUES (221, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 18:00:24');
+INSERT INTO `sys_logininfor` VALUES (222, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 18:00:29');
+INSERT INTO `sys_logininfor` VALUES (223, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 18:08:10');
+INSERT INTO `sys_logininfor` VALUES (224, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '登录成功', '2026-03-02 18:09:09');
+INSERT INTO `sys_logininfor` VALUES (225, 'wyqy1', '127.0.0.1', '内网IP', 'Edge 145', 'Windows >=10', '0', '退出成功', '2026-03-02 18:09:15');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -1135,7 +1201,7 @@ CREATE TABLE `sys_menu`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`menu_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10086 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单权限表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 10096 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单权限表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_menu
@@ -1276,13 +1342,12 @@ INSERT INTO `sys_menu` VALUES (2173, '种植管理修改', 2117, 3, '', '', NULL
 INSERT INTO `sys_menu` VALUES (2174, '种植管理删除', 2117, 4, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:farming:remove', '#', 'admin', '2026-01-22 18:41:45', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2175, '种植管理导出', 2117, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:farming:export', '#', 'admin', '2026-01-22 18:41:45', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2182, '农业管理', 0, 1, 'agriculture', NULL, NULL, '', 1, 0, 'M', '0', '0', '', 'date', 'admin', '2026-01-22 18:42:13', 'admin', '2026-01-31 16:39:03', '农业管理系统');
-INSERT INTO `sys_menu` VALUES (2183, '天气信息', 2182, 1, 'weather', 'agriculture/weather/index', NULL, '', 1, 0, 'C', '0', '0', 'agriculture:weather:list', 'el-icon-sunny', 'admin', '2026-01-22 18:42:13', '', NULL, '天气信息管理');
-INSERT INTO `sys_menu` VALUES (2184, '天气信息查询', 2183, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:query', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2185, '天气信息新增', 2183, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:add', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2186, '天气信息修改', 2183, 3, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:edit', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2187, '天气信息删除', 2183, 4, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:remove', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2188, '天气信息导出', 2183, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:export', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2189, '土壤信息', 2182, 2, 'soil', 'agriculture/soil/index', NULL, '', 1, 0, 'C', '0', '0', 'agriculture:soil:list', 'el-icon-connection', 'admin', '2026-01-22 18:42:13', '', NULL, '土壤信息管理');
+INSERT INTO `sys_menu` VALUES (2183, '地块信息', 2182, 1, 'weather', 'agriculture/weather/index', NULL, '', 1, 0, 'C', '0', '0', 'agriculture:weather:list', 'el-icon-sunny', 'admin', '2026-01-22 18:42:13', '', NULL, '天气信息管理');
+INSERT INTO `sys_menu` VALUES (2184, '地块信息查询', 2183, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:query', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2185, '地块信息新增', 2183, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:add', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2186, '地块信息修改', 2183, 3, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:edit', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2187, '地块信息删除', 2183, 4, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:remove', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2188, '地块信息导出', 2183, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:weather:export', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2190, '土壤信息查询', 2189, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:soil:query', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2191, '土壤信息新增', 2189, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:soil:add', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2192, '土壤信息修改', 2189, 3, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:soil:edit', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
@@ -1308,19 +1373,19 @@ INSERT INTO `sys_menu` VALUES (2211, '种植记录修改', 2208, 3, '', '', NULL
 INSERT INTO `sys_menu` VALUES (2212, '种植记录删除', 2208, 4, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:remove', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2213, '种植记录导出', 2208, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:export', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2214, '种植操作', 2207, 2, 'operate', 'agriculture/planting/operate', NULL, '', 1, 0, 'C', '0', '0', 'agriculture:planting:operate', 'el-icon-plus', 'admin', '2026-01-22 18:42:13', '', NULL, '种植操作');
-INSERT INTO `sys_menu` VALUES (2215, '农事管理', 2207, 3, 'farming', 'agriculture/farming/index', NULL, '', 1, 0, 'C', '0', '0', 'agriculture:farming:list', 'el-icon-setting', 'admin', '2026-01-22 18:42:13', '', NULL, '种植管理（施肥喷药）');
-INSERT INTO `sys_menu` VALUES (2216, '农事管理查询', 2215, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:farming:query', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2217, '农事管理新增', 2215, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:farming:add', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2218, '农事管理修改', 2215, 3, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:farming:edit', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2219, '农事管理删除', 2215, 4, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:farming:remove', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2220, '农事管理导出', 2215, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:farming:export', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2215, '农事管理', 2207, 3, 'farming', 'agriculture/farming/index', NULL, '', 1, 0, 'C', '0', '0', 'agriculture:planting:farming:query', 'el-icon-setting', 'admin', '2026-01-22 18:42:13', '', NULL, '种植管理（施肥喷药）');
+INSERT INTO `sys_menu` VALUES (2216, '农事管理查询', 2215, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:query', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2217, '农事管理新增', 2215, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:add', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2218, '农事管理修改', 2215, 3, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:edit', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2219, '农事管理删除', 2215, 4, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:remove', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2220, '农事管理导出', 2215, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:export', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2221, '采摘管理', 2182, 6, 'harvest', 'agriculture/harvest/index', NULL, '', 1, 0, 'C', '0', '0', 'agriculture:harvest:list', 'el-icon-s-finance', 'admin', '2026-01-22 18:42:13', '', NULL, '采摘管理');
 INSERT INTO `sys_menu` VALUES (2222, '采摘管理查询', 2221, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:harvest:query', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2223, '采摘管理新增', 2221, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:harvest:add', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2224, '采摘管理修改', 2221, 3, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:harvest:edit', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2225, '采摘管理删除', 2221, 4, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:harvest:remove', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2226, '采摘管理导出', 2221, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:harvest:export', '#', 'admin', '2026-01-22 18:42:13', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (3000, '智慧大屏', 0, 3, 'http://192.168.1.105:1145', NULL, '', '', 0, 1, 'M', '0', '0', '', 'monitor', 'admin', '2026-01-28 16:05:50', 'admin', '2026-01-30 17:23:02', '智慧大屏外链菜单');
+INSERT INTO `sys_menu` VALUES (3000, '智慧大屏', 0, 3, 'http://192.168.1.102:1145', NULL, '', '', 0, 1, 'M', '0', '0', '', 'monitor', 'admin', '2026-01-28 16:05:50', 'admin', '2026-01-30 17:23:02', '智慧大屏外链菜单');
 INSERT INTO `sys_menu` VALUES (5007, '实时识别', 5000, 0, 'realtime-detection', 'agriculture/ai-pest-detection/realtime', '', '', 1, 1, 'C', '0', '0', 'agriculture:ai-pest-detection:realtime', 'checkbox', 'admin', '2026-01-30 14:59:03', 'admin', '2026-01-30 16:49:27', 'AI实时识别页面');
 INSERT INTO `sys_menu` VALUES (5008, '实时识别权限', 5007, 1, '#', '', '', '', 1, 1, 'F', '0', '0', 'agriculture:ai-pest-detection:realtime', '#', 'admin', '2026-01-30 14:59:03', '', NULL, 'AI实时识别权限');
 INSERT INTO `sys_menu` VALUES (9991, '识别导出', 9997, 5, '#', '', '', '', 1, 1, 'F', '0', '0', 'agriculture:ai-pest-detection:export', '#', 'admin', '2026-01-30 15:16:37', '', NULL, 'AI病虫害识别导出权限');
@@ -1345,12 +1410,12 @@ INSERT INTO `sys_menu` VALUES (10009, '识别记录新增', 10002, 2, '', '', ''
 INSERT INTO `sys_menu` VALUES (10010, '识别记录修改', 10002, 3, '', '', '', '', 1, 1, 'F', '0', '0', 'agriculture:pest-detection:records:edit', '#', 'admin', '2026-02-06 14:00:00', '', NULL, '识别记录修改权限');
 INSERT INTO `sys_menu` VALUES (10011, '识别记录删除', 10002, 4, '', '', '', '', 1, 1, 'F', '0', '0', 'agriculture:pest-detection:records:remove', '#', 'admin', '2026-02-06 14:00:00', '', NULL, '识别记录删除权限');
 INSERT INTO `sys_menu` VALUES (10012, '识别记录导出', 10002, 5, '', '', '', '', 1, 1, 'F', '0', '0', 'agriculture:pest-detection:records:export', '#', 'admin', '2026-02-06 14:00:00', '', NULL, '识别记录导出权限');
-INSERT INTO `sys_menu` VALUES (10080, '农事管理', 2207, 4, 'farming', 'agriculture/planting/farming', NULL, '', 1, 0, 'C', '0', '0', 'agriculture:planting:farming', 'el-icon-setting', 'admin', '2026-02-06 15:22:00', '', NULL, '种植农事管理');
-INSERT INTO `sys_menu` VALUES (10081, '农事管理查询', 10010, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:query', '#', 'admin', '2026-02-06 15:22:00', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (10082, '农事管理新增', 10010, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:add', '#', 'admin', '2026-02-06 15:22:00', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (10083, '农事管理修改', 10010, 3, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:edit', '#', 'admin', '2026-02-06 15:22:00', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (10084, '农事管理删除', 10010, 4, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:remove', '#', 'admin', '2026-02-06 15:22:00', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (10085, '农事管理导出', 10010, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'agriculture:planting:farming:export', '#', 'admin', '2026-02-06 15:22:00', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (10090, '农事待办权限', 0, 99, 'task', '', NULL, '', 1, 1, 'C', '1', '0', 'agriculture:task:list', '#', 'admin', '2026-02-06 15:44:00', '', NULL, '农事待办权限');
+INSERT INTO `sys_menu` VALUES (10091, '任务查询权限', 10090, 1, '', '', NULL, '', 1, 1, 'F', '1', '0', 'agriculture:task:query', '#', 'admin', '2026-02-06 15:44:00', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (10092, '任务新增权限', 10090, 2, '', '', NULL, '', 1, 1, 'F', '1', '0', 'agriculture:task:add', '#', 'admin', '2026-02-06 15:44:00', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (10093, '任务修改权限', 10090, 3, '', '', NULL, '', 1, 1, 'F', '1', '0', 'agriculture:task:edit', '#', 'admin', '2026-02-06 15:44:00', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (10094, '任务删除权限', 10090, 4, '', '', NULL, '', 1, 1, 'F', '1', '0', 'agriculture:task:remove', '#', 'admin', '2026-02-06 15:44:00', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (10095, '任务导出权限', 10090, 5, '', '', NULL, '', 1, 1, 'F', '1', '0', 'agriculture:task:export', '#', 'admin', '2026-02-06 15:44:00', '', NULL, '');
 
 -- ----------------------------
 -- Table structure for sys_notice
@@ -1402,7 +1467,7 @@ CREATE TABLE `sys_oper_log`  (
   INDEX `idx_sys_oper_log_bt`(`business_type` ASC) USING BTREE,
   INDEX `idx_sys_oper_log_s`(`status` ASC) USING BTREE,
   INDEX `idx_sys_oper_log_ot`(`oper_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 507 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志记录' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 558 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志记录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_oper_log
@@ -1814,6 +1879,57 @@ INSERT INTO `sys_oper_log` VALUES (503, '用户管理', 2, 'wyqy.web.controller.
 INSERT INTO `sys_oper_log` VALUES (504, '菜单管理', 2, 'wyqy.web.controller.system.SysMenuController.edit()', 'PUT', 1, 'wyqy', '若依科技', '/system/menu', '127.0.0.1', '内网IP', '{\"children\":[],\"component\":\"translation/record/index\",\"createTime\":\"2026-01-22 16:55:23\",\"icon\":\"list\",\"isCache\":\"0\",\"isFrame\":\"1\",\"menuId\":2002,\"menuName\":\"翻译记录\",\"menuType\":\"C\",\"orderNum\":2,\"params\":{},\"parentId\":2000,\"path\":\"record\",\"perms\":\"translation:index:view\",\"routeName\":\"\",\"status\":\"0\",\"visible\":\"0\"} ', '{\"msg\":\"修改菜单\'翻译记录\'失败，路由名称或地址已存在\",\"code\":500}', 0, NULL, '2026-02-06 15:17:52', 10);
 INSERT INTO `sys_oper_log` VALUES (505, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.edit()', 'PUT', 1, 'wyqy', '若依科技', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createBy\":\"\",\"createTime\":\"2026-02-03 13:09:32\",\"expectedHarvestDate\":\"2026-02-03\",\"growthStage\":\"播种期\",\"healthStatus\":\"disease\",\"isMature\":\"0\",\"landId\":102,\"landName\":\"北区五十二号地块\",\"maturity\":\"0\",\"params\":{},\"plantingArea\":0.3,\"plantingDate\":\"2026-02-03\",\"plantingDensity\":30200,\"plantingId\":32,\"speciesId\":10,\"speciesName\":\"辣椒\",\"status\":\"0\",\"updateBy\":\"admin\",\"updateTime\":\"2026-02-06 15:24:31\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-06 15:24:31', 27);
 INSERT INTO `sys_oper_log` VALUES (506, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.edit()', 'PUT', 1, 'wyqy', '若依科技', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createBy\":\"\",\"createTime\":\"2026-02-03 13:09:32\",\"expectedHarvestDate\":\"2026-02-03\",\"growthStage\":\"播种期\",\"healthStatus\":\"healthy\",\"isMature\":\"0\",\"landId\":102,\"landName\":\"北区五十二号地块\",\"maturity\":\"0\",\"params\":{},\"plantingArea\":0.3,\"plantingDate\":\"2026-02-03\",\"plantingDensity\":30200,\"plantingId\":32,\"speciesId\":10,\"speciesName\":\"辣椒\",\"status\":\"0\",\"updateBy\":\"admin\",\"updateTime\":\"2026-02-06 15:24:34\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-06 15:24:34', 6);
+INSERT INTO `sys_oper_log` VALUES (507, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":32,\"landName\":\"北区五十二号地块\",\"speciesName\":\"辣椒\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-06 15:45:16', 7);
+INSERT INTO `sys_oper_log` VALUES (508, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":32,\"landName\":\"北区五十二号地块\",\"speciesName\":\"辣椒\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-06 15:45:40', 1);
+INSERT INTO `sys_oper_log` VALUES (509, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":32,\"landName\":\"北区五十二号地块\",\"speciesName\":\"辣椒\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-06 15:46:29', 1);
+INSERT INTO `sys_oper_log` VALUES (510, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":32,\"landName\":\"北区五十二号地块\",\"speciesName\":\"辣椒\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-06 15:47:04', 25);
+INSERT INTO `sys_oper_log` VALUES (511, '拍照识别', 1, 'wyqy.web.controller.agriculture.PestDetectionController.detectPest()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/pest-detection/detect', '127.0.0.1', '内网IP', '{\"landId\":\"\",\"speciesId\":\"\"}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"confidence\":0.99,\"detectionTime\":\"2026-02-06 15:59:15\",\"detectionType\":\"disease\",\"imageUrl\":\"/photo/D:\\\\云盘\\\\OneDrive\\\\桌面\\\\技能大赛\\\\wyqy\\\\photo/2026/02/06/955096b6-21c1-47e0-99ad-03c00b671405.jpg\",\"params\":{},\"pestName\":\"白粉病\",\"processStatus\":\"pending\",\"recommendation\":\"建议使用多菌灵或甲基托布津等杀菌剂进行防治，同时加强通风，降低湿度。注意及时清除病叶，避免病原传播。\"}}', 0, NULL, '2026-02-06 15:59:15', 3033);
+INSERT INTO `sys_oper_log` VALUES (512, '拍照识别', 1, 'wyqy.web.controller.agriculture.PestDetectionController.detectPest()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/pest-detection/detect', '127.0.0.1', '内网IP', '{\"landId\":\"\",\"speciesId\":\"\"}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"confidence\":0.99,\"detectionTime\":\"2026-02-06 15:59:27\",\"detectionType\":\"disease\",\"imageUrl\":\"/photo/D:\\\\云盘\\\\OneDrive\\\\桌面\\\\技能大赛\\\\wyqy\\\\photo/2026/02/06/15f0f6e1-1ffa-4bec-a6e4-5f54c75cb096.jpg\",\"params\":{},\"pestName\":\"白粉病\",\"processStatus\":\"pending\",\"recommendation\":\"建议使用多菌灵或甲基托布津等杀菌剂进行防治，同时加强通风，降低湿度。注意及时清除病叶，避免病原传播。\"}}', 0, NULL, '2026-02-06 15:59:27', 3016);
+INSERT INTO `sys_oper_log` VALUES (513, '地块信息', 2, 'wyqy.web.controller.agriculture.LandInfoController.edit()', 'PUT', 1, 'wyqy', '若依科技', '/agriculture/land', '127.0.0.1', '内网IP', '{\"createBy\":\"admin\",\"createTime\":\"2026-01-26 12:00:00\",\"drainageCondition\":\"良好\",\"irrigationMethod\":\"滴灌\",\"landArea\":12.8,\"landCode\":\"LAND049\",\"landId\":99,\"landName\":\"东区四十九号地块\",\"location\":\"农场东区西北角\",\"nitrogenContent\":121.3,\"organicMatter\":2.85,\"params\":{},\"phosphorusContent\":46.5,\"potassiumContent\":100.2,\"soilPh\":6.6,\"soilType\":\"壤土\",\"status\":\"0\",\"updateBy\":\"\",\"updateTime\":\"2026-02-07 13:45:42\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-07 13:45:43', 41);
+INSERT INTO `sys_oper_log` VALUES (514, '地块信息', 1, 'wyqy.web.controller.agriculture.LandInfoController.add()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/land', '127.0.0.1', '内网IP', '{\"createTime\":\"2026-02-07 13:46:17\",\"drainageCondition\":\"较差\",\"irrigationMethod\":\"滴灌\",\"landArea\":0.0,\"landCode\":\"114514\",\"landId\":119,\"landName\":\"114514\",\"location\":\"114514\",\"nitrogenContent\":0.0,\"notes\":\"测试用例\",\"organicMatter\":0.0,\"params\":{},\"phosphorusContent\":0.0,\"potassiumContent\":0.0,\"soilPh\":0.0,\"soilType\":\"粉砂壤土\",\"status\":\"0\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-07 13:46:17', 50);
+INSERT INTO `sys_oper_log` VALUES (515, '地块信息', 2, 'wyqy.web.controller.agriculture.LandInfoController.edit()', 'PUT', 1, 'wyqy', '若依科技', '/agriculture/land', '127.0.0.1', '内网IP', '{\"createBy\":\"\",\"createTime\":\"2026-02-07 13:46:17\",\"drainageCondition\":\"较差\",\"irrigationMethod\":\"滴灌\",\"landArea\":0.0,\"landCode\":\"114514\",\"landId\":119,\"landName\":\"114514\",\"location\":\"114514\",\"nitrogenContent\":0.0,\"notes\":\"测试用例\",\"organicMatter\":0.0,\"params\":{},\"phosphorusContent\":0.0,\"potassiumContent\":0.0,\"soilPh\":7.0,\"soilType\":\"粉砂壤土\",\"status\":\"0\",\"updateBy\":\"\",\"updateTime\":\"2026-02-07 13:46:30\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-07 13:46:30', 13);
+INSERT INTO `sys_oper_log` VALUES (516, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":32,\"landName\":\"北区五十二号地块\",\"speciesName\":\"辣椒\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-07 13:47:07', 3);
+INSERT INTO `sys_oper_log` VALUES (517, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.edit()', 'PUT', 1, 'wyqy', '若依科技', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createBy\":\"\",\"createTime\":\"2026-02-03 13:09:32\",\"expectedHarvestDate\":\"2026-02-03\",\"growthStage\":\"播种期\",\"healthStatus\":\"pest\",\"isMature\":\"0\",\"landId\":102,\"landName\":\"北区五十二号地块\",\"maturity\":\"0\",\"params\":{},\"plantingArea\":0.3,\"plantingDate\":\"2026-02-03\",\"plantingDensity\":30200,\"plantingId\":32,\"speciesId\":10,\"speciesName\":\"辣椒\",\"status\":\"0\",\"updateBy\":\"admin\",\"updateTime\":\"2026-02-07 13:47:22\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-07 13:47:22', 58);
+INSERT INTO `sys_oper_log` VALUES (518, '种植记录', 1, 'wyqy.web.controller.agriculture.PlantingRecordController.add()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createTime\":\"2026-02-07 13:47:39\",\"expectedHarvestDate\":\"2026-02-07\",\"growthStage\":\"播种期\",\"healthStatus\":\"healthy\",\"isMature\":\"0\",\"landId\":119,\"params\":{},\"plantingArea\":0.1,\"plantingDate\":\"2026-02-07\",\"plantingDensity\":100,\"plantingId\":33,\"remark\":\"\",\"seedSource\":\"\",\"speciesId\":8} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-07 13:47:39', 12);
+INSERT INTO `sys_oper_log` VALUES (519, '种植管理', 1, 'wyqy.web.controller.agriculture.FarmingManagementController.add()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/farming', '127.0.0.1', '内网IP', '{\"cost\":0.0,\"createTime\":\"2026-02-07 13:48:09\",\"dosage\":10000.0,\"effect\":\"\",\"farmingId\":28,\"managementDate\":\"2026-02-07 13:47:46\",\"managementType\":\"pesticide\",\"materialName\":\"11\",\"materialType\":\"农药\",\"method\":\"\",\"notes\":\"紧急处理：健康状态:pest\",\"operator\":\"\",\"params\":{},\"plantingId\":32,\"purpose\":\"防治病虫害\",\"unit\":\"kg\",\"weatherCondition\":\"\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-07 13:48:09', 31);
+INSERT INTO `sys_oper_log` VALUES (520, '农事待办', 2, 'wyqy.web.controller.agriculture.FarmingTaskController.markDone()', 'PUT', 1, 'wyqy', '若依科技', '/agriculture/task/done/52', '127.0.0.1', '内网IP', '52 ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-07 13:48:13', 21);
+INSERT INTO `sys_oper_log` VALUES (521, '采摘记录', 1, 'wyqy.web.controller.agriculture.HarvestRecordController.add()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/harvest', '127.0.0.1', '内网IP', '{\"createTime\":\"2026-02-07 13:48:32\",\"harvestArea\":0.4,\"harvestDate\":\"2026-02-07 13:48:24\",\"harvestId\":28,\"harvestQuantity\":0.0,\"notes\":\"\",\"operator\":\"11\",\"params\":{},\"plantingId\":31,\"qualityGrade\":\"特等\",\"totalPrice\":0.0,\"unitPrice\":0.0} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-07 13:48:32', 27);
+INSERT INTO `sys_oper_log` VALUES (522, '拍照识别', 1, 'wyqy.web.controller.agriculture.PestDetectionController.detectPest()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/pest-detection/detect', '127.0.0.1', '内网IP', '{\"landId\":\"\",\"speciesId\":\"\"}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"confidence\":0.99,\"detectionTime\":\"2026-02-07 13:49:28\",\"detectionType\":\"disease\",\"imageUrl\":\"/photo/D:\\\\云盘\\\\OneDrive\\\\桌面\\\\技能大赛\\\\wyqy\\\\photo/2026/02/07/0f06d9d6-5323-4392-83b9-9ae20daa7ea3.jpg\",\"params\":{},\"pestName\":\"白粉病\",\"processStatus\":\"pending\",\"recommendation\":\"建议使用多菌灵或甲基托布津等杀菌剂进行防治，同时加强通风，降低湿度。注意及时清除病叶，避免病原传播。\"}}', 0, NULL, '2026-02-07 13:49:28', 3030);
+INSERT INTO `sys_oper_log` VALUES (523, '保存识别结果', 1, 'wyqy.web.controller.agriculture.PestDetectionController.saveResult()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/pest-detection/save', '127.0.0.1', '内网IP', '{\"confidence\":0.99,\"createTime\":\"2026-02-07 13:49:31\",\"detectionTime\":\"2026-02-07 13:49:28\",\"detectionType\":\"disease\",\"imageUrl\":\"blob:http://localhost/1092dd23-060d-49dc-84b0-8680636ff859\",\"params\":{},\"pestName\":\"白粉病\",\"processStatus\":\"pending\",\"recommendation\":\"建议使用多菌灵或甲基托布津等杀菌剂进行防治，同时加强通风，降低湿度。注意及时清除病叶，避免病原传播。\",\"recordId\":7} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-07 13:49:31', 17);
+INSERT INTO `sys_oper_log` VALUES (524, '拍照识别', 1, 'wyqy.web.controller.agriculture.PestDetectionController.detectPest()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/pest-detection/detect', '127.0.0.1', '内网IP', '{\"landId\":\"\",\"speciesId\":\"\"}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"confidence\":0.99,\"detectionTime\":\"2026-02-08 13:20:09\",\"detectionType\":\"disease\",\"imageUrl\":\"/photo/D:\\\\云盘\\\\OneDrive\\\\桌面\\\\技能大赛\\\\wyqy\\\\photo/2026/02/08/15bcb888-e577-4baa-ada4-ca190b386ecb.jpg\",\"params\":{},\"pestName\":\"白粉病\",\"processStatus\":\"pending\",\"recommendation\":\"建议使用多菌灵或甲基托布津等杀菌剂进行防治，同时加强通风，降低湿度。注意及时清除病叶，避免病原传播。\"}}', 0, NULL, '2026-02-08 13:20:09', 3027);
+INSERT INTO `sys_oper_log` VALUES (525, '拍照识别', 1, 'wyqy.web.controller.agriculture.PestDetectionController.detectPest()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/pest-detection/detect', '127.0.0.1', '内网IP', '{\"landId\":\"\",\"speciesId\":\"\"}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"confidence\":0.99,\"detectionTime\":\"2026-02-08 13:27:50\",\"detectionType\":\"disease\",\"imageUrl\":\"/photo/D:\\\\云盘\\\\OneDrive\\\\桌面\\\\技能大赛\\\\wyqy\\\\photo/2026/02/08/e8f3565d-4e10-49af-9364-1e6db20fdc54.jpg\",\"params\":{},\"pestName\":\"白粉病\",\"processStatus\":\"pending\",\"recommendation\":\"建议使用多菌灵或甲基托布津等杀菌剂进行防治，同时加强通风，降低湿度。注意及时清除病叶，避免病原传播。\"}}', 0, NULL, '2026-02-08 13:27:50', 3024);
+INSERT INTO `sys_oper_log` VALUES (526, '拍照识别', 1, 'wyqy.web.controller.agriculture.PestDetectionController.detectPest()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/pest-detection/detect', '127.0.0.1', '内网IP', '{\"landId\":\"\",\"speciesId\":\"\"}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"confidence\":0.99,\"detectionTime\":\"2026-02-08 13:28:01\",\"detectionType\":\"disease\",\"imageUrl\":\"/photo/D:\\\\云盘\\\\OneDrive\\\\桌面\\\\技能大赛\\\\wyqy\\\\photo/2026/02/08/e5c00ae6-0524-42ff-bbe6-1228111676e5.jpg\",\"params\":{},\"pestName\":\"白粉病\",\"processStatus\":\"pending\",\"recommendation\":\"建议使用多菌灵或甲基托布津等杀菌剂进行防治，同时加强通风，降低湿度。注意及时清除病叶，避免病原传播。\"}}', 0, NULL, '2026-02-08 13:28:01', 3003);
+INSERT INTO `sys_oper_log` VALUES (527, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'wyqy', '若依科技', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":33,\"landName\":\"114514\",\"speciesName\":\"芒果\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-08 13:28:11', 5);
+INSERT INTO `sys_oper_log` VALUES (528, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":33,\"landName\":\"114514\",\"speciesName\":\"芒果\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-08 14:44:38', 3);
+INSERT INTO `sys_oper_log` VALUES (529, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting/createPestAlert', '192.168.1.102', '内网IP', '{\"plantingId\":33,\"landName\":\"114514\",\"speciesName\":\"芒果\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-08 14:45:09', 4);
+INSERT INTO `sys_oper_log` VALUES (530, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting/createPestAlert', '192.168.1.102', '内网IP', '{\"plantingId\":33,\"landName\":\"114514\",\"speciesName\":\"芒果\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-08 14:45:29', 2);
+INSERT INTO `sys_oper_log` VALUES (531, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.edit()', 'PUT', 1, 'admin', '研发部门', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createBy\":\"\",\"createTime\":\"2026-02-07 13:47:39\",\"expectedHarvestDate\":\"2026-02-07\",\"growthStage\":\"播种期\",\"healthStatus\":\"pest\",\"isMature\":\"0\",\"landId\":119,\"landName\":\"114514\",\"maturity\":\"0\",\"params\":{},\"plantingArea\":0.1,\"plantingDate\":\"2026-02-07\",\"plantingDensity\":100,\"plantingId\":33,\"speciesId\":8,\"speciesName\":\"芒果\",\"status\":\"0\",\"updateBy\":\"\",\"updateTime\":\"2026-02-08 14:47:28\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-08 14:47:28', 40);
+INSERT INTO `sys_oper_log` VALUES (532, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.edit()', 'PUT', 1, 'admin', '研发部门', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createBy\":\"\",\"createTime\":\"2026-02-07 13:47:39\",\"expectedHarvestDate\":\"2026-02-07\",\"growthStage\":\"播种期\",\"healthStatus\":\"pest\",\"isMature\":\"0\",\"landId\":119,\"landName\":\"114514\",\"maturity\":\"0\",\"params\":{},\"plantingArea\":0.1,\"plantingDate\":\"2026-02-07\",\"plantingDensity\":100,\"plantingId\":33,\"speciesId\":8,\"speciesName\":\"芒果\",\"status\":\"0\",\"updateBy\":\"\",\"updateTime\":\"2026-02-08 14:58:12\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-08 14:58:12', 8);
+INSERT INTO `sys_oper_log` VALUES (533, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.edit()', 'PUT', 1, 'admin', '研发部门', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createBy\":\"\",\"createTime\":\"2026-02-07 13:47:39\",\"expectedHarvestDate\":\"2026-02-07\",\"growthStage\":\"播种期\",\"healthStatus\":\"pest\",\"isMature\":\"0\",\"landId\":119,\"landName\":\"114514\",\"maturity\":\"0\",\"params\":{},\"plantingArea\":0.1,\"plantingDate\":\"2026-02-07\",\"plantingDensity\":100,\"plantingId\":33,\"speciesId\":8,\"speciesName\":\"芒果\",\"status\":\"0\",\"updateBy\":\"\",\"updateTime\":\"2026-02-08 14:59:47\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-08 14:59:47', 9);
+INSERT INTO `sys_oper_log` VALUES (534, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":33,\"landName\":\"114514\",\"speciesName\":\"芒果\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-12 00:17:27', 9);
+INSERT INTO `sys_oper_log` VALUES (535, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":33,\"landName\":\"114514\",\"speciesName\":\"芒果\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-15 21:05:14', 5);
+INSERT INTO `sys_oper_log` VALUES (536, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":33,\"landName\":\"114514\",\"speciesName\":\"芒果\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-15 21:05:27', 2);
+INSERT INTO `sys_oper_log` VALUES (537, '种植记录', 1, 'wyqy.web.controller.agriculture.PlantingRecordController.add()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createTime\":\"2026-02-17 02:58:17\",\"expectedHarvestDate\":\"2026-02-17\",\"growthStage\":\"播种期\",\"healthStatus\":\"healthy\",\"isMature\":\"0\",\"landId\":99,\"params\":{},\"plantingArea\":0.5,\"plantingDate\":\"2026-02-17\",\"plantingDensity\":25000,\"plantingId\":34,\"remark\":\"\",\"seedSource\":\"\",\"speciesId\":4} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-17 02:58:17', 122);
+INSERT INTO `sys_oper_log` VALUES (538, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":34,\"landName\":\"东区四十九号地块\",\"speciesName\":\"糯米\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-17 02:58:56', 8);
+INSERT INTO `sys_oper_log` VALUES (539, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.edit()', 'PUT', 1, 'admin', '研发部门', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createBy\":\"\",\"createTime\":\"2026-02-17 02:58:17\",\"expectedHarvestDate\":\"2026-02-17\",\"growthStage\":\"播种期\",\"healthStatus\":\"pest\",\"isMature\":\"0\",\"landId\":99,\"landName\":\"东区四十九号地块\",\"maturity\":\"0\",\"params\":{},\"plantingArea\":0.5,\"plantingDate\":\"2026-02-17\",\"plantingDensity\":25000,\"plantingId\":34,\"speciesId\":4,\"speciesName\":\"糯米\",\"status\":\"0\",\"updateBy\":\"\",\"updateTime\":\"2026-02-17 03:01:00\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-02-17 03:01:00', 113);
+INSERT INTO `sys_oper_log` VALUES (540, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":34,\"landName\":\"东区四十九号地块\",\"speciesName\":\"糯米\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-02-25 17:37:26', 5);
+INSERT INTO `sys_oper_log` VALUES (541, '拍照识别', 1, 'wyqy.web.controller.agriculture.PestDetectionController.detectPest()', 'POST', 1, 'admin', '研发部门', '/agriculture/pest-detection/detect', '127.0.0.1', '内网IP', '{\"landId\":\"\",\"speciesId\":\"\"}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"confidence\":0.99,\"detectionTime\":\"2026-02-25 17:38:05\",\"detectionType\":\"disease\",\"imageUrl\":\"/photo/D:\\\\云盘\\\\OneDrive\\\\桌面\\\\技能大赛\\\\wyqy\\\\photo/2026/02/25/969a9d10-4ddf-4003-8809-2df3561efc76.jpg\",\"params\":{},\"pestName\":\"白粉病\",\"processStatus\":\"pending\",\"recommendation\":\"建议使用多菌灵或甲基托布津等杀菌剂进行防治，同时加强通风，降低湿度。注意及时清除病叶，避免病原传播。\"}}', 0, NULL, '2026-02-25 17:38:05', 3018);
+INSERT INTO `sys_oper_log` VALUES (542, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.createPestAlert()', 'POST', 1, 'admin', '研发部门', '/agriculture/planting/createPestAlert', '127.0.0.1', '内网IP', '{\"plantingId\":34,\"landName\":\"东区四十九号地块\",\"speciesName\":\"糯米\"} ', '{\"msg\":\"报警已创建并同步到所有用户\",\"code\":200}', 0, NULL, '2026-03-02 16:31:41', 6);
+INSERT INTO `sys_oper_log` VALUES (543, '农事待办', 2, 'wyqy.web.controller.agriculture.FarmingTaskController.markDone()', 'PUT', 1, 'admin', '研发部门', '/agriculture/task/done/54', '127.0.0.1', '内网IP', '54 ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 16:54:55', 87);
+INSERT INTO `sys_oper_log` VALUES (544, '农事待办', 2, 'wyqy.web.controller.agriculture.FarmingTaskController.markDone()', 'PUT', 1, 'admin', '研发部门', '/agriculture/task/done/53', '127.0.0.1', '内网IP', '53 ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 16:54:57', 32);
+INSERT INTO `sys_oper_log` VALUES (545, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.edit()', 'PUT', 1, 'admin', '研发部门', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createBy\":\"\",\"createTime\":\"2026-02-17 02:58:17\",\"expectedHarvestDate\":\"2026-02-17\",\"growthStage\":\"播种期\",\"healthStatus\":\"pest\",\"isMature\":\"0\",\"landId\":99,\"landName\":\"东区四十九号地块\",\"maturity\":\"0\",\"params\":{},\"plantingArea\":0.5,\"plantingDate\":\"2026-02-17\",\"plantingDensity\":25000,\"plantingId\":34,\"speciesId\":4,\"speciesName\":\"糯米\",\"status\":\"0\",\"updateBy\":\"admin\",\"updateTime\":\"2026-03-02 17:13:46\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:13:46', 84);
+INSERT INTO `sys_oper_log` VALUES (546, '种植记录', 2, 'wyqy.web.controller.agriculture.PlantingRecordController.edit()', 'PUT', 1, 'admin', '研发部门', '/agriculture/planting', '127.0.0.1', '内网IP', '{\"canHarvest\":\"0\",\"createBy\":\"\",\"createTime\":\"2026-02-17 02:58:17\",\"expectedHarvestDate\":\"2026-02-17\",\"growthStage\":\"播种期\",\"healthStatus\":\"pest\",\"isMature\":\"0\",\"landId\":99,\"landName\":\"东区四十九号地块\",\"maturity\":\"0\",\"params\":{},\"plantingArea\":0.5,\"plantingDate\":\"2026-02-17\",\"plantingDensity\":25000,\"plantingId\":34,\"speciesId\":4,\"speciesName\":\"糯米\",\"status\":\"0\",\"updateBy\":\"admin\",\"updateTime\":\"2026-03-02 17:13:51\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:13:51', 22);
+INSERT INTO `sys_oper_log` VALUES (547, '农事待办', 2, 'wyqy.web.controller.agriculture.FarmingTaskController.markDone()', 'PUT', 1, 'admin', '研发部门', '/agriculture/task/done/55', '127.0.0.1', '内网IP', '55 ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:14:00', 18);
+INSERT INTO `sys_oper_log` VALUES (548, '天气信息', 2, 'wyqy.web.controller.agriculture.WeatherInfoController.edit()', 'PUT', 1, 'admin', '研发部门', '/agriculture/weather', '127.0.0.1', '内网IP', '{\"createBy\":\"admin\",\"createTime\":\"2026-01-26 12:00:00\",\"dataSource\":\"SENSOR004\",\"humidity\":63.0,\"lightIntensity\":58000.0,\"location\":\"北区四号地块\",\"params\":{},\"pressure\":1018.2,\"rainfall\":2.0,\"recordTime\":\"2026-01-26 18:00:00\",\"soilHumidity\":66.3,\"soilTemperature\":26.9,\"temperature\":29.7,\"updateBy\":\"\",\"updateTime\":\"2026-03-02 17:47:27\",\"weatherId\":69,\"windDirection\":\"西北\",\"windSpeed\":6.4} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:47:27', 62);
+INSERT INTO `sys_oper_log` VALUES (549, '角色管理', 1, 'wyqy.web.controller.system.SysRoleController.add()', 'POST', 1, 'admin', '研发部门', '/system/role', '127.0.0.1', '内网IP', '{\"admin\":false,\"deptCheckStrictly\":true,\"deptIds\":[],\"flag\":false,\"menuCheckStrictly\":true,\"menuIds\":[2182,2183,2184,2185,2186,2187,2188,2195,2196,2197,2198,2199,2200,2201,2202,2203,2204,2205,2206,2207,2208,2209,2210,2211,2212,2213,2214,2215,2216,2217,2218,2219,2220,2221,2222,2223,2224,2225,2226,2000,2001,2002,2004,2005,2006,2007,2003,2008,2009,2010,2011,2012,3000,9999,9998,9996,9997,9995,9994,9993,9992,9991,2,109,1046,1047,1048,110,1049,1050,1051,1052,1053,1054,111,112,113,114,1,100,1000,1001,1002,1003,1004,1005,1006,101,1007,1008,1009,1010,1011,102,1012,1013,1014,1015,103,1016,1017,1018,1019,104,1020,1021,1022,1023,1024,105,1025,1026,1027,1028,1029,106,1030,1031,1032,1033,1034,107,1035,1036,1037,1038,108,500,1039,1040,1041,501,1042,1043,1044,1045,3,115,116,1055,1056,1057,1058,1059,1060,117,10090,10091,10092,10093,10094,10095,2038,2081,2082,2046,2080,2083,2084,2085,2072,2027,2061,2028,2062,2029,2063,2030,2064,2031,2065,2117,2171,2172,2170,2173,2174,2175,2162,2106,2151,2107,2152,2108,2153,2109,2154,2110,2155,2190,2191,2192,2193,2194,5007,5008],\"params\":{},\"roleKey\":\"common\",\"roleName\":\"管理员\",\"roleSort\":0,\"status\":\"0\"} ', '{\"msg\":\"新增角色\'管理员\'失败，角色权限已存在\",\"code\":500}', 0, NULL, '2026-03-02 17:51:01', 10);
+INSERT INTO `sys_oper_log` VALUES (550, '角色管理', 1, 'wyqy.web.controller.system.SysRoleController.add()', 'POST', 1, 'admin', '研发部门', '/system/role', '127.0.0.1', '内网IP', '{\"admin\":false,\"deptCheckStrictly\":true,\"deptIds\":[],\"flag\":false,\"menuCheckStrictly\":true,\"menuIds\":[2182,2183,2184,2185,2186,2187,2188,2195,2196,2197,2198,2199,2200,2201,2202,2203,2204,2205,2206,2207,2208,2209,2210,2211,2212,2213,2214,2215,2216,2217,2218,2219,2220,2221,2222,2223,2224,2225,2226,2000,2001,2002,2004,2005,2006,2007,2003,2008,2009,2010,2011,2012,3000,9999,9998,9996,9997,9995,9994,9993,9992,9991,2,109,1046,1047,1048,110,1049,1050,1051,1052,1053,1054,111,112,113,114,1,100,1000,1001,1002,1003,1004,1005,1006,101,1007,1008,1009,1010,1011,102,1012,1013,1014,1015,103,1016,1017,1018,1019,104,1020,1021,1022,1023,1024,105,1025,1026,1027,1028,1029,106,1030,1031,1032,1033,1034,107,1035,1036,1037,1038,108,500,1039,1040,1041,501,1042,1043,1044,1045,3,115,116,1055,1056,1057,1058,1059,1060,117,10090,10091,10092,10093,10094,10095,2038,2081,2082,2046,2080,2083,2084,2085,2072,2027,2061,2028,2062,2029,2063,2030,2064,2031,2065,2117,2171,2172,2170,2173,2174,2175,2162,2106,2151,2107,2152,2108,2153,2109,2154,2110,2155,2190,2191,2192,2193,2194,5007,5008],\"params\":{},\"roleKey\":\"common\",\"roleName\":\"管理员1\",\"roleSort\":0,\"status\":\"0\"} ', '{\"msg\":\"新增角色\'管理员1\'失败，角色权限已存在\",\"code\":500}', 0, NULL, '2026-03-02 17:51:08', 12);
+INSERT INTO `sys_oper_log` VALUES (551, '部门管理', 1, 'wyqy.web.controller.system.SysDeptController.add()', 'POST', 1, 'admin', '研发部门', '/system/dept', '127.0.0.1', '内网IP', '{\"ancestors\":\"0,100\",\"children\":[],\"createBy\":\"admin\",\"deptName\":\"wyqy\",\"orderNum\":1,\"params\":{},\"parentId\":100,\"status\":\"0\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:53:13', 21);
+INSERT INTO `sys_oper_log` VALUES (552, '部门管理', 2, 'wyqy.web.controller.system.SysDeptController.edit()', 'PUT', 1, 'admin', '研发部门', '/system/dept', '127.0.0.1', '内网IP', '{\"ancestors\":\"0,100\",\"children\":[],\"deptId\":200,\"deptName\":\"wyqy\",\"orderNum\":1,\"params\":{},\"parentId\":100,\"parentName\":\"若依科技\",\"status\":\"0\",\"updateBy\":\"admin\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:53:17', 50);
+INSERT INTO `sys_oper_log` VALUES (553, '用户管理', 1, 'wyqy.web.controller.system.SysUserController.add()', 'POST', 1, 'admin', '研发部门', '/system/user', '127.0.0.1', '内网IP', '{\"admin\":false,\"createBy\":\"admin\",\"deptId\":100,\"nickName\":\"wyqy1\",\"params\":{},\"postIds\":[],\"roleIds\":[],\"status\":\"0\",\"userId\":101,\"userName\":\"wyqy1\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:53:58', 166);
+INSERT INTO `sys_oper_log` VALUES (554, '个人信息', 2, 'wyqy.web.controller.system.SysProfileController.updatePwd()', 'PUT', 1, 'wyqy1', '若依科技', '/system/user/profile/updatePwd', '127.0.0.1', '内网IP', '{} ', '{\"msg\":\"新密码不能与旧密码相同\",\"code\":500}', 0, NULL, '2026-03-02 17:54:39', 262);
+INSERT INTO `sys_oper_log` VALUES (555, '角色管理', 1, 'wyqy.web.controller.system.SysRoleController.add()', 'POST', 1, 'admin', '研发部门', '/system/role', '127.0.0.1', '内网IP', '{\"admin\":false,\"createBy\":\"admin\",\"deptCheckStrictly\":true,\"deptIds\":[],\"flag\":false,\"menuCheckStrictly\":true,\"menuIds\":[2182,2183,2184,2185,2186,2187,2188,2195,2196,2197,2198,2199,2200,2201,2202,2203,2204,2205,2206,2207,2208,2209,2210,2211,2212,2213,2214,2215,2216,2217,2218,2219,2220,2221,2222,2223,2224,2225,2226,2000,2001,2002,2004,2005,2006,2007,2003,2008,2009,2010,2011,2012,3000,9999,9998,9996,9997,9995,9994,9993,9992,9991,2,109,1046,1047,1048,110,1049,1050,1051,1052,1053,1054,111,112,113,114,1,100,1000,1001,1002,1003,1004,1005,1006,101,1007,1008,1009,1010,1011,102,1012,1013,1014,1015,103,1016,1017,1018,1019,104,1020,1021,1022,1023,1024,105,1025,1026,1027,1028,1029,106,1030,1031,1032,1033,1034,107,1035,1036,1037,1038,108,500,1039,1040,1041,501,1042,1043,1044,1045,3,115,116,1055,1056,1057,1058,1059,1060,117,10090,10091,10092,10093,10094,10095,2038,2081,2082,2046,2080,2083,2084,2085,2072,2027,2061,2028,2062,2029,2063,2030,2064,2031,2065,2117,2171,2172,2170,2173,2174,2175,2162,2106,2151,2107,2152,2108,2153,2109,2154,2110,2155,2190,2191,2192,2193,2194,5007,5008],\"params\":{},\"roleId\":100,\"roleKey\":\"wyqy\",\"roleName\":\"wyqy1\",\"roleSort\":3,\"status\":\"0\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:56:49', 63);
+INSERT INTO `sys_oper_log` VALUES (556, '个人信息', 2, 'wyqy.web.controller.system.SysProfileController.updatePwd()', 'PUT', 1, 'wyqy1', '若依科技', '/system/user/profile/updatePwd', '127.0.0.1', '内网IP', '{} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:57:30', 261);
+INSERT INTO `sys_oper_log` VALUES (557, '用户管理', 4, 'wyqy.web.controller.system.SysUserController.insertAuthRole()', 'PUT', 1, 'admin', '研发部门', '/system/user/authRole', '127.0.0.1', '内网IP', '{\"roleIds\":\"100\",\"userId\":\"101\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-03-02 17:58:43', 31);
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -1861,13 +1977,14 @@ CREATE TABLE `sys_role`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`role_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 100 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 101 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
 INSERT INTO `sys_role` VALUES (1, '超级管理员', 'admin', 1, '1', 1, 1, '0', '0', 'admin', '2026-01-22 16:24:52', '', NULL, '超级管理员');
 INSERT INTO `sys_role` VALUES (2, '普通角色', 'common', 2, '2', 1, 1, '0', '0', 'admin', '2026-01-22 16:24:52', 'admin', '2026-02-06 15:15:31', '普通角色');
+INSERT INTO `sys_role` VALUES (100, 'wyqy1', 'wyqy', 3, '1', 1, 1, '0', '0', 'admin', '2026-03-02 17:56:49', '', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_role_dept
@@ -1944,12 +2061,6 @@ INSERT INTO `sys_role_menu` VALUES (1, 10009);
 INSERT INTO `sys_role_menu` VALUES (1, 10010);
 INSERT INTO `sys_role_menu` VALUES (1, 10011);
 INSERT INTO `sys_role_menu` VALUES (1, 10012);
-INSERT INTO `sys_role_menu` VALUES (1, 10080);
-INSERT INTO `sys_role_menu` VALUES (1, 10081);
-INSERT INTO `sys_role_menu` VALUES (1, 10082);
-INSERT INTO `sys_role_menu` VALUES (1, 10083);
-INSERT INTO `sys_role_menu` VALUES (1, 10084);
-INSERT INTO `sys_role_menu` VALUES (1, 10085);
 INSERT INTO `sys_role_menu` VALUES (2, 1);
 INSERT INTO `sys_role_menu` VALUES (2, 2);
 INSERT INTO `sys_role_menu` VALUES (2, 3);
@@ -2145,12 +2256,208 @@ INSERT INTO `sys_role_menu` VALUES (2, 10009);
 INSERT INTO `sys_role_menu` VALUES (2, 10010);
 INSERT INTO `sys_role_menu` VALUES (2, 10011);
 INSERT INTO `sys_role_menu` VALUES (2, 10012);
-INSERT INTO `sys_role_menu` VALUES (2, 10080);
-INSERT INTO `sys_role_menu` VALUES (2, 10081);
-INSERT INTO `sys_role_menu` VALUES (2, 10082);
-INSERT INTO `sys_role_menu` VALUES (2, 10083);
-INSERT INTO `sys_role_menu` VALUES (2, 10084);
-INSERT INTO `sys_role_menu` VALUES (2, 10085);
+INSERT INTO `sys_role_menu` VALUES (2, 10090);
+INSERT INTO `sys_role_menu` VALUES (2, 10091);
+INSERT INTO `sys_role_menu` VALUES (2, 10092);
+INSERT INTO `sys_role_menu` VALUES (2, 10093);
+INSERT INTO `sys_role_menu` VALUES (2, 10094);
+INSERT INTO `sys_role_menu` VALUES (2, 10095);
+INSERT INTO `sys_role_menu` VALUES (100, 1);
+INSERT INTO `sys_role_menu` VALUES (100, 2);
+INSERT INTO `sys_role_menu` VALUES (100, 3);
+INSERT INTO `sys_role_menu` VALUES (100, 100);
+INSERT INTO `sys_role_menu` VALUES (100, 101);
+INSERT INTO `sys_role_menu` VALUES (100, 102);
+INSERT INTO `sys_role_menu` VALUES (100, 103);
+INSERT INTO `sys_role_menu` VALUES (100, 104);
+INSERT INTO `sys_role_menu` VALUES (100, 105);
+INSERT INTO `sys_role_menu` VALUES (100, 106);
+INSERT INTO `sys_role_menu` VALUES (100, 107);
+INSERT INTO `sys_role_menu` VALUES (100, 108);
+INSERT INTO `sys_role_menu` VALUES (100, 109);
+INSERT INTO `sys_role_menu` VALUES (100, 110);
+INSERT INTO `sys_role_menu` VALUES (100, 111);
+INSERT INTO `sys_role_menu` VALUES (100, 112);
+INSERT INTO `sys_role_menu` VALUES (100, 113);
+INSERT INTO `sys_role_menu` VALUES (100, 114);
+INSERT INTO `sys_role_menu` VALUES (100, 115);
+INSERT INTO `sys_role_menu` VALUES (100, 116);
+INSERT INTO `sys_role_menu` VALUES (100, 117);
+INSERT INTO `sys_role_menu` VALUES (100, 500);
+INSERT INTO `sys_role_menu` VALUES (100, 501);
+INSERT INTO `sys_role_menu` VALUES (100, 1000);
+INSERT INTO `sys_role_menu` VALUES (100, 1001);
+INSERT INTO `sys_role_menu` VALUES (100, 1002);
+INSERT INTO `sys_role_menu` VALUES (100, 1003);
+INSERT INTO `sys_role_menu` VALUES (100, 1004);
+INSERT INTO `sys_role_menu` VALUES (100, 1005);
+INSERT INTO `sys_role_menu` VALUES (100, 1006);
+INSERT INTO `sys_role_menu` VALUES (100, 1007);
+INSERT INTO `sys_role_menu` VALUES (100, 1008);
+INSERT INTO `sys_role_menu` VALUES (100, 1009);
+INSERT INTO `sys_role_menu` VALUES (100, 1010);
+INSERT INTO `sys_role_menu` VALUES (100, 1011);
+INSERT INTO `sys_role_menu` VALUES (100, 1012);
+INSERT INTO `sys_role_menu` VALUES (100, 1013);
+INSERT INTO `sys_role_menu` VALUES (100, 1014);
+INSERT INTO `sys_role_menu` VALUES (100, 1015);
+INSERT INTO `sys_role_menu` VALUES (100, 1016);
+INSERT INTO `sys_role_menu` VALUES (100, 1017);
+INSERT INTO `sys_role_menu` VALUES (100, 1018);
+INSERT INTO `sys_role_menu` VALUES (100, 1019);
+INSERT INTO `sys_role_menu` VALUES (100, 1020);
+INSERT INTO `sys_role_menu` VALUES (100, 1021);
+INSERT INTO `sys_role_menu` VALUES (100, 1022);
+INSERT INTO `sys_role_menu` VALUES (100, 1023);
+INSERT INTO `sys_role_menu` VALUES (100, 1024);
+INSERT INTO `sys_role_menu` VALUES (100, 1025);
+INSERT INTO `sys_role_menu` VALUES (100, 1026);
+INSERT INTO `sys_role_menu` VALUES (100, 1027);
+INSERT INTO `sys_role_menu` VALUES (100, 1028);
+INSERT INTO `sys_role_menu` VALUES (100, 1029);
+INSERT INTO `sys_role_menu` VALUES (100, 1030);
+INSERT INTO `sys_role_menu` VALUES (100, 1031);
+INSERT INTO `sys_role_menu` VALUES (100, 1032);
+INSERT INTO `sys_role_menu` VALUES (100, 1033);
+INSERT INTO `sys_role_menu` VALUES (100, 1034);
+INSERT INTO `sys_role_menu` VALUES (100, 1035);
+INSERT INTO `sys_role_menu` VALUES (100, 1036);
+INSERT INTO `sys_role_menu` VALUES (100, 1037);
+INSERT INTO `sys_role_menu` VALUES (100, 1038);
+INSERT INTO `sys_role_menu` VALUES (100, 1039);
+INSERT INTO `sys_role_menu` VALUES (100, 1040);
+INSERT INTO `sys_role_menu` VALUES (100, 1041);
+INSERT INTO `sys_role_menu` VALUES (100, 1042);
+INSERT INTO `sys_role_menu` VALUES (100, 1043);
+INSERT INTO `sys_role_menu` VALUES (100, 1044);
+INSERT INTO `sys_role_menu` VALUES (100, 1045);
+INSERT INTO `sys_role_menu` VALUES (100, 1046);
+INSERT INTO `sys_role_menu` VALUES (100, 1047);
+INSERT INTO `sys_role_menu` VALUES (100, 1048);
+INSERT INTO `sys_role_menu` VALUES (100, 1049);
+INSERT INTO `sys_role_menu` VALUES (100, 1050);
+INSERT INTO `sys_role_menu` VALUES (100, 1051);
+INSERT INTO `sys_role_menu` VALUES (100, 1052);
+INSERT INTO `sys_role_menu` VALUES (100, 1053);
+INSERT INTO `sys_role_menu` VALUES (100, 1054);
+INSERT INTO `sys_role_menu` VALUES (100, 1055);
+INSERT INTO `sys_role_menu` VALUES (100, 1056);
+INSERT INTO `sys_role_menu` VALUES (100, 1057);
+INSERT INTO `sys_role_menu` VALUES (100, 1058);
+INSERT INTO `sys_role_menu` VALUES (100, 1059);
+INSERT INTO `sys_role_menu` VALUES (100, 1060);
+INSERT INTO `sys_role_menu` VALUES (100, 2000);
+INSERT INTO `sys_role_menu` VALUES (100, 2001);
+INSERT INTO `sys_role_menu` VALUES (100, 2002);
+INSERT INTO `sys_role_menu` VALUES (100, 2003);
+INSERT INTO `sys_role_menu` VALUES (100, 2004);
+INSERT INTO `sys_role_menu` VALUES (100, 2005);
+INSERT INTO `sys_role_menu` VALUES (100, 2006);
+INSERT INTO `sys_role_menu` VALUES (100, 2007);
+INSERT INTO `sys_role_menu` VALUES (100, 2008);
+INSERT INTO `sys_role_menu` VALUES (100, 2009);
+INSERT INTO `sys_role_menu` VALUES (100, 2010);
+INSERT INTO `sys_role_menu` VALUES (100, 2011);
+INSERT INTO `sys_role_menu` VALUES (100, 2012);
+INSERT INTO `sys_role_menu` VALUES (100, 2027);
+INSERT INTO `sys_role_menu` VALUES (100, 2028);
+INSERT INTO `sys_role_menu` VALUES (100, 2029);
+INSERT INTO `sys_role_menu` VALUES (100, 2030);
+INSERT INTO `sys_role_menu` VALUES (100, 2031);
+INSERT INTO `sys_role_menu` VALUES (100, 2038);
+INSERT INTO `sys_role_menu` VALUES (100, 2046);
+INSERT INTO `sys_role_menu` VALUES (100, 2061);
+INSERT INTO `sys_role_menu` VALUES (100, 2062);
+INSERT INTO `sys_role_menu` VALUES (100, 2063);
+INSERT INTO `sys_role_menu` VALUES (100, 2064);
+INSERT INTO `sys_role_menu` VALUES (100, 2065);
+INSERT INTO `sys_role_menu` VALUES (100, 2072);
+INSERT INTO `sys_role_menu` VALUES (100, 2080);
+INSERT INTO `sys_role_menu` VALUES (100, 2081);
+INSERT INTO `sys_role_menu` VALUES (100, 2082);
+INSERT INTO `sys_role_menu` VALUES (100, 2083);
+INSERT INTO `sys_role_menu` VALUES (100, 2084);
+INSERT INTO `sys_role_menu` VALUES (100, 2085);
+INSERT INTO `sys_role_menu` VALUES (100, 2106);
+INSERT INTO `sys_role_menu` VALUES (100, 2107);
+INSERT INTO `sys_role_menu` VALUES (100, 2108);
+INSERT INTO `sys_role_menu` VALUES (100, 2109);
+INSERT INTO `sys_role_menu` VALUES (100, 2110);
+INSERT INTO `sys_role_menu` VALUES (100, 2117);
+INSERT INTO `sys_role_menu` VALUES (100, 2151);
+INSERT INTO `sys_role_menu` VALUES (100, 2152);
+INSERT INTO `sys_role_menu` VALUES (100, 2153);
+INSERT INTO `sys_role_menu` VALUES (100, 2154);
+INSERT INTO `sys_role_menu` VALUES (100, 2155);
+INSERT INTO `sys_role_menu` VALUES (100, 2162);
+INSERT INTO `sys_role_menu` VALUES (100, 2170);
+INSERT INTO `sys_role_menu` VALUES (100, 2171);
+INSERT INTO `sys_role_menu` VALUES (100, 2172);
+INSERT INTO `sys_role_menu` VALUES (100, 2173);
+INSERT INTO `sys_role_menu` VALUES (100, 2174);
+INSERT INTO `sys_role_menu` VALUES (100, 2175);
+INSERT INTO `sys_role_menu` VALUES (100, 2182);
+INSERT INTO `sys_role_menu` VALUES (100, 2183);
+INSERT INTO `sys_role_menu` VALUES (100, 2184);
+INSERT INTO `sys_role_menu` VALUES (100, 2185);
+INSERT INTO `sys_role_menu` VALUES (100, 2186);
+INSERT INTO `sys_role_menu` VALUES (100, 2187);
+INSERT INTO `sys_role_menu` VALUES (100, 2188);
+INSERT INTO `sys_role_menu` VALUES (100, 2190);
+INSERT INTO `sys_role_menu` VALUES (100, 2191);
+INSERT INTO `sys_role_menu` VALUES (100, 2192);
+INSERT INTO `sys_role_menu` VALUES (100, 2193);
+INSERT INTO `sys_role_menu` VALUES (100, 2194);
+INSERT INTO `sys_role_menu` VALUES (100, 2195);
+INSERT INTO `sys_role_menu` VALUES (100, 2196);
+INSERT INTO `sys_role_menu` VALUES (100, 2197);
+INSERT INTO `sys_role_menu` VALUES (100, 2198);
+INSERT INTO `sys_role_menu` VALUES (100, 2199);
+INSERT INTO `sys_role_menu` VALUES (100, 2200);
+INSERT INTO `sys_role_menu` VALUES (100, 2201);
+INSERT INTO `sys_role_menu` VALUES (100, 2202);
+INSERT INTO `sys_role_menu` VALUES (100, 2203);
+INSERT INTO `sys_role_menu` VALUES (100, 2204);
+INSERT INTO `sys_role_menu` VALUES (100, 2205);
+INSERT INTO `sys_role_menu` VALUES (100, 2206);
+INSERT INTO `sys_role_menu` VALUES (100, 2207);
+INSERT INTO `sys_role_menu` VALUES (100, 2208);
+INSERT INTO `sys_role_menu` VALUES (100, 2209);
+INSERT INTO `sys_role_menu` VALUES (100, 2210);
+INSERT INTO `sys_role_menu` VALUES (100, 2211);
+INSERT INTO `sys_role_menu` VALUES (100, 2212);
+INSERT INTO `sys_role_menu` VALUES (100, 2213);
+INSERT INTO `sys_role_menu` VALUES (100, 2214);
+INSERT INTO `sys_role_menu` VALUES (100, 2215);
+INSERT INTO `sys_role_menu` VALUES (100, 2216);
+INSERT INTO `sys_role_menu` VALUES (100, 2217);
+INSERT INTO `sys_role_menu` VALUES (100, 2218);
+INSERT INTO `sys_role_menu` VALUES (100, 2219);
+INSERT INTO `sys_role_menu` VALUES (100, 2220);
+INSERT INTO `sys_role_menu` VALUES (100, 2221);
+INSERT INTO `sys_role_menu` VALUES (100, 2222);
+INSERT INTO `sys_role_menu` VALUES (100, 2223);
+INSERT INTO `sys_role_menu` VALUES (100, 2224);
+INSERT INTO `sys_role_menu` VALUES (100, 2225);
+INSERT INTO `sys_role_menu` VALUES (100, 2226);
+INSERT INTO `sys_role_menu` VALUES (100, 3000);
+INSERT INTO `sys_role_menu` VALUES (100, 5007);
+INSERT INTO `sys_role_menu` VALUES (100, 5008);
+INSERT INTO `sys_role_menu` VALUES (100, 9991);
+INSERT INTO `sys_role_menu` VALUES (100, 9992);
+INSERT INTO `sys_role_menu` VALUES (100, 9993);
+INSERT INTO `sys_role_menu` VALUES (100, 9994);
+INSERT INTO `sys_role_menu` VALUES (100, 9995);
+INSERT INTO `sys_role_menu` VALUES (100, 9996);
+INSERT INTO `sys_role_menu` VALUES (100, 9997);
+INSERT INTO `sys_role_menu` VALUES (100, 9998);
+INSERT INTO `sys_role_menu` VALUES (100, 9999);
+INSERT INTO `sys_role_menu` VALUES (100, 10090);
+INSERT INTO `sys_role_menu` VALUES (100, 10091);
+INSERT INTO `sys_role_menu` VALUES (100, 10092);
+INSERT INTO `sys_role_menu` VALUES (100, 10093);
+INSERT INTO `sys_role_menu` VALUES (100, 10094);
+INSERT INTO `sys_role_menu` VALUES (100, 10095);
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -2178,14 +2485,15 @@ CREATE TABLE `sys_user`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`user_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 101 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 102 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 103, 'admin', '沃野千言', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2026-02-06 15:14:38', '2026-01-22 16:24:52', 'admin', '2026-01-22 16:24:52', '', '2026-02-03 13:46:42', '管理员');
+INSERT INTO `sys_user` VALUES (1, 103, 'admin', '沃野千言', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2026-03-02 17:57:47', '2026-01-22 16:24:52', 'admin', '2026-01-22 16:24:52', '', '2026-02-03 13:46:42', '管理员');
 INSERT INTO `sys_user` VALUES (2, 105, 'ry', '沃野千言1', '00', 'ry@qq1.com', '15666666666', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2026-01-26 12:02:42', '2026-01-22 16:24:52', 'admin', '2026-01-22 16:24:52', 'admin', '2026-02-03 13:47:03', '测试员');
-INSERT INTO `sys_user` VALUES (100, 100, 'wyqy', 'wyqy', '00', '', '18888888888', '0', '', '$2a$10$mzP1.iHfD5SpGrb8ckuOnOw.0AwfdJrogc2K4YHPEc7V8j75Z0tY2', '0', '0', '127.0.0.1', '2026-02-06 15:20:49', '2026-02-06 15:12:16', 'admin', '2026-02-06 15:11:23', 'admin', '2026-02-06 15:15:43', NULL);
+INSERT INTO `sys_user` VALUES (100, 100, 'wyqy', 'wyqy', '00', '', '18888888888', '0', '', '$2a$10$mzP1.iHfD5SpGrb8ckuOnOw.0AwfdJrogc2K4YHPEc7V8j75Z0tY2', '0', '0', '127.0.0.1', '2026-03-02 17:57:08', '2026-02-06 15:12:16', 'admin', '2026-02-06 15:11:23', 'admin', '2026-02-06 15:15:43', NULL);
+INSERT INTO `sys_user` VALUES (101, 100, 'wyqy1', 'wyqy1', '00', '', '', '0', '', '$2a$10$50.d.J41qf3fntlLTtGX5OXtH4KdawpXEnNLJd9ZK0abXes8UTCQ6', '0', '0', '127.0.0.1', '2026-03-02 18:09:10', '2026-03-02 17:57:30', 'admin', '2026-03-02 17:53:58', '', '2026-03-02 17:57:30', NULL);
 
 -- ----------------------------
 -- Table structure for sys_user_post
@@ -2219,6 +2527,7 @@ CREATE TABLE `sys_user_role`  (
 INSERT INTO `sys_user_role` VALUES (1, 1);
 INSERT INTO `sys_user_role` VALUES (2, 2);
 INSERT INTO `sys_user_role` VALUES (100, 2);
+INSERT INTO `sys_user_role` VALUES (101, 100);
 
 -- ----------------------------
 -- Table structure for translation_corpus
@@ -2380,7 +2689,7 @@ CREATE TABLE `translation_record`  (
   INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
   INDEX `idx_create_time`(`create_time` ASC) USING BTREE,
   INDEX `idx_status`(`status` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 137 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '翻译记录表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 138 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '翻译记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of translation_record
@@ -2486,6 +2795,7 @@ INSERT INTO `translation_record` VALUES (133, 'agr_098', '灌溉系统', 'ລະ
 INSERT INTO `translation_record` VALUES (134, 'agr_099', '农业现代化', 'ການທັນສະໄໝກະສິກຳ', 'zh', 'lo', 'auto', '[{\"corpusId\":114,\"sourceText\":\"农业现代化\",\"targetText\":\"ການທັນສະໄໝກະສິກຳ\",\"matchScore\":1.0}]', 125, 0.94, 1, 'admin', '192.168.1.100', 'Chrome120', 'Windows10', '0', NULL, '0', '2026-01-31 16:31:38', NULL);
 INSERT INTO `translation_record` VALUES (135, 'agr_100', '农业可持续发展', 'ການພັດທະນາກະສິກຳຍືນຍົງ', 'zh', 'lo', 'auto', '[{\"corpusId\":115,\"sourceText\":\"农业可持续发展\",\"targetText\":\"ການພັດທະນາກະສິກຳຍືນຍົງ\",\"matchScore\":1.0}]', 148, 0.93, 1, 'admin', '192.168.1.100', 'Chrome120', 'Windows10', '0', NULL, '0', '2026-01-31 16:31:39', NULL);
 INSERT INTO `translation_record` VALUES (136, '9e7134a2d0a44fd295575557ddac903e', '农业现代化', '翻译：农业现代化', 'zh', 'lo', 'auto', NULL, 45, 0.70, 1, 'admin', '127.0.0.1', 'Edge 144', 'Windows >=10', '0', NULL, '2', '2026-02-02 14:44:36', NULL);
+INSERT INTO `translation_record` VALUES (137, '5c1486ab1c9743b59da24e796c6fd612', 'nuihaop ', 'nuihaop ', 'auto', 'zh', 'auto', NULL, 0, 0.80, 100, 'wyqy', '127.0.0.1', 'Edge 144', 'Windows >=10', '0', NULL, '0', '2026-02-06 16:33:39', NULL);
 
 -- ----------------------------
 -- Table structure for translation_statistics
@@ -2614,7 +2924,7 @@ INSERT INTO `weather_info` VALUES (65, '中区五号地块', 32.00, 49.20, 1021.
 INSERT INTO `weather_info` VALUES (66, '东区一号地块', 31.70, 52.60, 1020.70, 2.90, '东南', 0.00, 66000.00, 29.00, 55.30, '2026-01-26 16:30:00', 'SENSOR001', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
 INSERT INTO `weather_info` VALUES (67, '西区二号地块', 30.80, 56.10, 1019.80, 3.80, '东风', 0.00, 62000.00, 28.10, 59.60, '2026-01-26 17:00:00', 'SENSOR002', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
 INSERT INTO `weather_info` VALUES (68, '南区三号地块', 32.40, 48.30, 1021.70, 4.70, '北风', 0.00, 70000.00, 29.70, 51.00, '2026-01-26 17:30:00', 'SENSOR003', 'admin', '2026-01-26 12:00:00', '', '2026-01-26 12:00:00', NULL);
-INSERT INTO `weather_info` VALUES (69, '北区四号地块', 29.70, 63.00, 1018.20, 6.40, '西北', 2.00, 58000.00, 26.90, 66.30, '2026-01-26 18:00:00', 'SENSOR004', 'admin', '2026-01-26 12:00:00', '', '2026-01-29 11:37:11', NULL);
+INSERT INTO `weather_info` VALUES (69, '北区四号地块', 29.70, 63.00, 1018.20, 6.40, '西北', 2.00, 58000.00, 26.90, 66.30, '2026-01-26 18:00:00', 'SENSOR004', 'admin', '2026-01-26 12:00:00', '', '2026-03-02 17:47:28', NULL);
 INSERT INTO `weather_info` VALUES (70, '中区五号地块', 33.10, 47.10, 1022.40, 2.60, '西风', 0.10, 71000.00, 30.20, 49.80, '2026-01-26 18:30:00', 'SENSOR005', 'admin', '2026-01-26 12:00:00', '', '2026-02-03 12:48:26', NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;

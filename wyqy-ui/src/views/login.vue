@@ -92,7 +92,7 @@
           </div>
         </div>
       </div>
-      
+      pr
       <div class="login-right">
         <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
           <div class="form-header">
@@ -274,9 +274,9 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 // 颜色变量
-$primary-green: #2D5A27;
-$light-green: #4A7C43;
-$accent-green: #6B9F65;
+$primary-green: #389aa5;
+$light-green: #5c8f9b;
+$accent-green: #76b1a9;
 $soft-green: #E8F5E6;
 $cream: #FDFCF7;
 $warm-white: #FFFEF9;

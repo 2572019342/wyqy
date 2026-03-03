@@ -1,34 +1,70 @@
 <template>
-  <el-menu
-    :default-active="activeMenu"
-    mode="horizontal"
-    @select="handleSelect"
-  >
-    <template v-for="(item, index) in topMenus">
-      <el-menu-item :style="{'--theme': theme}" :index="item.path" :key="index" v-if="index < visibleNumber">
+  <div class="topnav-wrapper">
+    <div class="topnav-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <span class="brand-text">智控中心</span>
+    </div>
+    
+    <nav class="topnav-menu">
+      <div 
+        v-for="(item, index) in topMenus" 
+        :key="index"
+        class="nav-menu-item"
+        :class="{ active: activeMenu === item.path }"
+        @click="handleSelect(item.path)"
+      >
         <svg-icon
-        v-if="item.meta && item.meta.icon && item.meta.icon !== '#'"
-        :icon-class="item.meta.icon"/>
-        {{ item.meta.title }}
-      </el-menu-item>
-    </template>
-
-    <!-- 顶部菜单超出数量折叠 -->
-    <el-submenu :style="{'--theme': theme}" index="more" :key="visibleNumber" v-if="topMenus.length > visibleNumber">
-      <template slot="title">更多菜单</template>
-      <template v-for="(item, index) in topMenus">
-        <el-menu-item
-          :index="item.path"
-          :key="index"
-          v-if="index >= visibleNumber">
-          <svg-icon
-            v-if="item.meta && item.meta.icon && item.meta.icon !== '#'"
-            :icon-class="item.meta.icon"/>
-          {{ item.meta.title }}
-        </el-menu-item>
-      </template>
-    </el-submenu>
-  </el-menu>
+          v-if="item.meta && item.meta.icon && item.meta.icon !== '#'"
+          :icon-class="item.meta.icon"
+          class="menu-icon"
+        />
+        <span class="menu-title">{{ item.meta.title }}</span>
+        <div class="active-indicator" v-if="activeMenu === item.path"></div>
+      </div>
+      
+      <!-- 更多菜单 -->
+      <div 
+        class="nav-menu-item more-menu" 
+        v-if="topMenus.length > visibleNumber"
+        @mouseenter="showMore = true"
+        @mouseleave="showMore = false"
+      >
+        <span class="menu-title">更多菜单</span>
+        <svg class="more-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6,9 12,15 18,9"/>
+        </svg>
+        
+        <transition name="fade">
+          <div class="more-dropdown" v-show="showMore">
+            <div 
+              v-for="(item, index) in topMenus.slice(visibleNumber)" 
+              :key="index"
+              class="dropdown-item"
+              :class="{ active: activeMenu === item.path }"
+              @click="handleSelect(item.path)"
+            >
+              <svg-icon
+                v-if="item.meta && item.meta.icon && item.meta.icon !== '#'"
+                :icon-class="item.meta.icon"
+              />
+              <span>{{ item.meta.title }}</span>
+            </div>
+          </div>
+        </transition>
+      </div>
+    </nav>
+    
+    <div class="topnav-right">
+      <div class="status-badge">
+        <span class="status-dot pulse"></span>
+        <span class="status-text">运行正常</span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -41,10 +77,9 @@ const hideList = ['/index', '/user/profile']
 export default {
   data() {
     return {
-      // 顶部栏初始数
-      visibleNumber: 5,
-      // 当前激活菜单的 index
-      currentIndex: undefined
+      visibleNumber: 6,
+      currentIndex: undefined,
+      showMore: false
     }
   },
   computed: {
@@ -120,8 +155,8 @@ export default {
   methods: {
     // 根据宽度计算设置显示栏数
     setVisibleNumber() {
-      const width = document.body.getBoundingClientRect().width / 3
-      this.visibleNumber = parseInt(width / 85)
+      const width = document.body.getBoundingClientRect().width
+      this.visibleNumber = parseInt((width - 400) / 120)
     },
     // 菜单选择事件
     handleSelect(key, keyPath) {
@@ -166,28 +201,235 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.topmenu-container.el-menu--horizontal > .el-menu-item {
-  float: left;
-  height: 50px !important;
-  line-height: 50px !important;
-  color: #303133 !important;
-  padding: 0 5px !important;
-  margin: 0 10px !important;
+<style lang="scss" scoped>
+// 色彩系统
+$color-primary: #14b8a6;
+$color-primary-dark: #0d9488;
+$color-text-primary: #0f172a;
+$color-text-secondary: #475569;
+$color-text-tertiary: #64748b;
+$color-border: #e2e8f0;
+$color-bg: #f8fafc;
+
+.topnav-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 28px;
+  background: white;
+  border-bottom: 1px solid $color-border;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.topmenu-container.el-menu--horizontal > .el-menu-item.is-active, .el-menu--horizontal > .el-submenu.is-active .el-submenu__title {
-  border-bottom: 2px solid #{'var(--theme)'} !important;
-  color: #303133;
+// 品牌区域
+.topnav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  
+  .brand-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
 }
 
-/* submenu item */
-.topmenu-container.el-menu--horizontal > .el-submenu .el-submenu__title {
-  float: left;
-  height: 50px !important;
-  line-height: 50px !important;
-  color: #303133 !important;
-  padding: 0 5px !important;
-  margin: 0 10px !important;
+// 菜单区域
+.topnav-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  
+  .nav-menu-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(20, 184, 166, 0.08);
+      
+      .menu-title {
+        color: $color-primary;
+      }
+    }
+    
+    &.active {
+      background: rgba(20, 184, 166, 0.12);
+      
+      .menu-title {
+        color: $color-primary;
+        font-weight: 600;
+      }
+      
+      .active-indicator {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 3px;
+        background: $color-primary;
+        border-radius: 2px;
+      }
+    }
+    
+    .menu-icon {
+      width: 18px;
+      height: 18px;
+      color: $color-text-tertiary;
+    }
+    
+    .menu-title {
+      font-size: 14px;
+      color: $color-text-secondary;
+      transition: color 0.2s ease;
+    }
+  }
+  
+  // 更多菜单
+  .more-menu {
+    position: relative;
+    
+    .more-arrow {
+      width: 14px;
+      height: 14px;
+      color: $color-text-tertiary;
+      transition: transform 0.2s ease;
+    }
+    
+    &:hover .more-arrow {
+      transform: rotate(180deg);
+    }
+    
+    .more-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 160px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid $color-border;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      padding: 8px;
+      z-index: 1000;
+      
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          background: rgba(20, 184, 166, 0.08);
+          
+          span {
+            color: $color-primary;
+          }
+        }
+        
+        &.active {
+          background: rgba(20, 184, 166, 0.12);
+          
+          span {
+            color: $color-primary;
+            font-weight: 500;
+          }
+        }
+        
+        span {
+          font-size: 13px;
+          color: $color-text-secondary;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
+// 右侧状态
+.topnav-right {
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(20, 184, 166, 0.1);
+    border-radius: 20px;
+    border: 1px solid rgba(20, 184, 166, 0.2);
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: $color-primary;
+      border-radius: 50%;
+      
+      &.pulse {
+        animation: pulse 2s ease-in-out infinite;
+      }
+    }
+    
+    .status-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: $color-primary;
+    }
+  }
+}
+
+// 动画
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s, transform 0.2s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .topnav-wrapper {
+    padding: 0 16px;
+  }
+  
+  .brand-text {
+    display: none;
+  }
+  
+  .topnav-menu {
+    justify-content: flex-end;
+  }
 }
 </style>

@@ -214,18 +214,35 @@ export default {
 <style scoped>
 /* 主容器样式 */
 .soil-container {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --brand: #14b8a6;
+  --brand-2: #06b6d4;
+  --brand-soft: rgba(20, 184, 166, 0.12);
+  --text-1: #0f172a;
+  --text-2: #334155;
+  --text-3: #64748b;
+  --border: rgba(15, 23, 42, 0.08);
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-solid: #ffffff;
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --shadow-sm: 0 6px 16px rgba(2, 8, 23, 0.08);
+  --shadow-md: 0 16px 32px rgba(2, 8, 23, 0.10);
+
+  background:
+    radial-gradient(900px 380px at 20% 0%, rgba(20, 184, 166, 0.10) 0%, transparent 55%),
+    radial-gradient(900px 380px at 90% 10%, rgba(56, 189, 248, 0.10) 0%, transparent 55%),
+    linear-gradient(180deg, #f7fbfc 0%, #f2f6f8 100%);
   min-height: 100vh;
   padding: 24px;
 }
 
 /* 页面头部 */
 .page-header {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.92) 0%, rgba(6, 182, 212, 0.92) 55%, rgba(56, 189, 248, 0.86) 100%);
+  border-radius: var(--radius-lg);
   padding: 28px 32px;
   margin-bottom: 28px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-md);
   position: relative;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -233,7 +250,7 @@ export default {
 
 .page-header:hover {
   transform: translateY(-2px);
-  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15), 0 15px 15px -5px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 22px 40px rgba(2, 8, 23, 0.14);
 }
 
 .page-header::before {
@@ -288,7 +305,7 @@ export default {
 .refresh-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 22px 32px rgba(2, 8, 23, 0.16);
 }
 
 /* 选择区域 */
@@ -297,28 +314,29 @@ export default {
 }
 
 .section-card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
 }
 
 .section-card:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(34, 197, 94, 0.2);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(20, 184, 166, 0.22);
 }
 
 .card-header {
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.82) 100%);
   padding: 24px 28px;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(10px);
 }
 
 .section-title {
-  color: #1f2937;
+  color: var(--text-1);
   margin: 0;
   font-size: 18px;
   font-weight: 600;
@@ -328,7 +346,7 @@ export default {
 }
 
 .section-title i {
-  color: #22c55e;
+  color: var(--brand);
   font-size: 20px;
 }
 
@@ -343,14 +361,14 @@ export default {
 
 .land-selector .el-input__inner {
   border-radius: 12px;
-  border: 1px solid rgba(229, 231, 235, 0.8);
+  border: 1px solid rgba(15, 23, 42, 0.12);
   transition: all 0.3s ease;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .land-selector .el-input__inner:focus {
-  border-color: #22c55e;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.14);
 }
 
 .option-item {
@@ -361,29 +379,30 @@ export default {
 }
 
 .option-item i {
-  color: #22c55e;
+  color: var(--brand);
   font-size: 16px;
 }
 
 .option-item small {
-  color: #6b7280;
+  color: var(--text-3);
   margin-left: auto;
   font-weight: 500;
 }
 
 /* 地块列表区域 */
 .lands-section {
-  background: #ffffff;
-  border-radius: 16px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
   padding: 28px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
 }
 
 .lands-section:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(34, 197, 94, 0.2);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(20, 184, 166, 0.22);
 }
 
 .section-header {
@@ -392,7 +411,7 @@ export default {
   align-items: center;
   margin-bottom: 28px;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid var(--border);
 }
 
 .section-stats {
@@ -404,13 +423,13 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #6b7280;
+  color: var(--text-3);
   font-size: 14px;
   font-weight: 500;
 }
 
 .stats-item i {
-  color: #22c55e;
+  color: var(--brand);
 }
 
 .lands-grid {
@@ -426,28 +445,29 @@ export default {
 }
 
 .land-card {
-  background: #ffffff;
-  border-radius: 16px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
   border: 2px solid transparent;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(10px);
 }
 
 .land-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(34, 197, 94, 0.2);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(20, 184, 166, 0.22);
 }
 
 .land-card .card-header {
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.82) 100%);
   padding: 24px;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -455,18 +475,14 @@ export default {
 }
 
 .land-info h4 {
-  color: #1f2937;
+  color: var(--text-1);
   margin: 0 0 6px 0;
   font-size: 16px;
   font-weight: 700;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .land-info p {
-  color: #6b7280;
+  color: var(--text-3);
   margin: 0;
   font-size: 12px;
   font-weight: 500;
@@ -475,14 +491,14 @@ export default {
 .land-icon {
   width: 52px;
   height: 52px;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 26px;
-  box-shadow: 0 8px 16px -4px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 10px 22px rgba(2, 8, 23, 0.16);
   transition: transform 0.3s ease;
 }
 
@@ -506,17 +522,17 @@ export default {
   flex-direction: column;
   gap: 8px;
   padding: 16px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(255, 255, 255, 0.82) 100%);
   border-radius: 12px;
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  border: 1px solid rgba(15, 23, 42, 0.08);
   transition: all 0.3s ease;
 }
 
 .data-item:hover {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 163, 74, 0.02) 100%);
-  border-color: rgba(34, 197, 94, 0.2);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.08) 0%, rgba(56, 189, 248, 0.06) 100%);
+  border-color: rgba(20, 184, 166, 0.22);
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.1);
+  box-shadow: 0 10px 18px rgba(2, 8, 23, 0.10);
 }
 
 .data-label {
@@ -524,7 +540,7 @@ export default {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-3);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -532,18 +548,14 @@ export default {
 
 .data-label i {
   font-size: 14px;
-  color: #22c55e;
+  color: var(--brand);
 }
 
 .data-value {
   font-size: 14px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-1);
   word-break: break-word;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* 土壤类型文字样式 */
@@ -555,26 +567,26 @@ export default {
 
 .land-card .card-footer {
   padding: 20px 24px;
-  border-top: 1px solid rgba(229, 231, 235, 0.5);
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border-radius: 0 0 16px 16px;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.82) 100%);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
 .view-btn {
   width: 100%;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
   border: none;
   border-radius: 12px;
   color: white;
   font-weight: 600;
   transition: all 0.3s ease;
   padding: 12px 20px;
-  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 10px 18px rgba(20, 184, 166, 0.22);
 }
 
 .view-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.3), 0 10px 10px -5px rgba(34, 197, 94, 0.1);
+  box-shadow: 0 22px 32px rgba(2, 8, 23, 0.16);
 }
 
 /* 抽屉样式 */
@@ -583,7 +595,7 @@ export default {
 }
 
 .soil-drawer .el-drawer__header {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 55%, rgba(56, 189, 248, 0.90) 100%);
   color: white;
   padding: 28px 32px;
   margin-bottom: 0;
@@ -605,8 +617,8 @@ export default {
 
 .drawer-header {
   padding: 28px 32px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.82) 100%);
+  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(10px);
 }
 
@@ -619,29 +631,25 @@ export default {
 .summary-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 32px;
-  box-shadow: 0 8px 16px -4px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 10px 22px rgba(2, 8, 23, 0.16);
 }
 
 .summary-info h3 {
-  color: #1f2937;
+  color: var(--text-1);
   margin: 0 0 6px 0;
   font-size: 20px;
   font-weight: 700;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .summary-info p {
-  color: #6b7280;
+  color: var(--text-3);
   margin: 0;
   font-size: 14px;
   font-weight: 500;
@@ -651,38 +659,34 @@ export default {
   padding: 32px;
   flex: 1;
   overflow-y: auto;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.82) 100%);
 }
 
 .soil-descriptions {
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .soil-descriptions .el-descriptions__header {
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.82) 100%);
 }
 
 .soil-descriptions .el-descriptions-item__label {
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  color: #1f2937;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.82) 100%);
+  color: var(--text-1);
   font-weight: 600;
 }
 
 .desc-value {
-  color: #6b7280;
+  color: var(--text-2);
   font-weight: 600;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .drawer-footer {
   padding: 24px 32px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border-top: 1px solid rgba(229, 231, 235, 0.5);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.82) 100%);
+  border-top: 1px solid var(--border);
   text-align: right;
 }
 
@@ -690,7 +694,7 @@ export default {
   background: white;
   border: 1px solid rgba(229, 231, 235, 0.8);
   border-radius: 12px;
-  color: #6b7280;
+  color: var(--text-3);
   padding: 12px 24px;
   transition: all 0.3s ease;
   font-weight: 600;
@@ -698,20 +702,20 @@ export default {
 }
 
 .close-btn:hover {
-  border-color: #22c55e;
-  color: #22c55e;
-  background: rgba(34, 197, 94, 0.05);
+  border-color: rgba(20, 184, 166, 0.32);
+  color: var(--brand);
+  background: rgba(20, 184, 166, 0.06);
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 10px 16px rgba(2, 8, 23, 0.10);
 }
 
 /* 空状态 */
 .empty-state {
   text-align: center;
   padding: 80px 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border-radius: 16px;
-  border: 2px dashed rgba(156, 163, 175, 0.3);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.88) 0%, rgba(255, 255, 255, 0.82) 100%);
+  border-radius: var(--radius-lg);
+  border: 2px dashed rgba(148, 163, 184, 0.42);
   margin: 20px 0;
 }
 

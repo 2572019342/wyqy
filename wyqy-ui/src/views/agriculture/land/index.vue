@@ -463,39 +463,37 @@ export default {
 </script>
 
 <style scoped>
-/* 主容器样式 */
+/* 主容器样式：中性浅灰蓝背景，偏工业科技感 */
 .land-container {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: #f5f7fb;
   min-height: 100vh;
   padding: 24px;
+  box-sizing: border-box;
 }
 
-/* 页面头部 */
+/* 页面头部：青绿色主色调 */
 .page-header {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #0097a7 0%, #00acc1 45%, #26c6da 100%);
   border-radius: 16px;
   padding: 28px 32px;
   margin-bottom: 28px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 18px 32px rgba(0, 150, 167, 0.35);
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .page-header:hover {
   transform: translateY(-2px);
-  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15), 0 15px 15px -5px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 24px 40px rgba(0, 150, 167, 0.45);
 }
 
 .page-header::before {
   content: '';
   position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  animation: shimmer 3s ease-in-out infinite;
+  inset: -40%;
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.25), transparent 60%);
+  opacity: 0.9;
   pointer-events: none;
 }
 
@@ -508,38 +506,36 @@ export default {
 }
 
 .page-title {
-  color: white;
+  color: #ffffff;
   margin: 0;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 12px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  letter-spacing: 0.5px;
+  gap: 10px;
+  letter-spacing: 0.06em;
 }
 
 .page-title i {
-  font-size: 30px;
+  font-size: 26px;
 }
 
 .add-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  border-radius: 12px;
-  padding: 12px 24px;
+  background: rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #e0f7fa;
+  border-radius: 999px;
+  padding: 10px 22px;
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
 .add-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
 }
 
 /* 搜索区域 */
@@ -550,21 +546,22 @@ export default {
 .section-card {
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.25);
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .section-card:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(34, 197, 94, 0.2);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+  border-color: rgba(0, 172, 193, 0.4);
+  transform: translateY(-1px);
 }
 
 .card-header {
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  padding: 24px 28px;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -572,9 +569,9 @@ export default {
 }
 
 .section-title {
-  color: #1f2937;
+  color: #0f172a;
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -582,34 +579,36 @@ export default {
 }
 
 .section-title i {
-  color: #22c55e;
-  font-size: 20px;
+  color: #00acc1;
+  font-size: 18px;
 }
 
 .search-btn {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #0097a7 0%, #00acc1 45%, #26c6da 100%);
   border: none;
-  border-radius: 12px;
-  color: white;
+  border-radius: 999px;
+  color: #ffffff;
   font-weight: 600;
   transition: all 0.3s ease;
-  padding: 10px 20px;
-  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
+  padding: 8px 18px;
+  box-shadow: 0 4px 14px rgba(0, 150, 167, 0.35);
+  font-size: 13px;
 }
 
 .search-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.3), 0 10px 10px -5px rgba(34, 197, 94, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(0, 150, 167, 0.45);
 }
 
 .card-content {
-  padding: 28px;
+  padding: 22px 24px 20px;
 }
 
 .search-form {
   display: flex;
   gap: 20px;
   align-items: flex-end;
+  flex-wrap: wrap;
 }
 
 .search-input,
@@ -620,39 +619,42 @@ export default {
 .search-input .el-input__inner,
 .search-select .el-input__inner {
   border-radius: 12px;
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  background: #f9fafb;
 }
 
 .search-input .el-input__inner:focus,
 .search-select .el-input__inner:focus {
-  border-color: #22c55e;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  border-color: #00acc1;
+  box-shadow: 0 0 0 3px rgba(0, 172, 193, 0.18);
+  background: #ffffff;
 }
 
 /* 地块列表区域 */
 .lands-section {
   background: #ffffff;
   border-radius: 16px;
-  padding: 28px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 24px 24px 20px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  transition: all 0.2s ease;
 }
 
 .lands-section:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(34, 197, 94, 0.2);
+  box-shadow: 0 18px 32px rgba(15, 23, 42, 0.12);
+  border-color: rgba(0, 172, 193, 0.4);
+  transform: translateY(-1px);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .section-stats {
@@ -664,14 +666,14 @@ export default {
 .stats-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
 
 .stats-item i {
-  color: #22c55e;
+  color: #00acc1;
 }
 
 .action-group {
@@ -682,18 +684,18 @@ export default {
 .batch-delete-btn {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   border: none;
-  border-radius: 12px;
-  color: white;
-  transition: all 0.3s ease;
+  border-radius: 999px;
+  color: #ffffff;
+  transition: all 0.2s ease;
   font-weight: 600;
-  padding: 10px 16px;
-  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
+  padding: 8px 14px;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  font-size: 12px;
 }
 
 .batch-delete-btn:hover {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.3), 0 10px 10px -5px rgba(239, 68, 68, 0.1);
+  transform: translateY(-1px);
 }
 
 .lands-grid {
@@ -701,7 +703,7 @@ export default {
 }
 
 .cards-container {
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
 .land-card-col {
@@ -711,9 +713,9 @@ export default {
 .land-card {
   background: #ffffff;
   border-radius: 16px;
-  border: 2px solid transparent;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+  transition: all 0.2s ease;
   cursor: pointer;
   overflow: hidden;
   height: 100%;
@@ -722,29 +724,28 @@ export default {
 }
 
 .land-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(34, 197, 94, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.15);
+  border-color: rgba(0, 172, 193, 0.6);
 }
 
 .land-card.card-selected {
-  border-color: #22c55e;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 163, 74, 0.05) 100%);
-  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.15), 0 10px 10px -5px rgba(34, 197, 94, 0.05);
+  border-color: #00acc1;
+  background: linear-gradient(135deg, rgba(0, 172, 193, 0.06) 0%, rgba(38, 198, 218, 0.04) 100%);
+  box-shadow: 0 16px 32px rgba(0, 172, 193, 0.35);
 }
 
 .land-card .card-header {
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  padding: 20px 24px;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
   display: flex;
   align-items: center;
-  gap: 12px;
-  backdrop-filter: blur(10px);
+  gap: 10px;
 }
 
 .card-checkbox {
-  margin-right: 8px;
+  margin-right: 4px;
 }
 
 .land-info {
@@ -752,14 +753,10 @@ export default {
 }
 
 .land-info h4 {
-  color: #1f2937;
-  margin: 0 0 6px 0;
-  font-size: 16px;
+  margin: 0 0 4px 0;
+  font-size: 15px;
   font-weight: 700;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0f172a;
 }
 
 .land-info p {
@@ -775,66 +772,62 @@ export default {
 }
 
 .land-card .card-body {
-  padding: 24px;
+  padding: 18px 20px 16px;
   flex: 1;
 }
 
 .data-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 14px;
 }
 
 .data-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  gap: 6px;
+  padding: 12px 12px 10px;
+  background: #f9fafb;
   border-radius: 12px;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  transition: all 0.2s ease;
 }
 
 .data-item:hover {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 163, 74, 0.02) 100%);
-  border-color: rgba(34, 197, 94, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.1);
+  background: linear-gradient(135deg, #f1f5f9 0%, #e0f7fa 100%);
+  border-color: rgba(0, 172, 193, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(148, 163, 184, 0.4);
 }
 
 .data-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 11px;
   color: #6b7280;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
 }
 
 .data-label i {
   font-size: 14px;
-  color: #22c55e;
+  color: #00acc1;
 }
 
 .data-value {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: #1f2937;
+  color: #0f172a;
   word-break: break-word;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* 土壤类型文字样式 */
 .soil-type-text {
-  color: #000000 !important;
+  color: #00838f !important;
   font-weight: 700 !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
 .data-value.small-text {
@@ -843,16 +836,16 @@ export default {
 }
 
 .land-card .card-footer {
-  padding: 20px 24px;
-  border-top: 1px solid rgba(229, 231, 235, 0.5);
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  padding: 14px 20px 14px;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
   border-radius: 0 0 16px 16px;
 }
 
 .land-info-extra {
   display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .info-item {
@@ -865,7 +858,7 @@ export default {
 }
 
 .info-item i {
-  color: #22c55e;
+  color: #00acc1;
   font-size: 14px;
 }
 
@@ -878,33 +871,31 @@ export default {
   flex: 1;
   border-radius: 8px;
   font-size: 12px;
-  padding: 10px 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 8px 14px;
+  transition: all 0.2s ease;
   border: none;
   font-weight: 600;
-  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.14);
 }
 
 .action-btn.edit-btn {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+  background: linear-gradient(135deg, #0097a7 0%, #00acc1 45%, #26c6da 100%);
+  color: #ffffff;
 }
 
 .action-btn.edit-btn:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.3), 0 10px 10px -5px rgba(16, 185, 129, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 150, 167, 0.45);
 }
 
 .action-btn.delete-btn {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
+  color: #ffffff;
 }
 
 .action-btn.delete-btn:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.3), 0 10px 10px -5px rgba(239, 68, 68, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
 }
 
 /* 对话框样式 */
@@ -914,29 +905,28 @@ export default {
 }
 
 .land-dialog .el-dialog__header {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  color: white;
+  background: linear-gradient(135deg, #0097a7 0%, #00acc1 45%, #26c6da 100%);
+  color: #ffffff;
   border-radius: 16px 16px 0 0;
-  padding: 28px 32px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 22px 26px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
 }
 
 .land-dialog .el-dialog__title {
-  color: white;
-  font-size: 18px;
+  color: #ffffff;
+  font-size: 16px;
   font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .land-dialog .el-dialog__body {
-  padding: 32px;
+  padding: 24px 26px;
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
 }
 
 .dialog-form .el-form-item__label {
-  color: #1f2937;
+  color: #0f172a;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .form-input,
@@ -944,17 +934,17 @@ export default {
 .form-select,
 .form-textarea {
   border-radius: 12px;
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
 }
 
 .form-input:focus,
 .form-number:focus,
 .form-select:focus,
 .form-textarea:focus {
-  border-color: #22c55e;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  border-color: #00acc1;
+  box-shadow: 0 0 0 3px rgba(0, 172, 193, 0.18);
 }
 
 .form-radio {
@@ -964,60 +954,59 @@ export default {
 
 .dialog-footer {
   text-align: right;
-  padding: 24px 32px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  padding: 18px 26px;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
   border-radius: 0 0 16px 16px;
-  border-top: 1px solid rgba(229, 231, 235, 0.5);
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .cancel-btn {
-  background: white;
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
   color: #6b7280;
-  padding: 12px 24px;
-  transition: all 0.3s ease;
+  padding: 8px 20px;
+  transition: all 0.2s ease;
   font-weight: 600;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  font-size: 13px;
 }
 
 .cancel-btn:hover {
-  border-color: #22c55e;
-  color: #22c55e;
-  background: rgba(34, 197, 94, 0.05);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
+  border-color: #00acc1;
+  color: #00838f;
+  background: rgba(0, 172, 193, 0.06);
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #0097a7 0%, #00acc1 45%, #26c6da 100%);
   border: none;
-  border-radius: 12px;
-  color: white;
-  padding: 12px 24px;
+  border-radius: 999px;
+  color: #ffffff;
+  padding: 8px 20px;
   font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
+  transition: all 0.2s ease;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(0, 150, 167, 0.45);
 }
 
 .submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.3), 0 10px 10px -5px rgba(34, 197, 94, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0, 150, 167, 0.55);
 }
 
 /* 空状态 */
 .empty-state {
   text-align: center;
-  padding: 80px 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  padding: 64px 20px;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
   border-radius: 16px;
-  border: 2px dashed rgba(156, 163, 175, 0.3);
-  margin: 20px 0;
+  border: 1px dashed rgba(148, 163, 184, 0.6);
+  margin: 16px 0;
 }
 
 /* 分页样式 */
 .pagination {
-  margin-top: 20px;
+  margin-top: 16px;
   display: flex;
   justify-content: center;
 }
@@ -1034,13 +1023,13 @@ export default {
   
   .header-content {
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     text-align: center;
   }
   
   .search-form {
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
   }
   
   .search-input,
@@ -1050,7 +1039,7 @@ export default {
   
   .section-header {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     text-align: center;
   }
   
@@ -1060,7 +1049,7 @@ export default {
   
   .land-info-extra {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
   
   .card-actions {
@@ -1070,41 +1059,17 @@ export default {
   .action-btn {
     width: 100%;
   }
-  
-  .land-dialog {
-    border-radius: 0;
-  }
-  
-  .land-dialog .el-dialog__header,
-  .land-dialog .el-dialog__body,
-  .dialog-footer {
-    padding: 20px;
-  }
 }
 
-/* 动画效果 */
-@keyframes shimmer {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
+/* 卡片入场动画，轻微淡入上移 */
 .land-card {
-  animation: fadeInUp 0.6s ease-out;
+  animation: fadeInUp 0.4s ease-out;
 }
-
-.land-card:nth-child(1) { animation-delay: 0.1s; }
-.land-card:nth-child(2) { animation-delay: 0.2s; }
-.land-card:nth-child(3) { animation-delay: 0.3s; }
-.land-card:nth-child(4) { animation-delay: 0.4s; }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;

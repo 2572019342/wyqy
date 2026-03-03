@@ -20,58 +20,102 @@
 
     <!-- AI识别主界面 -->
     <el-row :gutter="20" class="mb20">
-      <!-- 左侧：视频流显示 -->
-      <el-col :span="16">
-        <el-card class="video-card">
-          <div slot="header" class="card-header">
-            <div class="header-title">
-              <i class="el-icon-video-camera"></i>
-              <span>智农AI实时监控</span>
-            </div>
-            <div class="header-status">
-              <span class="status-tag" :class="'status-' + aiStatus.type">{{ aiStatus.text }}</span>
-            </div>
-          </div>
-          <div class="video-container">
-            <div class="video-wrapper">
-              <iframe 
-                :src="videoStreamUrl" 
-                class="video-stream"
-                @error="handleVideoError"
-                @load="handleVideoLoad"
-                frameborder="0"
-                allowfullscreen
-              ></iframe>
-              <div class="video-overlay" v-if="!videoConnected">
-                <div class="loading-spinner">
-                  <i class="el-icon-loading"></i>
-                  <p>正在连接视频流...</p>
+      <el-col :span="24">
+        <el-row :gutter="20" class="dual-video-row">
+          <el-col :span="12">
+            <el-card class="video-card video-card--drone">
+              <div slot="header" class="card-header">
+                <div class="header-title">
+                  <i class="el-icon-video-camera"></i>
+                  <span>实时监控</span>
+                </div>
+                <div class="header-status">
+                  <span class="status-tag" :class="'status-' + aiStatus.type">{{ aiStatus.text }}</span>
                 </div>
               </div>
-              <div class="ai-indicator" v-if="isAnalyzing">
-                <div class="ai-scanner"></div>
-                <div class="ai-text">智农AI正在识别...</div>
-              </div>
-              <!-- 识别结果叠加层 -->
-              <div class="detection-overlay" v-if="currentDetection">
-                <div class="detection-box" :class="'detection-' + currentDetection.detectionType">
-                  <div class="detection-label">
-                    {{ getDetectionTypeText(currentDetection.detectionType) }}: {{ currentDetection.pestName }}
+              <div class="video-container">
+                <div class="video-wrapper">
+                  <iframe 
+                    :src="droneVideoStreamUrl" 
+                    class="video-stream"
+                    @error="handleVideoError('drone')"
+                    @load="handleVideoLoad('drone')"
+                    frameborder="0"
+                    allowfullscreen
+                  ></iframe>
+                  <div class="video-overlay" v-if="!droneVideoConnected">
+                    <div class="loading-spinner">
+                      <i class="el-icon-loading"></i>
+                      <p>正在连接视频流...</p>
+                    </div>
                   </div>
-                  <div class="detection-confidence">
-                    置信度: {{ (currentDetection.confidence * 100).toFixed(1) }}%
+                  <div class="ai-indicator" v-if="isAnalyzing">
+                    <div class="ai-scanner"></div>
+                    <div class="ai-text">智农AI正在识别...</div>
+                  </div>
+                  <!-- 识别结果叠加层 -->
+                  <div class="detection-overlay" v-if="currentDetection">
+                    <div class="detection-box" :class="'detection-' + currentDetection.detectionType">
+                      <div class="detection-label">
+                        {{ getDetectionTypeText(currentDetection.detectionType) }}: {{ currentDetection.pestName }}
+                      </div>
+                      <div class="detection-confidence">
+                        置信度: {{ (currentDetection.confidence * 100).toFixed(1) }}%
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            
-          </div>
-        </el-card>
-      </el-col>
+            </el-card>
+          </el-col>
 
-    <!-- 右侧：最近识别结果面板 -->
-      <el-col :span="8">
-        <el-card class="control-panel">
+          <el-col :span="12">
+            <el-card class="video-card video-card--car">
+              <div slot="header" class="card-header">
+                <div class="header-title">
+                  <i class="el-icon-video-camera"></i>
+                  <span>小车出行</span>
+                </div>
+                <div class="header-status">
+                  <span class="status-tag" :class="'status-' + carVideoStatus.type">{{ carVideoStatus.text }}</span>
+                  <el-button
+                    type="primary"
+                    size="mini"
+                    style="margin-left: 12px"
+                    :loading="robotRunning"
+                    @click="runRobot"
+                  >
+                    启动机器人
+                  </el-button>
+                </div>
+              </div>
+              <div class="video-container">
+                <div class="video-wrapper">
+                  <iframe 
+                    :src="carVideoStreamUrl" 
+                    class="video-stream"
+                    @error="handleVideoError('car')"
+                    @load="handleVideoLoad('car')"
+                    frameborder="0"
+                    allowfullscreen
+                  ></iframe>
+                  <div class="video-overlay" v-if="!carVideoConnected">
+                    <div class="loading-spinner">
+                      <i class="el-icon-loading"></i>
+                      <p>正在连接视频流...</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-col>
+    </el-row>
+
+    <el-row :gutter="20" class="mb20">
+      <el-col :span="24">
+        <el-card class="control-panel control-panel--bottom">
           <!-- 卡片头部 -->
           <div slot="header" class="card-header">
             <div class="header-title">
@@ -159,7 +203,7 @@ import { detectPest, getVideoStream, getDetectionStats, listAiPestDetection } fr
 import { listLand } from "@/api/agriculture/land";
 import { listCropSpecies } from "@/api/agriculture/crop";
 import { listPlanting, getPlanting, updatePlanting } from "@/api/agriculture/planting";
-
+import request from "@/utils/request";
 export default {
   name: "RealtimeDetection",
   data() {
@@ -178,8 +222,16 @@ export default {
         speciesName: null
       },
       // 视频流相关
-      videoStreamUrl: "http://192.168.1.103:1145/play_drone.html",
-      videoConnected: false,
+      droneVideoStreamUrl: "http://192.168.1.102:1145/play_drone.html",
+      carVideoStreamUrl: "http://192.168.1.102:1145/play_car.html",
+      droneVideoConnected: false,
+      carVideoConnected: false,
+      carVideoStatus: {
+        type: 'info',
+        text: '未连接'
+      },
+      // 机器人运行状态
+      robotRunning: false,
       isAnalyzing: false,
       aiStatus: {
         type: 'info',
@@ -296,8 +348,10 @@ export default {
     checkVideoConnection() {
       // 由于使用iframe，我们直接尝试连接
       // 实际项目中可以通过postMessage或其他方式检测iframe加载状态
-      this.videoConnected = true;
+      this.droneVideoConnected = true;
+      this.carVideoConnected = true;
       this.aiStatus = { type: 'success', text: '已连接' };
+      this.carVideoStatus = { type: 'success', text: '已连接' };
     },
     // 切换分析状态
     toggleAnalysis() {
@@ -356,27 +410,63 @@ export default {
       this.$message.info('正在截图并识别...');
       this.performDetection();
     },
+    // 前端触发后端运行 robot.py
+    async runRobot() {
+      if (this.robotRunning) {
+        return;
+      }
+      this.robotRunning = true;
+      try {
+        const res = await request({
+          url: '/robot/run',
+          method: 'post'
+        });
+        if (res && (res.code === 200 || res.success)) {
+          this.$message.success(res.msg || '机器人任务已启动');
+        } else {
+          this.$message.error((res && res.msg) || '机器人任务启动失败');
+        }
+      } catch (e) {
+        this.$message.error('机器人任务启动失败');
+      } finally {
+        this.robotRunning = false;
+      }
+    },
     // 刷新视频
     refreshVideo() {
-      this.videoConnected = false;
+      this.droneVideoConnected = false;
+      this.carVideoConnected = false;
       this.aiStatus = { type: 'info', text: '重新连接中...' };
+      this.carVideoStatus = { type: 'info', text: '重新连接中...' };
       // 强制刷新iframe
-      const iframe = document.querySelector('.video-stream');
-      if (iframe) {
-        iframe.src = iframe.src;
+      const iframes = document.querySelectorAll('.video-stream');
+      if (iframes && iframes.length) {
+        iframes.forEach(iframe => {
+          iframe.src = iframe.src;
+        });
       }
       setTimeout(() => {
         this.checkVideoConnection();
       }, 1000);
     },
     // 处理视频错误
-    handleVideoError() {
-      this.videoConnected = false;
+    handleVideoError(type) {
+      if (type === 'car') {
+        this.carVideoConnected = false;
+        this.carVideoStatus = { type: 'danger', text: '连接失败' };
+        return;
+      }
+      this.droneVideoConnected = false;
       this.aiStatus = { type: 'danger', text: '连接失败' };
     },
     // 处理视频加载
-    handleVideoLoad() {
-      this.videoConnected = true;
+    handleVideoLoad(type) {
+      if (type === 'car') {
+        this.carVideoConnected = true;
+        this.carVideoStatus = { type: 'success', text: '已连接' };
+        return;
+      }
+      this.droneVideoConnected = true;
       this.aiStatus = { type: 'success', text: '已连接' };
     },
     // 获取选中的地块名称
@@ -672,8 +762,24 @@ export default {
 }
 
 /* 视频卡片样式 */
+.dual-video-row {
+  height: 62vh;
+  min-height: 420px;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.dual-video-row >>> .el-col {
+  display: flex;
+}
+
+.dual-video-row .video-card {
+  flex: 1;
+  height: 100%;
+}
+
 .video-card {
-  height: calc(100vh - 260px);
+  height: 100%;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: none;
@@ -695,10 +801,18 @@ export default {
 }
 
 .video-card >>> .el-card__body {
-  padding: 20px;
+  padding: 16px;
   background: #ffffff;
   height: calc(100% - 60px);
   box-sizing: border-box;
+}
+
+.video-card--drone >>> .el-card__header {
+  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+}
+
+.video-card--car >>> .el-card__header {
+  background: linear-gradient(135deg, #0D47A1 0%, #42A5F5 100%);
 }
 
 .card-header {
@@ -885,7 +999,16 @@ export default {
 
 /* 右侧控制卡片 */
 .control-panel {
-  height: calc(100vh - 260px);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.control-panel--bottom {
+  height: 32vh;
+  min-height: 280px;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: none;

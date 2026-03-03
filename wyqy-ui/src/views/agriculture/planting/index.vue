@@ -61,10 +61,6 @@
     <!-- 操作按钮 -->
     <el-row :gutter="10" class="mb8 action-buttons">
       <el-col :span="1.5">
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd" 
-                   v-hasPermi="['agriculture:planting:add']" class="action-btn add-btn">新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
         <el-button type="success" icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate" 
                    v-hasPermi="['agriculture:planting:edit']" class="action-btn edit-btn">修改</el-button>
       </el-col>
@@ -735,12 +731,7 @@ export default {
       this.single = this.ids.length !== 1
       this.multiple = this.ids.length === 0
     },
-    /** 新增按钮操作 */
-    handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加种植记录";
-    },
+
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
