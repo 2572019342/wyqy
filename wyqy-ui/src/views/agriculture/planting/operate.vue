@@ -2,23 +2,6 @@
   <div class="operate-container">
     <!-- 种植向导 -->
     <div class="wizard-card">
-      <!-- <div class="card-header">
-        <div class="header-content">
-          <h3 class="card-title">
-            <i class="el-icon-s-grid"></i>
-            种植向导
-          </h3>
-        </div>
-        <div class="steps-wrapper">
-          <el-steps :active="currentStep" finish-status="success" class="wizard-steps">
-            <el-step title="选择地块" icon="el-icon-location"></el-step>
-            <el-step title="选择作物" icon="el-icon-vegetables"></el-step>
-            <el-step title="设置参数" icon="el-icon-setting"></el-step>
-            <el-step title="确认种植" icon="el-icon-check"></el-step>
-          </el-steps>
-        </div>
-      </div> -->
-
       <!-- 步骤1: 选择地块 -->
       <div v-if="currentStep === 0" class="step-content">
         <h3 class="step-title">选择种植地块</h3>
@@ -282,7 +265,7 @@
       <div class="assistant-toggle" @click="toggleAssistant">
         <img src="/photo/picture.png" alt="AI助手" class="assistant-icon" />
       </div>
-      <transition name="assistant-fade">
+      <transition name="assistant-scale">
         <div
           v-if="assistantVisible"
           class="assistant-panel"
@@ -293,7 +276,7 @@
             <span class="assistant-title">种植 AI 助手</span>
             <i class="el-icon-close assistant-close" @click.stop="toggleAssistant"></i>
           </div>
-          <div class="assistant-body">
+          <div ref="assistantBody" class="assistant-body">
             <div
               v-for="(msg, index) in assistantMessages"
               :key="index"
@@ -301,7 +284,11 @@
               :class="'assistant-message--' + msg.role"
             >
               <span class="assistant-message-role">
-                {{ msg.role === 'user' ? '我' : '助手' }}
+                <img
+                  :src="msg.role === 'user' ? '/photo/profile.jpg' : '/photo/picture.png'"
+                  :alt="msg.role === 'user' ? '我' : '助手'"
+                  class="assistant-message-avatar"
+                />
               </span>
               <span class="assistant-message-content">{{ msg.content }}</span>
             </div>
@@ -321,10 +308,33 @@
               发送
             </el-button>
           </div>
-          <div class="assistant-resizer" @mousedown.stop.prevent="startAssistantResize"></div>
+          <div class="assistant-resizer assistant-resizer-se" @mousedown.stop.prevent="startAssistantResize($event, 'se')"></div>
+          <div class="assistant-resizer assistant-resizer-sw" @mousedown.stop.prevent="startAssistantResize($event, 'sw')"></div>
+          <div class="assistant-resizer assistant-resizer-ne" @mousedown.stop.prevent="startAssistantResize($event, 'ne')"></div>
+          <div class="assistant-resizer assistant-resizer-nw" @mousedown.stop.prevent="startAssistantResize($event, 'nw')"></div>
         </div>
       </transition>
     </div>
+    <!-- 每次操作时的半透明红色背景 + 提示文案 -->
+    <transition name="auto-overlay-fade">
+      <div v-if="autoStepOverlayVisible" class="auto-step-overlay">
+        <span class="auto-step-overlay-text">openclaw正在操作</span>
+      </div>
+    </transition>
+    <!-- 自动流程点击指针（带滑动动画） -->
+    <transition name="auto-pointer-fade">
+      <div
+        v-if="autoPointerVisible"
+        class="auto-click-pointer-wrap"
+        :style="autoPointerWrapStyle"
+      >
+        <img
+          class="auto-click-pointer"
+          src="/photo/picture.png"
+          alt="自动点击指针"
+        />
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -401,8 +411,16 @@ export default {
       assistantVisible: false,
       assistantInput: "",
       assistantMessages: [],
-      assistantWidth: 340,
-      assistantHeight: 380,
+      // 记录最近一次用户在 AI 助手中的问题，用于自动填写备注等信息
+      assistantLastUserQuestion: "",
+      // 自动流程点击指针（滑动：从右下角到目标位置）
+      autoPointerVisible: false,
+      autoPointerTop: 0,
+      autoPointerLeft: 0,
+      // 每次操作时半透明红色背景
+      autoStepOverlayVisible: false,
+      assistantWidth: 360,
+      assistantHeight: 420,
       assistantTop: null,
       assistantLeft: null,
       isAssistantDragging: false,
@@ -411,8 +429,11 @@ export default {
       isAssistantResizing: false,
       resizeStartX: 0,
       resizeStartY: 0,
+      resizeStartLeft: 0,
+      resizeStartTop: 0,
       resizeStartWidth: 0,
-      resizeStartHeight: 0
+      resizeStartHeight: 0,
+      resizeDirection: "se"
     };
   },
   computed: {
@@ -451,27 +472,46 @@ export default {
                 this.landSearchForm.soilType || 
                 this.landSearchForm.location);
     },
+    // 自动点击指针容器样式（left/top 变化时有滑动过渡）
+    autoPointerWrapStyle() {
+      return {
+        left: this.autoPointerLeft + 'px',
+        top: this.autoPointerTop + 'px'
+      };
+    },
     // AI 助手面板样式（支持拖动和缩放）
     assistantPanelComputedStyle() {
       const style = {};
-      const width = this.assistantWidth || 340;
-      const height = this.assistantHeight || 380;
+      const width = this.assistantWidth || 360;
+      const height = this.assistantHeight || 420;
       let top = this.assistantTop;
       let left = this.assistantLeft;
 
       if (top == null || left == null) {
-        // 默认出现在右下角
+        // 默认出现在屏幕正中
         const vh = window.innerHeight || 800;
         const vw = window.innerWidth || 1200;
-        top = vh - height - 120;
-        left = vw - width - 120;
+        top = (vh - height) / 2;
+        left = (vw - width) / 2;
       }
 
       style.width = `${width}px`;
       style.height = `${height}px`;
       style.top = `${top}px`;
       style.left = `${left}px`;
+      style.transformOrigin = "center center";
       return style;
+    }
+  },
+  watch: {
+    assistantMessages: {
+      handler() {
+        this.$nextTick(this.scrollAssistantToBottom);
+      },
+      deep: true
+    },
+    assistantVisible(val) {
+      if (val) this.$nextTick(this.scrollAssistantToBottom);
     }
   },
   created() {
@@ -702,16 +742,21 @@ export default {
       };
       return textMap[status] || status;
     },
+    // 聊天消息区滚动到底部
+    scrollAssistantToBottom() {
+      const el = this.$refs.assistantBody;
+      if (el) el.scrollTop = el.scrollHeight;
+    },
     // 切换 AI 助手悬浮窗显示
     toggleAssistant() {
       this.assistantVisible = !this.assistantVisible;
       if (this.assistantVisible && (this.assistantTop == null || this.assistantLeft == null)) {
         const vh = window.innerHeight || 800;
         const vw = window.innerWidth || 1200;
-        const height = this.assistantHeight || 380;
-        const width = this.assistantWidth || 340;
-        this.assistantTop = vh - height - 120;
-        this.assistantLeft = vw - width - 120;
+        const height = this.assistantHeight || 420;
+        const width = this.assistantWidth || 360;
+        this.assistantTop = (vh - height) / 2;
+        this.assistantLeft = (vw - width) / 2;
       }
     },
     // 发送 AI 助手消息（当前为前端本地模拟）
@@ -720,16 +765,186 @@ export default {
       if (!content) {
         return;
       }
+      // 记录最近一次用户问题
+      this.assistantLastUserQuestion = content;
       this.assistantMessages.push({
         role: "user",
         content
       });
-      // 简单的占位回复，后续可替换为真实接口调用
+      this.assistantInput = "";
+
+      // 先插入“思考中”的占位动画消息
       this.assistantMessages.push({
         role: "assistant",
-        content: "已收到您的问题，当前为本地示例对话框。如需接入真实 AI，可在此方法中调用后端接口。"
+        content: "……正在思考，请稍等……"
       });
-      this.assistantInput = "";
+      const thinkingIndex = this.assistantMessages.length - 1;
+
+      // 模拟 AI 思考 5 秒后再更新为正式回复
+      setTimeout(() => {
+        // 防御性判断，防止数组长度变化导致越界
+        if (this.assistantMessages[thinkingIndex]) {
+          this.$set(this.assistantMessages, thinkingIndex, {
+            role: "assistant",
+            content: "在2秒后将按照您的要求进行处理"
+          });
+        } else {
+          // 如果该位置不存在了，则直接追加一条回复
+          this.assistantMessages.push({
+            role: "assistant",
+            content: "在2秒后将按照您的要求进行处理"
+          });
+        }
+
+        // 在正式回复输出 3 秒后，根据当前页面自动完成种植流程
+        setTimeout(() => {
+          this.startAutoPlantingWorkflow();
+        }, 2000);
+      }, 5000);
+    },
+    // 显示自动点击指针：从右下角滑到目标位置，并显示半透明红色背景
+    // selectors 可为 "screen-center" 表示目标在屏幕正中
+    showAutoClickPointer(selectors) {
+      const selectorList = Array.isArray(selectors) ? selectors : [selectors];
+      this.autoPointerVisible = false;
+      this.autoStepOverlayVisible = false;
+      this.$nextTick(() => {
+        const vw = window.innerWidth || 1200;
+        const vh = window.innerHeight || 800;
+        let toLeft, toTop;
+        if (selectorList[0] === "screen-center") {
+          toLeft = vw / 2;
+          toTop = vh / 2;
+        } else {
+          let target = null;
+          for (const sel of selectorList) {
+            if (!sel) continue;
+            const el = document.querySelector(sel);
+            if (el) {
+              target = el;
+              break;
+            }
+          }
+          if (!target) {
+            this.autoPointerLeft = vw - 80;
+            this.autoPointerTop = vh - 120;
+            this.autoPointerVisible = true;
+            this.autoStepOverlayVisible = true;
+            setTimeout(() => {
+              this.autoPointerVisible = false;
+              this.autoStepOverlayVisible = false;
+            }, 800);
+            return;
+          }
+          const rect = target.getBoundingClientRect();
+          toLeft = rect.left + rect.width / 2;
+          toTop = rect.top + rect.height / 2;
+        }
+        const fromLeft = vw - 80;
+        const fromTop = vh - 120;
+        this.autoPointerLeft = fromLeft;
+        this.autoPointerTop = fromTop;
+        this.autoPointerVisible = true;
+        this.autoStepOverlayVisible = true;
+        this.$nextTick(() => {
+          this.autoPointerLeft = toLeft;
+          this.autoPointerTop = toTop;
+        });
+        setTimeout(() => {
+          this.autoPointerVisible = false;
+          this.autoStepOverlayVisible = false;
+        }, 1200);
+      });
+    },
+    // 自动执行完整的种植流程
+    startAutoPlantingWorkflow() {
+      const actions = [
+        // 关闭 AI 助手并选择第一个地块
+        () => {
+          this.showAutoClickPointer([".assistant-panel .assistant-close", ".ai-assistant .assistant-toggle"]);
+          if (this.assistantVisible) {
+            this.toggleAssistant();
+          }
+          // 可根据需要重置向导到初始状态
+          this.resetWizard();
+          const firstLand = this.filteredLandOptions[0] || this.landOptions[0];
+          if (firstLand) {
+            this.showAutoClickPointer([".step-content .land-card"]);
+            this.selectLand(firstLand);
+          }
+        },
+        // 从步骤1跳转到步骤2（选择作物）
+        () => {
+          this.showAutoClickPointer([".fixed-next-btn", ".step-content .next-btn"]);
+          if (this.currentStep !== 0) {
+            this.currentStep = 0;
+          }
+          this.nextStep();
+        },
+        // 选择第一个作物
+        () => {
+          const firstCrop = this.cropOptions[0];
+          if (firstCrop) {
+            this.showAutoClickPointer([".step-content .crop-card"]);
+            this.selectCrop(firstCrop);
+          }
+        },
+        // 从步骤2跳转到步骤3（设置参数）
+        () => {
+          this.showAutoClickPointer([".fixed-next-btn", ".step-content .next-btn"]);
+          this.nextStep();
+        },
+        // 填写种植参数（指针落在屏幕正中）
+        () => {
+          this.showAutoClickPointer("screen-center");
+          this.plantingForm.plantingDate = "2026-03-05";
+          this.plantingForm.expectedHarvestDate = "2026-03-05";
+          this.plantingForm.plantingArea = 0.66;
+          this.plantingForm.plantingDensity = 25000.0;
+          this.plantingForm.seedQuantity = 10000.0;
+          // 种子来源固定为“农场种植库”，备注使用用户提问
+          this.plantingForm.seedSource = "农场种植库";
+          this.plantingForm.remark = "openclaw需求自动化种植";
+        },
+        // 从步骤3跳转到步骤4（确认种植）
+        () => {
+          this.showAutoClickPointer([".fixed-next-btn", ".step-content .next-btn"]);
+          this.nextStep();
+        },
+        // 最后一步：确认种植
+        () => {
+          this.showAutoClickPointer([".fixed-confirm-btn", ".step-content .confirm-btn"]);
+          this.confirmPlanting();
+        },
+        // 操作完成后弹出聊天助手，4秒内逐字输出完成提示
+        () => {
+          this.assistantVisible = true;
+          const fullText = "我已严格按照您的要求，顺利完成本次种植操作。首先在系统界面中选中第一个地块，确认无误后点击下一步；接着在作物列表里选择第一个目标作物，核对信息后继续点击下一步；然后认真填写各项种植参数，包括种植日期、种植面积、种植密度、种子用量等关键数据，仔细检查确保准确无误后再点击下一步；最后对地块、作物及所有参数进行最终确认，提交完成整个种植流程，操作规范、步骤清晰、记录完整。";
+          this.assistantMessages.push({ role: "assistant", content: "" });
+          const idx = this.assistantMessages.length - 1;
+          const totalMs = 4000;
+          const chars = fullText.split("");
+          const stepMs = totalMs / chars.length;
+          let i = 0;
+          const tick = () => {
+            if (i < chars.length) {
+              this.$set(this.assistantMessages[idx], "content", this.assistantMessages[idx].content + chars[i]);
+              i++;
+              setTimeout(tick, stepMs);
+            }
+          };
+          setTimeout(tick, stepMs);
+        }
+      ];
+
+      let delay = 0;
+      const interval = 2000;
+      actions.forEach((fn) => {
+        delay += interval;
+        setTimeout(() => {
+          fn.call(this);
+        }, delay);
+      });
     },
     // 开始拖动 AI 助手面板
     startAssistantDrag(event) {
@@ -759,13 +974,16 @@ export default {
       document.removeEventListener("mousemove", this.onAssistantDrag);
       document.removeEventListener("mouseup", this.stopAssistantDrag);
     },
-    // 开始调整大小
-    startAssistantResize(event) {
+    // 开始调整大小（direction: se/sw/ne/nw）
+    startAssistantResize(event, direction) {
       const panel = event.currentTarget.parentNode;
       const rect = panel.getBoundingClientRect();
       this.isAssistantResizing = true;
+      this.resizeDirection = direction || "se";
       this.resizeStartX = event.clientX;
       this.resizeStartY = event.clientY;
+      this.resizeStartLeft = rect.left;
+      this.resizeStartTop = rect.top;
       this.resizeStartWidth = rect.width;
       this.resizeStartHeight = rect.height;
       document.addEventListener("mousemove", this.onAssistantResize);
@@ -773,18 +991,35 @@ export default {
     },
     onAssistantResize(event) {
       if (!this.isAssistantResizing) return;
-      const vw = window.innerWidth || 1200;
-      const vh = window.innerHeight || 800;
-      const minWidth = 260;
-      const minHeight = 260;
+      const minSize = 200;
       const deltaX = event.clientX - this.resizeStartX;
       const deltaY = event.clientY - this.resizeStartY;
-      let newWidth = this.resizeStartWidth + deltaX;
-      let newHeight = this.resizeStartHeight + deltaY;
-      newWidth = Math.max(minWidth, Math.min(newWidth, vw - 40));
-      newHeight = Math.max(minHeight, Math.min(newHeight, vh - 80));
-      this.assistantWidth = newWidth;
-      this.assistantHeight = newHeight;
+      const dir = this.resizeDirection;
+      let left = this.resizeStartLeft;
+      let top = this.resizeStartTop;
+      let w = this.resizeStartWidth;
+      let h = this.resizeStartHeight;
+      if (dir === "se") {
+        w = Math.max(minSize, w + deltaX);
+        h = Math.max(minSize, h + deltaY);
+      } else if (dir === "sw") {
+        left = this.resizeStartLeft + deltaX;
+        w = Math.max(minSize, w - deltaX);
+        h = Math.max(minSize, h + deltaY);
+      } else if (dir === "ne") {
+        top = this.resizeStartTop + deltaY;
+        w = Math.max(minSize, w + deltaX);
+        h = Math.max(minSize, h - deltaY);
+      } else if (dir === "nw") {
+        left = this.resizeStartLeft + deltaX;
+        top = this.resizeStartTop + deltaY;
+        w = Math.max(minSize, w - deltaX);
+        h = Math.max(minSize, h - deltaY);
+      }
+      this.assistantLeft = left;
+      this.assistantTop = top;
+      this.assistantWidth = w;
+      this.assistantHeight = h;
     },
     stopAssistantResize() {
       this.isAssistantResizing = false;
@@ -1350,19 +1585,20 @@ export default {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35), 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 2px solid rgba(34, 197, 94, 0.2);
 }
 
 .assistant-toggle:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(34, 197, 94, 0.4);
 }
 
 .assistant-icon {
@@ -1373,64 +1609,101 @@ export default {
 
 .assistant-panel {
   position: fixed;
-  width: 340px;
-  max-height: 520px;
+  width: 360px;
+  max-height: 540px;
   background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 24px 40px rgba(15, 23, 42, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(34, 197, 94, 0.08);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 
 .assistant-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
 
 .assistant-title {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .assistant-close {
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
+  opacity: 0.9;
+  padding: 4px;
+  border-radius: 8px;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.assistant-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 1;
 }
 
 .assistant-body {
-  padding: 12px 12px 4px;
-  background: linear-gradient(135deg, #f9fafb 0%, #e5f9ef 100%);
+  padding: 16px;
+  background: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 30%, #f8fafc 100%);
   overflow-y: auto;
   flex: 1;
+  min-height: 180px;
 }
 
 .assistant-message {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 8px;
-  font-size: 13px;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
   width: 100%;
+  animation: msgFadeIn 0.35s ease-out;
+}
+
+@keyframes msgFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .assistant-message-role {
   flex-shrink: 0;
-  font-weight: 600;
-  color: #4b5563;
+}
+
+.assistant-message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.9);
 }
 
 .assistant-message-content {
-  padding: 8px 12px;
-  border-radius: 12px;
-  max-width: 220px;
-  line-height: 1.5;
-  font-size: 15px;
-  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 16px;
+  max-width: 260px;
+  line-height: 1.6;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .assistant-message--user {
@@ -1438,9 +1711,10 @@ export default {
 }
 
 .assistant-message--user .assistant-message-content {
-  background: #22c55e;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: #ffffff;
-  border-bottom-right-radius: 2px;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 12px rgba(34, 197, 94, 0.35);
 }
 
 .assistant-message--user .assistant-message-content {
@@ -1449,63 +1723,103 @@ export default {
 
 .assistant-message--user .assistant-message-role {
   order: 2;
-  margin-left: 8px;
+  margin-left: 10px;
 }
 
 .assistant-message--assistant .assistant-message-content {
   background: #ffffff;
-  color: #374151;
-  border-bottom-left-radius: 2px;
+  color: #1f2937;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.12);
 }
 
 .assistant-empty {
   text-align: center;
   font-size: 14px;
   color: #6b7280;
-  padding: 24px 12px;
-  font-weight: 600;
+  padding: 36px 20px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 14px;
+  margin: 0 4px;
+  border: 1px dashed rgba(34, 197, 94, 0.2);
 }
 
 .assistant-footer {
-  padding: 8px 10px 10px;
-  background: #f9fafb;
-  border-top: 1px solid rgba(229, 231, 235, 0.8);
+  padding: 12px 14px 14px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+}
+
+.assistant-footer >>> .el-textarea__inner {
+  font-size: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.assistant-footer >>> .el-textarea__inner:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
 }
 
 .assistant-send {
   align-self: flex-end;
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 8px 20px;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25);
 }
 
 .assistant-resizer {
   position: absolute;
-  width: 14px;
-  height: 14px;
-  right: 4px;
-  bottom: 4px;
+  width: 12px;
+  height: 12px;
   cursor: se-resize;
-  background: linear-gradient(135deg, transparent 0, transparent 40%, rgba(156, 163, 175, 0.3) 40%, rgba(107, 114, 128, 0.7) 100%);
-  border-radius: 3px;
+  background: linear-gradient(135deg, transparent 0, transparent 40%, rgba(156, 163, 175, 0.35) 40%, rgba(107, 114, 128, 0.6) 100%);
+  border-radius: 2px;
+  z-index: 2;
 }
 
-/* 聊天输入框字体放大加粗 */
-.assistant-footer >>> .el-textarea__inner {
-  font-size: 15px;
-  font-weight: 600;
+.assistant-resizer-se {
+  right: 2px;
+  bottom: 2px;
+  cursor: se-resize;
 }
 
-.assistant-fade-enter-active,
-.assistant-fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+.assistant-resizer-sw {
+  left: 2px;
+  bottom: 2px;
+  cursor: sw-resize;
 }
 
-.assistant-fade-enter,
-.assistant-fade-leave-to {
+.assistant-resizer-ne {
+  right: 2px;
+  top: 2px;
+  cursor: ne-resize;
+}
+
+.assistant-resizer-nw {
+  left: 2px;
+  top: 2px;
+  cursor: nw-resize;
+}
+
+.assistant-scale-enter-active,
+.assistant-scale-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.assistant-scale-enter,
+.assistant-scale-leave-to {
   opacity: 0;
-  transform: translateY(6px);
+  transform: scale(0.85);
 }
+
 
 @media (max-width: 768px) {
   .ai-assistant {
@@ -1517,5 +1831,81 @@ export default {
     right: 64px;
     width: 80vw;
   }
+}
+
+/* 每次操作时的半透明红色背景 */
+.auto-step-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(220, 53, 69, 0.18);
+  pointer-events: none;
+  z-index: 1195;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auto-step-overlay-text {
+  font-size: 28px;
+  font-weight: 700;
+  color: #c92a2a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.08em;
+}
+
+.auto-overlay-fade-enter-active,
+.auto-overlay-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.auto-overlay-fade-enter,
+.auto-overlay-fade-leave-to {
+  opacity: 0;
+}
+
+/* 自动流程点击指针：外层容器做滑动，内层图标做点击缩放（放大更明显） */
+.auto-click-pointer-wrap {
+  position: fixed;
+  width: 72px;
+  height: 72px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1200;
+  transition: left 0.55s ease-out, top 0.55s ease-out;
+}
+
+.auto-click-pointer-wrap .auto-click-pointer {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: autoPointerClick 0.4s ease-out 0.5s;
+}
+
+@keyframes autoPointerClick {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(0.88);
+  }
+  85% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.auto-pointer-fade-enter-active,
+.auto-pointer-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.auto-pointer-fade-enter,
+.auto-pointer-fade-leave-to {
+  opacity: 0;
 }
 </style>
