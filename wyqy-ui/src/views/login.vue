@@ -92,7 +92,6 @@
           </div>
         </div>
       </div>
-      pr
       <div class="login-right">
         <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
           <div class="form-header">

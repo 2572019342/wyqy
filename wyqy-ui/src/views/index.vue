@@ -6,8 +6,8 @@
       <!-- 顶部全局信息栏 -->
       <header class="top-bar">
         <div class="top-bar-left">
-          <h1 class="page-title">综合管理驾驶舱</h1>
-          <span class="page-subtitle">仪表板概览</span>
+          <h1 class="page-title">{{ t('综合管理驾驶舱') }}</h1>
+          <span class="page-subtitle">{{ t('仪表板概览') }}</span>
         </div>
         <div class="top-bar-right">
           <div class="info-item">
@@ -23,6 +23,17 @@
             </svg>
             <span class="info-value">{{ temperature }}°C</span>
           </div>
+          <div class="lang-switch">
+            <button
+              v-for="lang in langs"
+              :key="lang.value"
+              class="lang-btn"
+              :class="{ active: currentLang === lang.value }"
+              @click="setLang(lang.value)"
+            >
+              {{ lang.label }}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -35,11 +46,11 @@
               <i :class="card.icon"></i>
             </div>
             <div class="stat-card-content">
-              <div class="stat-card-label">{{ card.label }}</div>
+              <div class="stat-card-label">{{ t(card.label) }}</div>
               <div class="stat-card-value">
                 <count-to :start-val="0" :end-val="card.value" :duration="1600" />
               </div>
-              <div class="stat-card-desc">{{ card.desc }}</div>
+              <div class="stat-card-desc">{{ t(card.desc) }}</div>
             </div>
             <div class="stat-card-indicator"></div>
           </div>
@@ -56,11 +67,11 @@
                     <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>
                   </svg>
                 </div>
-                <span>环境监控</span>
+                <span>{{ t('环境监控') }}</span>
               </div>
               <div class="env-status">
                 <span class="status-dot pulse"></span>
-                <span class="status-text">正常</span>
+                <span class="status-text">{{ t('正常') }}</span>
               </div>
             </div>
             <div class="environment-gauges">
@@ -74,9 +85,9 @@
                   </div>
                 </div>
                 <div class="gauge-info">
-                  <span class="gauge-label">温度</span>
+                  <span class="gauge-label">{{ t('温度') }}</span>
                   <span class="gauge-value">{{ temperature }}°C</span>
-                  <span class="gauge-status">适宜</span>
+                  <span class="gauge-status">{{ t('适宜') }}</span>
                 </div>
               </div>
               <div class="divider"></div>
@@ -90,9 +101,9 @@
                   </div>
                 </div>
                 <div class="gauge-info">
-                  <span class="gauge-label">湿度</span>
+                  <span class="gauge-label">{{ t('湿度') }}</span>
                   <span class="gauge-value">{{ humidity }}%</span>
-                  <span class="gauge-status">舒适</span>
+                  <span class="gauge-status">{{ t('舒适') }}</span>
                 </div>
               </div>
             </div>
@@ -101,14 +112,14 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
                 </svg>
-                <span>光照: 充足</span>
+                <span>{{ t('光照: 充足') }}</span>
               </div>
               <div class="env-metric">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <circle cx="12" cy="12" r="10"/>
                   <path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/>
                 </svg>
-                <span>CO₂: 正常</span>
+                <span>{{ t('CO₂: 正常') }}</span>
               </div>
             </div>
           </div>
@@ -129,7 +140,7 @@
                   <line x1="1" y1="9" x2="4" y2="9"/>
                   <line x1="1" y1="14" x2="4" y2="14"/>
                 </svg>
-                <span>设备状态</span>
+                <span>{{ t('设备状态') }}</span>
               </div>
             </div>
             <div class="device-chart-wrapper">
@@ -139,43 +150,43 @@
             <div class="device-status-legend">
               <div class="status-tag status-normal">
                 <span class="status-dot"></span>
-                <span>正常</span>
+                <span>{{ t('正常') }}</span>
                 <span class="status-count">45</span>
               </div>
               <div class="status-tag status-testing">
                 <span class="status-dot"></span>
-                <span>检测中</span>
+                <span>{{ t('检测中') }}</span>
                 <span class="status-count">8</span>
               </div>
               <div class="status-tag status-lent">
                 <span class="status-dot"></span>
-                <span>借出</span>
+                <span>{{ t('借出') }}</span>
                 <span class="status-count">12</span>
               </div>
               <div class="status-tag status-damage">
                 <span class="status-dot"></span>
-                <span>损坏</span>
+                <span>{{ t('损坏') }}</span>
                 <span class="status-count">3</span>
               </div>
               <div class="status-tag status-loss">
                 <span class="status-dot"></span>
-                <span>丢失</span>
+                <span>{{ t('丢失') }}</span>
                 <span class="status-count">1</span>
               </div>
               <div class="status-tag status-scrap">
                 <span class="status-dot"></span>
-                <span>报废</span>
+                <span>{{ t('报废') }}</span>
                 <span class="status-count">2</span>
               </div>
             </div>
             <!-- 底部汇总信息 -->
             <div class="device-summary">
               <div class="summary-left">
-                <span class="summary-label">设备总数</span>
-                <span class="summary-value">{{ deviceSummary.total }} 台</span>
+                <span class="summary-label">{{ t('设备总数') }}</span>
+                <span class="summary-value">{{ deviceSummary.total }} {{ t('台') }}</span>
               </div>
               <div class="summary-right">
-                <span class="summary-meta">正常占比 {{ deviceSummary.normalRate }}%</span>
+                <span class="summary-meta">{{ t('正常占比') }} {{ deviceSummary.normalRate }}%</span>
               </div>
             </div>
           </div>
@@ -189,7 +200,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>
                 </svg>
-                <span>农业生产结构</span>
+                <span>{{ t('农业生产结构') }}</span>
               </div>
             </div>
             <div class="chart-content">
@@ -203,22 +214,22 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
                 </svg>
-                <span>AI 病虫害识别</span>
+                <span>{{ t('AI 病虫害识别') }}</span>
               </div>
-              <div class="status-badge status-testing">检测中</div>
+              <div class="status-badge status-testing">{{ t('检测中') }}</div>
             </div>
             <div class="pest-stats">
               <div class="pest-stat-item">
                 <span class="pest-stat-value">28</span>
-                <span class="pest-stat-label">今日识别</span>
+                <span class="pest-stat-label">{{ t('今日识别') }}</span>
               </div>
               <div class="pest-stat-item">
                 <span class="pest-stat-value">94.2%</span>
-                <span class="pest-stat-label">平均置信度</span>
+                <span class="pest-stat-label">{{ t('平均置信度') }}</span>
               </div>
               <div class="pest-stat-item">
                 <span class="pest-stat-value">156</span>
-                <span class="pest-stat-label">已处理</span>
+                <span class="pest-stat-label">{{ t('已处理') }}</span>
               </div>
             </div>
             <div class="tree-wrapper">
@@ -233,10 +244,10 @@
                 <span slot-scope="{ data }" class="custom-tree-node">
                   <span class="node-left">
                     <span class="node-dot" :class="'dot-' + (data.type || 'default')"></span>
-                    <span class="node-label">{{ data.label }}</span>
+                    <span class="node-label">{{ t(data.label) }}</span>
                   </span>
                   <span class="node-meta" v-if="data.count !== undefined">
-                    {{ data.count }} 次
+                    {{ data.count }} {{ t('次') }}
                   </span>
                 </span>
               </el-tree>
@@ -252,12 +263,12 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
                 </svg>
-                <span>翻译工作量趋势</span>
+                <span>{{ t('翻译工作量趋势') }}</span>
               </div>
               <div class="card-actions">
-                <button class="action-btn active">周</button>
-                <button class="action-btn">月</button>
-                <button class="action-btn">年</button>
+                <button class="action-btn active">{{ t('周') }}</button>
+                <button class="action-btn">{{ t('月') }}</button>
+                <button class="action-btn">{{ t('年') }}</button>
               </div>
             </div>
             <div class="trend-chart-wrapper">
@@ -282,6 +293,206 @@ export default {
       currentTime: "",
       temperature: 24.5,
       humidity: 62,
+      currentLang: "zh",
+      langs: [
+        { value: "zh", label: "中" },
+        { value: "en", label: "EN" },
+        { value: "lo", label: "ລາວ" }
+      ],
+      i18n: {
+        zh: {
+          "综合管理驾驶舱": "综合管理驾驶舱",
+          "仪表板概览": "仪表板概览",
+          "在管地块": "在管地块",
+          "覆盖多种地块类型与种植模式": "覆盖多种地块类型与种植模式",
+          "作物品类": "作物品类",
+          "蔬菜、水果、粮食及经济作物": "蔬菜、水果、粮食及经济作物",
+          "年度翻译任务": "年度翻译任务",
+          "覆盖多语种多领域的翻译需求": "覆盖多语种多领域的翻译需求",
+          "语料库条目": "语料库条目",
+          "高质量术语与双语句对沉淀": "高质量术语与双语句对沉淀",
+          "环境监控": "环境监控",
+          "正常": "正常",
+          "温度": "温度",
+          "适宜": "适宜",
+          "湿度": "湿度",
+          "舒适": "舒适",
+          "光照: 充足": "光照: 充足",
+          "CO₂: 正常": "CO₂: 正常",
+          "设备状态": "设备状态",
+          "检测中": "检测中",
+          "借出": "借出",
+          "损坏": "损坏",
+          "丢失": "丢失",
+          "报废": "报废",
+          "设备总数": "设备总数",
+          "台": "台",
+          "正常占比": "正常占比",
+          "农业生产结构": "农业生产结构",
+          "作物类型占比": "作物类型占比",
+          "蔬菜": "蔬菜",
+          "水果": "水果",
+          "粮食": "粮食",
+          "经济作物": "经济作物",
+          "AI 病虫害识别": "AI 病虫害识别",
+          "今日识别": "今日识别",
+          "平均置信度": "平均置信度",
+          "已处理": "已处理",
+          "虫害识别": "虫害识别",
+          "病害识别": "病害识别",
+          "识别记录": "识别记录",
+          "待处理": "待处理",
+          "蚜虫": "蚜虫",
+          "红蜘蛛": "红蜘蛛",
+          "粉虱": "粉虱",
+          "蓟马": "蓟马",
+          "叶斑病": "叶斑病",
+          "霜霉病": "霜霉病",
+          "白粉病": "白粉病",
+          "炭疽病": "炭疽病",
+          "次": "次",
+          "翻译工作量趋势": "翻译工作量趋势",
+          "周": "周",
+          "月": "月",
+          "年": "年",
+          "周一": "周一",
+          "周二": "周二",
+          "周三": "周三",
+          "周四": "周四",
+          "周五": "周五",
+          "周六": "周六",
+          "周日": "周日",
+          "完成任务数": "完成任务数"
+        },
+        en: {
+          "综合管理驾驶舱": "Integrated Management Cockpit",
+          "仪表板概览": "Dashboard Overview",
+          "在管地块": "Managed Plots",
+          "覆盖多种地块类型与种植模式": "Covers multiple plot types and planting modes",
+          "作物品类": "Crop Categories",
+          "蔬菜、水果、粮食及经济作物": "Vegetables, fruits, grains and cash crops",
+          "年度翻译任务": "Annual Translation Tasks",
+          "覆盖多语种多领域的翻译需求": "Translation needs across multiple languages and domains",
+          "语料库条目": "Corpus Entries",
+          "高质量术语与双语句对沉淀": "High-quality terminology and bilingual sentence pairs",
+          "环境监控": "Environment Monitoring",
+          "正常": "Normal",
+          "温度": "Temperature",
+          "适宜": "Comfortable",
+          "湿度": "Humidity",
+          "舒适": "Comfortable",
+          "光照: 充足": "Light: Sufficient",
+          "CO₂: 正常": "CO₂: Normal",
+          "设备状态": "Device Status",
+          "检测中": "Inspecting",
+          "借出": "Lent Out",
+          "损坏": "Damaged",
+          "丢失": "Lost",
+          "报废": "Scrapped",
+          "设备总数": "Total Devices",
+          "台": "units",
+          "正常占比": "Normal rate",
+          "农业生产结构": "Agricultural Production Structure",
+          "作物类型占比": "Crop Type Share",
+          "蔬菜": "Vegetables",
+          "水果": "Fruits",
+          "粮食": "Grains",
+          "经济作物": "Cash Crops",
+          "AI 病虫害识别": "AI Pest & Disease Recognition",
+          "今日识别": "Detections Today",
+          "平均置信度": "Average Confidence",
+          "已处理": "Handled",
+          "虫害识别": "Insect Recognition",
+          "病害识别": "Disease Recognition",
+          "识别记录": "Recognition Records",
+          "待处理": "Pending",
+          "蚜虫": "Aphid",
+          "红蜘蛛": "Red Spider Mite",
+          "粉虱": "Whitefly",
+          "蓟马": "Thrips",
+          "叶斑病": "Leaf Spot",
+          "霜霉病": "Downy Mildew",
+          "白粉病": "Powdery Mildew",
+          "炭疽病": "Anthracnose",
+          "次": "times",
+          "翻译工作量趋势": "Translation Workload Trend",
+          "周": "Week",
+          "月": "Month",
+          "年": "Year",
+          "周一": "Mon",
+          "周二": "Tue",
+          "周三": "Wed",
+          "周四": "Thu",
+          "周五": "Fri",
+          "周六": "Sat",
+          "周日": "Sun",
+          "完成任务数": "Completed Tasks"
+        },
+        lo: {
+          "综合管理驾驶舱": "ຫ້ອງຄວບຄຸມການບໍລິຫານລວມ",
+          "仪表板概览": "ພາບລວມແຜງຄວບຄຸມ",
+          "在管地块": "ແປງນາທີ່ຄວບຄຸມ",
+          "覆盖多种地块类型与种植模式": "ຄອບຄຸມປະເພດແປງ ແລະ ຮູບແບບປູກຝັງຫຼາຍຮູບແບບ",
+          "作物品类": "ປະເພດພືດ",
+          "蔬菜、水果、粮食及经济作物": "ຜັກ, ໝາກໄມ້, ເຂົ້າ ແລະ ພືດເສດຖະກິດ",
+          "年度翻译任务": "ວຽກແປປະຈໍາປີ",
+          "覆盖多语种多领域的翻译需求": "ຮອງຮັບການແປຫຼາຍພາສາ ແລະ ຫຼາຍຂະແຫນງ",
+          "语料库条目": "ລາຍການຄັງຂໍ້ມູນພາສາ",
+          "高质量术语与双语句对沉淀": "ສະສົມຄໍາສັບ ແລະ ປະໂຫຍກສອງພາສາທີ່ມີຄຸນນະພາບສູງ",
+          "环境监控": "ການຕິດຕາມສະພາບແວດລ້ອມ",
+          "正常": "ປົກກະຕິ",
+          "温度": "ອຸນຫະພູມ",
+          "适宜": "ເໝາະສົມ",
+          "湿度": "ຄວາມຊຸ່ມ",
+          "舒适": "ນ່າສະບາຍ",
+          "光照: 充足": "ແສງ: ເພີຽງພໍ",
+          "CO₂: 正常": "CO₂: ປົກກະຕິ",
+          "设备状态": "ສະຖານະອຸປະກອນ",
+          "检测中": "ກໍາລັງກວດສອບ",
+          "借出": "ໃຫ້ຍືມ",
+          "损坏": "ເສຍຫາຍ",
+          "丢失": "ສູນເສຍ",
+          "报废": "ຕັດຈໍາໜ່າຍ",
+          "设备总数": "ຈໍານວນອຸປະກອນທັງໝົດ",
+          "台": "ເຄື່ອງ",
+          "正常占比": "ສັດສ່ວນປົກກະຕິ",
+          "农业生产结构": "ໂຄງສ້າງການຜະລິດກະສິກໍາ",
+          "作物类型占比": "ສັດສ່ວນປະເພດພືດ",
+          "蔬菜": "ຜັກ",
+          "水果": "ໝາກໄມ້",
+          "粮食": "ເຂົ້າ",
+          "经济作物": "ພືດເສດຖະກິດ",
+          "AI 病虫害识别": "AI ການຈໍາແນກໂລກ ແລະ ແມງສັດຕູພືດ",
+          "今日识别": "ຈໍານວນຈໍາແນກມື້ນີ້",
+          "平均置信度": "ຄ່າໝັ້ນໃຈສະເລ່ຍ",
+          "已处理": "ຈັດການແລ້ວ",
+          "虫害识别": "ຈໍາແນກແມງສັດຕູພືດ",
+          "病害识别": "ຈໍາແນກໂລກພືດ",
+          "识别记录": "ບັນທຶກການຈໍາແນກ",
+          "待处理": "ລໍຖ້າຈັດການ",
+          "蚜虫": "ແມງໄມ້ອ່ອນ",
+          "红蜘蛛": "ແມງໄມ້ແດງ",
+          "粉虱": "ແມງຟອງຂາວ",
+          "蓟马": "ແມງທຣິບ",
+          "叶斑病": "ໂລກຈຸດໃບ",
+          "霜霉病": "ໂລກຮາຝອຍ",
+          "白粉病": "ໂລກຮາຜົງຂາວ",
+          "炭疽病": "ໂລກຖ່ານປອກ",
+          "次": "ເທື່ອ",
+          "翻译工作量趋势": "ແນວໂນ້ມວຽກແປ",
+          "周": "ອາທິດ",
+          "月": "ເດືອນ",
+          "年": "ປີ",
+          "周一": "ຈ.",
+          "周二": "ອ.",
+          "周三": "ພ.",
+          "周四": "ພະ.",
+          "周五": "ສຸ.",
+          "周六": "ເສົາ",
+          "周日": "ອາທິດ",
+          "完成任务数": "ຈໍານວນວຽກສໍາເລັດ"
+        }
+      },
       // 顶部卡片静态演示数据
       statCards: [
         {
@@ -404,6 +615,23 @@ export default {
     });
   },
   methods: {
+    t(key) {
+      const pack = this.i18n[this.currentLang] || this.i18n.zh;
+      if (pack && pack[key]) {
+        return pack[key];
+      }
+      if (this.i18n.zh && this.i18n.zh[key]) {
+        return this.i18n.zh[key];
+      }
+      return key;
+    },
+    setLang(lang) {
+      if (this.currentLang === lang) return;
+      this.currentLang = lang;
+      this.renderDeviceChart();
+      this.renderAgricultureChart();
+      this.renderTranslationChart();
+    },
     updateTime() {
       const now = new Date();
       this.currentTime = now.toLocaleTimeString('zh-CN', { 
@@ -549,7 +777,14 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: ['正常', '检测中', '借出', '损坏', '丢失', '报废'],
+          data: [
+            this.t('正常'),
+            this.t('检测中'),
+            this.t('借出'),
+            this.t('损坏'),
+            this.t('丢失'),
+            this.t('报废')
+          ],
           axisLine: { show: false },
           axisTick: { show: false },
           axisLabel: {
@@ -615,7 +850,7 @@ export default {
         color: ["#14b8a6", "#38bdf8", "#a78bfa", "#fbbf24"],
         series: [
           {
-            name: "作物类型占比",
+            name: this.t("作物类型占比"),
             type: "pie",
             radius: ["45%", "70%"],
             center: ["50%", "45%"],
@@ -637,10 +872,10 @@ export default {
               }
             },
             data: [
-              { value: 45, name: "蔬菜" },
-              { value: 26, name: "水果" },
-              { value: 18, name: "粮食" },
-              { value: 11, name: "经济作物" }
+              { value: 45, name: this.t("蔬菜") },
+              { value: 26, name: this.t("水果") },
+              { value: 18, name: this.t("粮食") },
+              { value: 11, name: this.t("经济作物") }
             ]
           }
         ]
@@ -671,7 +906,15 @@ export default {
         xAxis: {
           type: "category",
           boundaryGap: false,
-          data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+          data: [
+            this.t("周一"),
+            this.t("周二"),
+            this.t("周三"),
+            this.t("周四"),
+            this.t("周五"),
+            this.t("周六"),
+            this.t("周日")
+          ],
           axisLine: {
             lineStyle: { color: '#e2e8f0' }
           },
@@ -697,7 +940,7 @@ export default {
         },
         series: [
           {
-            name: "完成任务数",
+            name: this.t("完成任务数"),
             type: "line",
             smooth: true,
             symbol: "circle",

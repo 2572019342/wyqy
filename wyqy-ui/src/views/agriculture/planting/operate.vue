@@ -276,6 +276,55 @@
         </el-button>
       </div>
     </div>
+
+    <!-- AI 助手悬浮窗 -->
+    <div class="ai-assistant">
+      <div class="assistant-toggle" @click="toggleAssistant">
+        <img src="/photo/picture.png" alt="AI助手" class="assistant-icon" />
+      </div>
+      <transition name="assistant-fade">
+        <div
+          v-if="assistantVisible"
+          class="assistant-panel"
+          :style="assistantPanelComputedStyle"
+          @mousedown.stop
+        >
+          <div class="assistant-header" @mousedown.stop.prevent="startAssistantDrag">
+            <span class="assistant-title">种植 AI 助手</span>
+            <i class="el-icon-close assistant-close" @click.stop="toggleAssistant"></i>
+          </div>
+          <div class="assistant-body">
+            <div
+              v-for="(msg, index) in assistantMessages"
+              :key="index"
+              class="assistant-message"
+              :class="'assistant-message--' + msg.role"
+            >
+              <span class="assistant-message-role">
+                {{ msg.role === 'user' ? '我' : '助手' }}
+              </span>
+              <span class="assistant-message-content">{{ msg.content }}</span>
+            </div>
+            <div v-if="assistantMessages.length === 0" class="assistant-empty">
+              我可以帮助您完成您想要的操作
+            </div>
+          </div>
+          <div class="assistant-footer">
+            <el-input
+              v-model="assistantInput"
+              type="textarea"
+              :rows="2"
+              placeholder="请输入要咨询的问题，按 Enter 发送"
+              @keyup.enter.native.exact="sendAssistantMessage"
+            />
+            <el-button type="primary" size="mini" class="assistant-send" @click="sendAssistantMessage">
+              发送
+            </el-button>
+          </div>
+          <div class="assistant-resizer" @mousedown.stop.prevent="startAssistantResize"></div>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 
@@ -347,7 +396,23 @@ export default {
       // 提交状态
       submitting: false,
       // 最近种植记录
-      recentPlantings: []
+      recentPlantings: [],
+      // AI 助手悬浮窗
+      assistantVisible: false,
+      assistantInput: "",
+      assistantMessages: [],
+      assistantWidth: 340,
+      assistantHeight: 380,
+      assistantTop: null,
+      assistantLeft: null,
+      isAssistantDragging: false,
+      dragOffsetX: 0,
+      dragOffsetY: 0,
+      isAssistantResizing: false,
+      resizeStartX: 0,
+      resizeStartY: 0,
+      resizeStartWidth: 0,
+      resizeStartHeight: 0
     };
   },
   computed: {
@@ -385,12 +450,40 @@ export default {
       return !!(this.landSearchForm.landName || 
                 this.landSearchForm.soilType || 
                 this.landSearchForm.location);
+    },
+    // AI 助手面板样式（支持拖动和缩放）
+    assistantPanelComputedStyle() {
+      const style = {};
+      const width = this.assistantWidth || 340;
+      const height = this.assistantHeight || 380;
+      let top = this.assistantTop;
+      let left = this.assistantLeft;
+
+      if (top == null || left == null) {
+        // 默认出现在右下角
+        const vh = window.innerHeight || 800;
+        const vw = window.innerWidth || 1200;
+        top = vh - height - 120;
+        left = vw - width - 120;
+      }
+
+      style.width = `${width}px`;
+      style.height = `${height}px`;
+      style.top = `${top}px`;
+      style.left = `${left}px`;
+      return style;
     }
   },
   created() {
     this.getLandOptions();
     this.getCropOptions();
     this.getRecentPlantings();
+  },
+  beforeDestroy() {
+    document.removeEventListener("mousemove", this.onAssistantDrag);
+    document.removeEventListener("mouseup", this.stopAssistantDrag);
+    document.removeEventListener("mousemove", this.onAssistantResize);
+    document.removeEventListener("mouseup", this.stopAssistantResize);
   },
   methods: {
     // 获取地块选项
@@ -608,6 +701,95 @@ export default {
         'serious': '病重'
       };
       return textMap[status] || status;
+    },
+    // 切换 AI 助手悬浮窗显示
+    toggleAssistant() {
+      this.assistantVisible = !this.assistantVisible;
+      if (this.assistantVisible && (this.assistantTop == null || this.assistantLeft == null)) {
+        const vh = window.innerHeight || 800;
+        const vw = window.innerWidth || 1200;
+        const height = this.assistantHeight || 380;
+        const width = this.assistantWidth || 340;
+        this.assistantTop = vh - height - 120;
+        this.assistantLeft = vw - width - 120;
+      }
+    },
+    // 发送 AI 助手消息（当前为前端本地模拟）
+    sendAssistantMessage() {
+      const content = (this.assistantInput || "").trim();
+      if (!content) {
+        return;
+      }
+      this.assistantMessages.push({
+        role: "user",
+        content
+      });
+      // 简单的占位回复，后续可替换为真实接口调用
+      this.assistantMessages.push({
+        role: "assistant",
+        content: "已收到您的问题，当前为本地示例对话框。如需接入真实 AI，可在此方法中调用后端接口。"
+      });
+      this.assistantInput = "";
+    },
+    // 开始拖动 AI 助手面板
+    startAssistantDrag(event) {
+      const panel = event.currentTarget.parentNode;
+      const rect = panel.getBoundingClientRect();
+      this.isAssistantDragging = true;
+      this.dragOffsetX = event.clientX - rect.left;
+      this.dragOffsetY = event.clientY - rect.top;
+      document.addEventListener("mousemove", this.onAssistantDrag);
+      document.addEventListener("mouseup", this.stopAssistantDrag);
+    },
+    onAssistantDrag(event) {
+      if (!this.isAssistantDragging) return;
+      const width = this.assistantWidth || 340;
+      const height = this.assistantHeight || 380;
+      const vw = window.innerWidth || 1200;
+      const vh = window.innerHeight || 800;
+      let left = event.clientX - this.dragOffsetX;
+      let top = event.clientY - this.dragOffsetY;
+      const maxLeft = vw - width;
+      const maxTop = vh - height;
+      this.assistantLeft = Math.min(Math.max(left, 0), Math.max(maxLeft, 0));
+      this.assistantTop = Math.min(Math.max(top, 0), Math.max(maxTop, 0));
+    },
+    stopAssistantDrag() {
+      this.isAssistantDragging = false;
+      document.removeEventListener("mousemove", this.onAssistantDrag);
+      document.removeEventListener("mouseup", this.stopAssistantDrag);
+    },
+    // 开始调整大小
+    startAssistantResize(event) {
+      const panel = event.currentTarget.parentNode;
+      const rect = panel.getBoundingClientRect();
+      this.isAssistantResizing = true;
+      this.resizeStartX = event.clientX;
+      this.resizeStartY = event.clientY;
+      this.resizeStartWidth = rect.width;
+      this.resizeStartHeight = rect.height;
+      document.addEventListener("mousemove", this.onAssistantResize);
+      document.addEventListener("mouseup", this.stopAssistantResize);
+    },
+    onAssistantResize(event) {
+      if (!this.isAssistantResizing) return;
+      const vw = window.innerWidth || 1200;
+      const vh = window.innerHeight || 800;
+      const minWidth = 260;
+      const minHeight = 260;
+      const deltaX = event.clientX - this.resizeStartX;
+      const deltaY = event.clientY - this.resizeStartY;
+      let newWidth = this.resizeStartWidth + deltaX;
+      let newHeight = this.resizeStartHeight + deltaY;
+      newWidth = Math.max(minWidth, Math.min(newWidth, vw - 40));
+      newHeight = Math.max(minHeight, Math.min(newHeight, vh - 80));
+      this.assistantWidth = newWidth;
+      this.assistantHeight = newHeight;
+    },
+    stopAssistantResize() {
+      this.isAssistantResizing = false;
+      document.removeEventListener("mousemove", this.onAssistantResize);
+      document.removeEventListener("mouseup", this.stopAssistantResize);
     }
   }
 };
@@ -1155,4 +1337,185 @@ export default {
 .land-card:nth-child(2), .crop-card:nth-child(2) { animation-delay: 0.2s; }
 .land-card:nth-child(3), .crop-card:nth-child(3) { animation-delay: 0.3s; }
 .land-card:nth-child(4), .crop-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* AI 助手悬浮窗样式 */
+.ai-assistant {
+  position: fixed;
+  right: 24px;
+  bottom: 96px;
+  z-index: 1100;
+}
+
+.assistant-toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.assistant-toggle:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.3);
+}
+
+.assistant-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.assistant-panel {
+  position: fixed;
+  width: 340px;
+  max-height: 520px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 24px 40px rgba(15, 23, 42, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.assistant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #ffffff;
+}
+
+.assistant-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.assistant-close {
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.assistant-body {
+  padding: 12px 12px 4px;
+  background: linear-gradient(135deg, #f9fafb 0%, #e5f9ef 100%);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.assistant-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  width: 100%;
+}
+
+.assistant-message-role {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.assistant-message-content {
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 220px;
+  line-height: 1.5;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.assistant-message--user {
+  justify-content: flex-end;
+}
+
+.assistant-message--user .assistant-message-content {
+  background: #22c55e;
+  color: #ffffff;
+  border-bottom-right-radius: 2px;
+}
+
+.assistant-message--user .assistant-message-content {
+  order: 1;
+}
+
+.assistant-message--user .assistant-message-role {
+  order: 2;
+  margin-left: 8px;
+}
+
+.assistant-message--assistant .assistant-message-content {
+  background: #ffffff;
+  color: #374151;
+  border-bottom-left-radius: 2px;
+}
+
+.assistant-empty {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+  padding: 24px 12px;
+  font-weight: 600;
+}
+
+.assistant-footer {
+  padding: 8px 10px 10px;
+  background: #f9fafb;
+  border-top: 1px solid rgba(229, 231, 235, 0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.assistant-send {
+  align-self: flex-end;
+}
+
+.assistant-resizer {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  right: 4px;
+  bottom: 4px;
+  cursor: se-resize;
+  background: linear-gradient(135deg, transparent 0, transparent 40%, rgba(156, 163, 175, 0.3) 40%, rgba(107, 114, 128, 0.7) 100%);
+  border-radius: 3px;
+}
+
+/* 聊天输入框字体放大加粗 */
+.assistant-footer >>> .el-textarea__inner {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.assistant-fade-enter-active,
+.assistant-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.assistant-fade-enter,
+.assistant-fade-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+@media (max-width: 768px) {
+  .ai-assistant {
+    right: 16px;
+    bottom: 96px;
+  }
+
+  .assistant-panel {
+    right: 64px;
+    width: 80vw;
+  }
+}
 </style>

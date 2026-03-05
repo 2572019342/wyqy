@@ -352,15 +352,6 @@
         <h2 class="warning-title">检测到光照较低</h2>
         <p class="warning-message">检测到光照较低，即将进行自动补光</p>
 
-        <div class="warning-actions">
-          <el-button type="primary" size="medium" @click="handleGoToFarming" class="go-farming-btn">
-            <i class="el-icon-sunny"></i>
-            确认
-          </el-button>
-          <el-button size="medium" @click="handleClosePestWarning" class="close-warning-btn">
-            取消
-          </el-button>
-        </div>
       </div>
     </el-dialog>
   </div>
@@ -497,6 +488,10 @@ export default {
       this.resetAlertInterceptor();
       console.log('已清除所有种植记录报警显示记录和拦截器状态');
     };
+
+    // 全局监听 Ctrl+4，弹窗打开时也可用键盘取消报警（不依赖容器焦点）
+    this._boundHandleGlobalKeyDown = (e) => this.handleGlobalKeyDown(e);
+    document.addEventListener('keydown', this._boundHandleGlobalKeyDown);
   },
   beforeDestroy() {
     // 清除轮询定时器
@@ -513,6 +508,9 @@ export default {
     this.stopAlarmAudio();
     if (this.alarmAudio) {
       this.alarmAudio = null;
+    }
+    if (this._boundHandleGlobalKeyDown) {
+      document.removeEventListener('keydown', this._boundHandleGlobalKeyDown);
     }
   },
   methods: {
@@ -787,6 +785,17 @@ export default {
       }, `planting_${new Date().getTime()}.xlsx`)
     },
     /** 键盘事件处理 */
+    /** 全局按键（弹窗打开时焦点在对话框内，容器收不到 keydown，故用 document 监听） */
+    handleGlobalKeyDown(event) {
+      const isCtrlOrMeta = event.ctrlKey || event.metaKey;
+      const isNumberFour = event.keyCode === 52 || event.key === '4' || event.code === 'Digit4';
+      if (isCtrlOrMeta && isNumberFour && this.showPestWarningDialog) {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log('✓ 全局检测到 Ctrl+4，取消报警（等同点击确认）');
+        this.handleGoToFarming();
+      }
+    },
     handleKeyDown(event) {
       // 防止重复触发 - 如果拦截器已锁定，跳过处理
       if (this.alertInterceptor.lock) {
@@ -826,13 +835,18 @@ export default {
         return false;
       }
       
-      // 监听 Ctrl+4 键 - 关闭小灯
+      // 监听 Ctrl+4 键 - 若报警弹窗显示则取消报警（等同点击确认），否则关闭小灯
       const isNumberFour = event.keyCode === 52 || event.key === '4' || event.code === 'Digit4';
       if (isCtrlOrMeta && isNumberFour) {
         event.preventDefault();
         event.stopPropagation();
-        console.log('✓ 检测到 Ctrl+4，关闭小灯');
-        this.handleTurnOffLight();
+        if (this.showPestWarningDialog) {
+          console.log('✓ 检测到 Ctrl+4，取消报警（等同点击确认）');
+          this.handleGoToFarming();
+        } else {
+          console.log('✓ 检测到 Ctrl+4，关闭小灯');
+          this.handleTurnOffLight();
+        }
         return false;
       }
     },

@@ -129,7 +129,7 @@ referer:
 # YX5285R 声光报警器（小灯）串口配置
 light-alarm:
   enabled: true
-  port: COM5
+  port: COM8
   baud-rate: 9600
 
 # 防止XSS攻击

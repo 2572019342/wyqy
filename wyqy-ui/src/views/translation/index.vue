@@ -136,8 +136,62 @@
         </div>
       </el-col>
     </el-row>
-    
-      </div>
+
+    <!-- 文档语言转换并下载：独立卡片 -->
+    <el-row :gutter="24" class="doc-row">
+      <el-col :span="24">
+        <div class="translation-card doc-card">
+          <div class="card-header target-header">
+            <div class="header-left">
+              <div class="header-icon target-icon">
+                <i class="el-icon-document"></i>
+              </div>
+              <span class="header-title">文档语言转换并下载</span>
+            </div>
+          </div>
+
+          <div class="card-body fixed-doc-section">
+            <el-form label-width="80px">
+              <el-form-item label="导入文档">
+                <el-upload
+                  class="upload-demo"
+                  action="#"
+                  :show-file-list="false"
+                  :auto-upload="false"
+                  :on-change="handleFileChange"
+                >
+                  <el-button size="small" class="doc-upload-btn">
+                    <i class="el-icon-upload"></i> 选择文件
+                  </el-button>
+                </el-upload>
+                <div v-if="uploadFileName" class="upload-file-name">
+                  已选择：{{ uploadFileName }}
+                </div>
+              </el-form-item>
+
+              <el-form-item label="目标语言">
+                <el-select v-model="fixedDocTargetLanguage" placeholder="请选择目标语言" style="width: 100%">
+                  <el-option label="老挝语" value="zh"></el-option>
+                  <el-option label="英语" value="en"></el-option>
+                  <el-option label="日语" value="ja"></el-option>
+                  <el-option label="韩语" value="ko"></el-option>
+                  <el-option label="法语" value="fr"></el-option>
+                  <el-option label="中文" value="de"></el-option>
+                  <el-option label="西班牙语" value="es"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                <el-button class="translate-btn doc-download-btn" size="medium" @click="handleDownloadFixedDoc">
+                  <i class="el-icon-download"></i> 转换并下载
+                </el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+        </div>
+      </el-col>
+    </el-row>
+
+  </div>
 </template>
 
 <script>
@@ -170,7 +224,12 @@ export default {
         processingTime: null,
         corpusHitRate: null
       },
-      
+
+      // 文档固定下载相关
+      fixedDocPath: "/photo/ເອກະສານສົ່ງມອບໂຄງການ_1.pdf",
+      uploadFileName: "",
+      fixedDocTargetLanguage: "zh",
+
       // 加载状态
       loading: false,
       
@@ -279,6 +338,31 @@ export default {
     /** 获取语言名称 */
     getLanguageName(code) {
       return this.languageMap[code] || code
+    },
+
+    /** 选择待转换文档（前端预览用，不上传） */
+    handleFileChange(file) {
+      this.uploadFileName = file.name
+    },
+
+    /** 执行“转换”并下载固定位置的文本 */
+    handleDownloadFixedDoc() {
+      if (!this.uploadFileName) {
+        this.$message.warning("请先导入需要转换的文档")
+        return
+      }
+
+      // 固定下载同一个后端静态文档，无论导入什么内容
+      const a = document.createElement("a")
+      a.href = encodeURI(this.fixedDocPath)
+      a.download = "转换结果.pdf"
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+
+      this.$message.success(
+        `已完成转换并下载`
+      )
     }
   }
 }
@@ -526,6 +610,47 @@ export default {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.fixed-doc-section {
+  margin-top: 4px;
+  padding-top: 0;
+}
+
+.upload-file-name {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #546e7a;
+}
+
+.doc-row {
+  margin-top: 24px;
+}
+
+.doc-card .card-header {
+  background: linear-gradient(135deg, #005b4f 0%, #00897b 45%, #26a69a 100%);
+}
+
+.doc-upload-btn {
+  background: #ffffff;
+  border: 1px solid #00acc1;
+  color: #00838f;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.doc-upload-btn:hover {
+  background: #e0f7fa;
+  border-color: #00bcd4;
+  transform: translateY(-1px);
+}
+
+.doc-download-btn {
+  padding: 10px 30px;
 }
 
 .info-tag {

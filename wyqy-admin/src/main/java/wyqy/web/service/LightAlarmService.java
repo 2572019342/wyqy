@@ -21,7 +21,7 @@ public class LightAlarmService {
     @Value("${light-alarm.enabled:false}")
     private boolean enabled;
 
-    @Value("${light-alarm.port:COM5}")
+    @Value("${light-alarm.port:COM8}")
     private String port;
 
     @Value("${light-alarm.baud-rate:9600}")

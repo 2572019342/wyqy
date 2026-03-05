@@ -13,7 +13,7 @@
               <div class="stat-label">{{ stat.label }}</div>
             </div>
           </div>
-          <div class="stat-decoration"></div>
+          <div class="stat-decoration"></div>-
         </div>
       </el-col>
     </el-row>
@@ -78,15 +78,6 @@
                 </div>
                 <div class="header-status">
                   <span class="status-tag" :class="'status-' + carVideoStatus.type">{{ carVideoStatus.text }}</span>
-                  <el-button
-                    type="primary"
-                    size="mini"
-                    style="margin-left: 12px"
-                    :loading="robotRunning"
-                    @click="runRobot"
-                  >
-                    启动机器人
-                  </el-button>
                 </div>
               </div>
               <div class="video-container">
@@ -222,8 +213,8 @@ export default {
         speciesName: null
       },
       // 视频流相关
-      droneVideoStreamUrl: "http://192.168.1.102:1145/play_drone.html",
-      carVideoStreamUrl: "http://192.168.1.102:1145/play_car.html",
+      droneVideoStreamUrl: "http://192.168.1.103:1145/play_drone.html",
+      carVideoStreamUrl: "http://192.168.1.103:1145/play_car.html",
       droneVideoConnected: false,
       carVideoConnected: false,
       carVideoStatus: {
@@ -421,13 +412,13 @@ export default {
           url: '/robot/run',
           method: 'post'
         });
-        if (res && (res.code === 200 || res.success)) {
-          this.$message.success(res.msg || '机器人任务已启动');
-        } else {
-          this.$message.error((res && res.msg) || '机器人任务启动失败');
+        if (!(res && (res.code === 200 || res.success))) {
+          // 保留日志，避免打扰用户界面
+          console.error((res && res.msg) || '机器人任务启动失败');
         }
       } catch (e) {
-        this.$message.error('机器人任务启动失败');
+        // 保留错误日志，避免弹出提示
+        console.error('机器人任务启动失败', e);
       } finally {
         this.robotRunning = false;
       }
@@ -483,13 +474,21 @@ export default {
     handleKeyDown(event) {
       if (!this.keyListenerEnabled) return;
       
-      // 监听 Ctrl+2 键
       const isCtrlOrMeta = event.ctrlKey || event.metaKey;
       const isKey2 = event.key === '2' || event.code === 'Digit2';
+      const isKey6 = event.key === '6' || event.code === 'Digit6';
       
+      // Ctrl+2：快速识别
       if (isCtrlOrMeta && isKey2) {
         event.preventDefault();
         this.quickDetect();
+        return;
+      }
+      
+      // Ctrl+6：启动机器人
+      if (isCtrlOrMeta && isKey6) {
+        event.preventDefault();
+        this.runRobot();
       }
     },
     // 快速识别（Ctrl+2），不再强制选择地块和作物
