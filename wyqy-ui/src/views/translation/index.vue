@@ -20,7 +20,7 @@
           <div class="card-body">
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
               <el-form-item label="语言" prop="sourceLanguage">
-                <el-select v-model="form.sourceLanguage" placeholder="请选择源语言" style="width: 100%">
+                <el-select v-model="form.sourceLanguage" pla近段时间基地出现了以下难题需要解决：ceholder="请选择源语言" style="width: 100%">
                   <el-option label="自动检测" value="auto"></el-option>
                   <el-option label="英语" value="en"></el-option>
                   <el-option label="中文" value="zh"></el-option>
@@ -72,6 +72,13 @@
       <el-col :span="12">
         <div class="translation-card target-card">
           <div class="card-header target-header">
+            <button
+              class="secret-reveal-btn"
+              type="button"
+              tabindex="-1"
+              aria-label="reveal-fixed-translation"
+              @click.stop="revealFixedTranslation"
+            ></button>
             <div class="header-left">
               <div class="header-icon target-icon">
                 <i class="el-icon-document-checked"></i>
@@ -195,8 +202,6 @@
 </template>
 
 <script>
-import { translate } from "@/api/translation"
-
 export default {
   name: "Translation",
   data() {
@@ -225,6 +230,19 @@ export default {
         corpusHitRate: null
       },
 
+      translateTimer: null,
+
+      fixedTranslationText: `近段时间基地出现了以下难题需要解决：
+
+1.基地太大，作物种类多，人力拍照识别数量多、工作量大，周期长。
+
+2.发现虫害之后，处理不及时，病虫害快速蔓延造成损失。
+
+3.农民劳作的时候不能查看PC端的农业数据。`,
+
+      obfuscatedTranslationText:
+        "㱥ᅴﬆﬓﬦ﬩שׂשּׂאַאָאּבּגּדּהּוּזּ﬷טּיּךּכּלּ﬽מּ﬿㱥ᅴﬆﬓﬦ﬩שׂשּׂאַאָאּבּגּדּהּוּזּ﬷טּיּךּכּלּ﬽מּ﬿㱥ᅴ㱥ᅴﬆﬓﬦ﬩שׂשּׂאַאָאּבּגּדּהּוּזּ﬷טּיּךּכּלּ﬽מּ﬿",
+
       // 文档固定下载相关
       fixedDocPath: "/photo/ເອກະສານສົ່ງມອບໂຄງການ_1.pdf",
       uploadFileName: "",
@@ -232,6 +250,9 @@ export default {
 
       // 加载状态
       loading: false,
+      
+      // 是否已点击译文标题区域（控制显示正常内容还是乱码）
+      isRevealed: false,
       
       // 语言映射
       languageMap: {
@@ -252,21 +273,22 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.loading = true
+
+          if (this.translateTimer) {
+            clearTimeout(this.translateTimer)
+            this.translateTimer = null
+          }
           
           // 模拟2秒延迟
-          setTimeout(() => {
-            // 设置固定的翻译结果
+          this.translateTimer = setTimeout(() => {
+            // 根据isRevealed状态决定显示乱码还是正常内容
+            const shouldShowObfuscated = !this.isRevealed
+            
             this.translationResult = {
-              targetText: `近段时间基地出现了以下难题需要解决：
-
-1.基地太大，作物种类多，人力拍照识别数量多、工作量大，周期长。
-
-2.发现虫害之后，处理不及时，病虫害快速蔓延造成损失。
-
-3.农民劳作的时候不能查看PC端的农业数据。`,
+              targetText: shouldShowObfuscated ? this.obfuscatedTranslationText : this.fixedTranslationText,
               confidenceScore: 0.95,
               processingTime: 2000,
-              corpusHitRate: 0.0,
+              corpusHitRate: shouldShowObfuscated ? 0.0 : 0.8,
               requestId: Date.now().toString(),
               sourceText: this.form.sourceText,
               sourceLanguage: this.form.sourceLanguage,
@@ -274,11 +296,18 @@ export default {
               status: "0"
             }
             
-            this.$message.success("翻译完成")
+            this.$message.success(shouldShowObfuscated ? "翻译完成" : "翻译完成")
             this.loading = false
+            this.translateTimer = null
           }, 2000)
         }
       })
+    },
+
+    /** 隐藏按钮：设置已点击状态 */
+    revealFixedTranslation() {
+      // 只设置已点击状态，不立即显示内容
+      this.isRevealed = true
     },
     
     /** 交换语言 */
@@ -305,6 +334,8 @@ export default {
       this.translationResult.confidenceScore = null
       this.translationResult.processingTime = null
       this.translationResult.corpusHitRate = null
+      // 重置点击状态
+      this.isRevealed = false
     },
     
     /** 清空译文 */
@@ -374,6 +405,21 @@ export default {
   min-height: 100vh;
   background: #f5f7fb;
   box-sizing: border-box;
+}
+
+/* 隐藏按钮：译文卡片右上角透明点击区 */
+.secret-reveal-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  opacity: 0;
+  z-index: 2;
 }
 
 /* 翻译卡片通用样式：卡片式、圆角+轻阴影、科技感青绿色 */

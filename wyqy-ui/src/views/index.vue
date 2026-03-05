@@ -24,15 +24,20 @@
             <span class="info-value">{{ temperature }}°C</span>
           </div>
           <div class="lang-switch">
-            <button
-              v-for="lang in langs"
-              :key="lang.value"
-              class="lang-btn"
-              :class="{ active: currentLang === lang.value }"
-              @click="setLang(lang.value)"
+            <el-select
+              v-model="currentLang"
+              class="lang-select"
+              popper-class="lang-select-dropdown"
+              placeholder="选择语言"
+              @change="setLang"
             >
-              {{ lang.label }}
-            </button>
+              <el-option
+                v-for="lang in langs"
+                :key="lang.value"
+                :label="lang.label"
+                :value="lang.value"
+              />
+            </el-select>
           </div>
         </div>
       </header>
@@ -181,12 +186,26 @@
             </div>
             <!-- 底部汇总信息 -->
             <div class="device-summary">
-              <div class="summary-left">
-                <span class="summary-label">{{ t('设备总数') }}</span>
-                <span class="summary-value">{{ deviceSummary.total }} {{ t('台') }}</span>
+              <div class="summary-row summary-main">
+                <div class="summary-left">
+                  <span class="summary-label">{{ t('设备总数') }}</span>
+                  <span class="summary-value">{{ deviceSummary.total }} {{ t('台') }}</span>
+                </div>
+                <div class="summary-right">
+                  <span class="summary-meta">{{ t('正常占比') }} {{ deviceSummary.normalRate }}%</span>
+                </div>
               </div>
-              <div class="summary-right">
-                <span class="summary-meta">{{ t('正常占比') }} {{ deviceSummary.normalRate }}%</span>
+              <div class="summary-row summary-extra">
+                <span class="extra-item">
+                  <span class="extra-label">{{ t('需关注设备') }}</span>
+                  <span class="extra-value">{{ deviceSummary.attentionCount }} {{ t('台') }}</span>
+                  <span class="extra-hint">{{ t('损坏/丢失/报废') }}</span>
+                </span>
+                <span class="extra-divider"></span>
+                <span class="extra-item">
+                  <span class="extra-label">{{ t('数据更新于') }}</span>
+                  <span class="extra-value">{{ t(deviceSummary.updateTime) }}</span>
+                </span>
               </div>
             </div>
           </div>
@@ -297,7 +316,12 @@ export default {
       langs: [
         { value: "zh", label: "中" },
         { value: "en", label: "EN" },
-        { value: "lo", label: "ລາວ" }
+        { value: "lo", label: "ລາວ" },
+        { value: "ja", label: "日本語" },
+        { value: "ko", label: "한국어" },
+        { value: "th", label: "ไทย" },
+        { value: "vi", label: "Tiếng Việt" },
+        { value: "es", label: "Español" }
       ],
       i18n: {
         zh: {
@@ -328,6 +352,10 @@ export default {
           "设备总数": "设备总数",
           "台": "台",
           "正常占比": "正常占比",
+          "需关注设备": "需关注设备",
+          "损坏/丢失/报废": "损坏/丢失/报废",
+          "数据更新于": "数据更新于",
+          "今日": "今日",
           "农业生产结构": "农业生产结构",
           "作物类型占比": "作物类型占比",
           "蔬菜": "蔬菜",
@@ -392,6 +420,10 @@ export default {
           "设备总数": "Total Devices",
           "台": "units",
           "正常占比": "Normal rate",
+          "需关注设备": "Need attention",
+          "损坏/丢失/报废": "Damaged/Lost/Scrapped",
+          "数据更新于": "Updated",
+          "今日": "Today",
           "农业生产结构": "Agricultural Production Structure",
           "作物类型占比": "Crop Type Share",
           "蔬菜": "Vegetables",
@@ -456,6 +488,10 @@ export default {
           "设备总数": "ຈໍານວນອຸປະກອນທັງໝົດ",
           "台": "ເຄື່ອງ",
           "正常占比": "ສັດສ່ວນປົກກະຕິ",
+          "需关注设备": "ຕ້ອງເອົາໃຈໃສ່",
+          "损坏/丢失/报废": "ເສຍຫາຍ/ສູນເສຍ/ຕັດຈໍາໜ່າຍ",
+          "数据更新于": "ອັບເດດຂໍ້ມູນ",
+          "今日": "ມື້ນີ້",
           "农业生产结构": "ໂຄງສ້າງການຜະລິດກະສິກໍາ",
           "作物类型占比": "ສັດສ່ວນປະເພດພືດ",
           "蔬菜": "ຜັກ",
@@ -585,11 +621,17 @@ export default {
   computed: {
     deviceSummary() {
       const normal = 45;
-      const total = 45 + 8 + 12 + 3 + 1 + 2;
+      const damaged = 3;
+      const lost = 1;
+      const scrap = 2;
+      const total = 45 + 8 + 12 + damaged + lost + scrap;
       const normalRate = ((normal / total) * 100).toFixed(1);
+      const attentionCount = damaged + lost + scrap;
       return {
         total,
-        normalRate
+        normalRate,
+        attentionCount,
+        updateTime: '今日'
       };
     }
   },
@@ -625,9 +667,7 @@ export default {
       }
       return key;
     },
-    setLang(lang) {
-      if (this.currentLang === lang) return;
-      this.currentLang = lang;
+    setLang() {
       this.renderDeviceChart();
       this.renderAgricultureChart();
       this.renderTranslationChart();
@@ -788,7 +828,7 @@ export default {
           axisLine: { show: false },
           axisTick: { show: false },
           axisLabel: {
-            fontSize: 11,
+            fontSize: 13,
             color: '#64748b'
           }
         },
@@ -803,7 +843,7 @@ export default {
             }
           },
           axisLabel: {
-            fontSize: 11,
+            fontSize: 13,
             color: '#64748b'
           }
         },
@@ -844,7 +884,7 @@ export default {
           itemHeight: 8,
           textStyle: { 
             color: "#64748b",
-            fontSize: 12
+            fontSize: 14
           }
         },
         color: ["#14b8a6", "#38bdf8", "#a78bfa", "#fbbf24"],
@@ -866,7 +906,7 @@ export default {
             emphasis: {
               label: {
                 show: true,
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: 'bold',
                 color: '#1e293b'
               }
@@ -920,7 +960,7 @@ export default {
           },
           axisLabel: {
             color: '#64748b',
-            fontSize: 12
+            fontSize: 14
           }
         },
         yAxis: {
@@ -935,7 +975,7 @@ export default {
           },
           axisLabel: {
             color: '#64748b',
-            fontSize: 12
+            fontSize: 14
           }
         },
         series: [
@@ -1041,7 +1081,7 @@ $color-border: #e2e8f0;
     }
 
     .logo-text {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
       color: $color-text-primary;
     }
@@ -1068,7 +1108,7 @@ $color-border: #e2e8f0;
       }
 
       span {
-        font-size: 14px;
+        font-size: 15px;
         color: $color-text-secondary;
         transition: color 0.2s ease;
       }
@@ -1118,14 +1158,14 @@ $color-border: #e2e8f0;
     gap: 12px;
 
     .page-title {
-      font-size: 18px;
+      font-size: 22px;
       font-weight: 600;
       color: $color-text-primary;
       margin: 0;
     }
 
     .page-subtitle {
-      font-size: 13px;
+      font-size: 15px;
       color: $color-text-tertiary;
     }
   }
@@ -1147,15 +1187,48 @@ $color-border: #e2e8f0;
       }
 
       .info-value {
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 500;
         color: $color-text-secondary;
         font-variant-numeric: tabular-nums;
       }
     }
+
+    .lang-switch {
+      .lang-select {
+        width: 120px;
+
+        ::v-deep .el-input__inner {
+          height: 36px;
+          line-height: 36px;
+          padding: 0 32px 0 12px;
+          font-size: 15px;
+          color: $color-text-secondary;
+          border-color: $color-border;
+          border-radius: 8px;
+          transition: all 0.2s ease;
+
+          &:hover {
+            border-color: $color-primary;
+          }
+          &:focus {
+            border-color: $color-primary;
+            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.15);
+          }
+        }
+
+        ::v-deep .el-input__suffix {
+          .el-input__suffix-inner .el-icon-arrow-up {
+            color: $color-text-tertiary;
+            font-size: 13px;
+          }
+        }
+      }
+    }
   }
 }
 
+// 语言选择下拉框样式（非 scoped，用于 popper）
 // 数据看板主体
 .dashboard-body {
   padding: 24px 28px;
@@ -1203,7 +1276,7 @@ $color-border: #e2e8f0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 26px;
     color: white;
     flex-shrink: 0;
 
@@ -1224,7 +1297,7 @@ $color-border: #e2e8f0;
     flex: 1;
 
     .stat-card-label {
-      font-size: 12px;
+      font-size: 14px;
       color: $color-text-tertiary;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -1232,7 +1305,7 @@ $color-border: #e2e8f0;
     }
 
     .stat-card-value {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 700;
       color: $color-text-primary;
       line-height: 1.2;
@@ -1240,7 +1313,7 @@ $color-border: #e2e8f0;
     }
 
     .stat-card-desc {
-      font-size: 12px;
+      font-size: 14px;
       color: $color-text-secondary;
       line-height: 1.4;
     }
@@ -1294,7 +1367,7 @@ $color-border: #e2e8f0;
     border-bottom: none;
 
     .card-title {
-      font-size: 14px;
+      font-size: 16px;
 
       svg {
         width: 18px;
@@ -1316,7 +1389,7 @@ $color-border: #e2e8f0;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
     color: $color-text-primary;
 
@@ -1332,7 +1405,7 @@ $color-border: #e2e8f0;
 .status-badge {
   padding: 4px 10px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
 
   &.status-normal {
@@ -1399,7 +1472,7 @@ $color-border: #e2e8f0;
       }
       
       .status-text {
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 600;
         color: $color-primary;
       }
@@ -1494,13 +1567,13 @@ $color-border: #e2e8f0;
       margin-top: 16px;
 
       .gauge-label {
-        font-size: 13px;
+        font-size: 15px;
         color: $color-text-tertiary;
         font-weight: 500;
       }
 
       .gauge-value {
-        font-size: 24px;
+        font-size: 28px;
         font-weight: 700;
         color: $color-text-primary;
         line-height: 1;
@@ -1508,7 +1581,7 @@ $color-border: #e2e8f0;
       }
       
       .gauge-status {
-        font-size: 11px;
+        font-size: 13px;
         padding: 3px 10px;
         border-radius: 12px;
         background: rgba(20, 184, 166, 0.1);
@@ -1553,7 +1626,7 @@ $color-border: #e2e8f0;
     }
     
     span {
-      font-size: 12px;
+      font-size: 14px;
       color: $color-text-secondary;
       font-weight: 500;
     }
@@ -1596,7 +1669,7 @@ $color-border: #e2e8f0;
     gap: 6px;
     padding: 6px 12px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
 
     .status-dot {
@@ -1657,12 +1730,19 @@ $color-border: #e2e8f0;
 
 // 设备汇总信息条
 .device-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: 10px 20px 14px;
   background: linear-gradient(180deg, #f9fafb 0%, #edf2ff 100%);
   border-top: 1px solid rgba(226, 232, 240, 0.9);
+
+  .summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &.summary-main {
+      margin-bottom: 10px;
+    }
+  }
 
   .summary-left {
     display: flex;
@@ -1671,25 +1751,62 @@ $color-border: #e2e8f0;
   }
 
   .summary-right {
-    font-size: 12px;
+    font-size: 14px;
     color: $color-text-tertiary;
   }
 
   .summary-label {
-    font-size: 12px;
+    font-size: 14px;
     color: $color-text-tertiary;
   }
 
   .summary-value {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     color: $color-text-primary;
   }
 
   .summary-meta {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     color: $color-primary;
+  }
+
+  .summary-extra {
+    padding-top: 10px;
+    border-top: 1px dashed rgba(148, 163, 184, 0.35);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .extra-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: $color-text-secondary;
+  }
+
+  .extra-label {
+    color: $color-text-tertiary;
+  }
+
+  .extra-value {
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  .extra-hint {
+    font-size: 12px;
+    color: $color-text-tertiary;
+    margin-left: 2px;
+  }
+
+  .extra-divider {
+    width: 1px;
+    height: 14px;
+    background: $color-border;
+    flex-shrink: 0;
   }
 }
 
@@ -1740,14 +1857,14 @@ $color-border: #e2e8f0;
 
       .pest-stat-value {
         display: block;
-        font-size: 20px;
+        font-size: 24px;
         font-weight: 700;
         color: $color-primary;
         margin-bottom: 4px;
       }
 
       .pest-stat-label {
-        font-size: 12px;
+        font-size: 14px;
         color: $color-text-tertiary;
       }
     }
@@ -1800,12 +1917,12 @@ $color-border: #e2e8f0;
     }
 
     .node-label {
-      font-size: 13px;
+      font-size: 15px;
       color: $color-text-secondary;
     }
 
     .node-meta {
-      font-size: 12px;
+      font-size: 14px;
       color: $color-primary;
       font-weight: 500;
       background: rgba(20, 184, 166, 0.1);
@@ -1836,7 +1953,7 @@ trend-section {
       border: none;
       background: transparent;
       color: $color-text-tertiary;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 500;
       border-radius: 6px;
       cursor: pointer;
@@ -1877,6 +1994,27 @@ trend-section {
 
   .dashboard-body {
     padding: 16px;
+  }
+}
+</style>
+
+<style lang="scss">
+/* 语言选择下拉框（popper 挂载在 body，需全局样式） */
+.lang-select-dropdown {
+  .el-select-dropdown__item {
+    font-size: 15px;
+    padding: 0 12px;
+    height: 38px;
+    line-height: 38px;
+
+    &.selected {
+      color: #14b8a6;
+      font-weight: 500;
+    }
+    &:hover {
+      background: rgba(20, 184, 166, 0.08);
+      color: #14b8a6;
+    }
   }
 }
 </style>
