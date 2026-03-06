@@ -23,22 +23,6 @@
             </svg>
             <span class="info-value">{{ temperature }}°C</span>
           </div>
-          <div class="lang-switch">
-            <el-select
-              v-model="currentLang"
-              class="lang-select"
-              popper-class="lang-select-dropdown"
-              placeholder="选择语言"
-              @change="setLang"
-            >
-              <el-option
-                v-for="lang in langs"
-                :key="lang.value"
-                :label="lang.label"
-                :value="lang.value"
-              />
-            </el-select>
-          </div>
         </div>
       </header>
 
@@ -302,6 +286,7 @@
 <script>
 import * as echarts from "echarts";
 import CountTo from "vue-count-to";
+import { t as tLang } from "@/utils/locales";
 
 export default {
   name: "Index",
@@ -312,7 +297,7 @@ export default {
       currentTime: "",
       temperature: 24.5,
       humidity: 62,
-      currentLang: "zh",
+      // 语言选项（与顶部导航保持一致）
       langs: [
         { value: "zh", label: "中" },
         { value: "en", label: "EN" },
@@ -323,212 +308,6 @@ export default {
         { value: "vi", label: "Tiếng Việt" },
         { value: "es", label: "Español" }
       ],
-      i18n: {
-        zh: {
-          "综合管理驾驶舱": "综合管理驾驶舱",
-          "仪表板概览": "仪表板概览",
-          "在管地块": "在管地块",
-          "覆盖多种地块类型与种植模式": "覆盖多种地块类型与种植模式",
-          "作物品类": "作物品类",
-          "蔬菜、水果、粮食及经济作物": "蔬菜、水果、粮食及经济作物",
-          "年度翻译任务": "年度翻译任务",
-          "覆盖多语种多领域的翻译需求": "覆盖多语种多领域的翻译需求",
-          "语料库条目": "语料库条目",
-          "高质量术语与双语句对沉淀": "高质量术语与双语句对沉淀",
-          "环境监控": "环境监控",
-          "正常": "正常",
-          "温度": "温度",
-          "适宜": "适宜",
-          "湿度": "湿度",
-          "舒适": "舒适",
-          "光照: 充足": "光照: 充足",
-          "CO₂: 正常": "CO₂: 正常",
-          "设备状态": "设备状态",
-          "检测中": "检测中",
-          "借出": "借出",
-          "损坏": "损坏",
-          "丢失": "丢失",
-          "报废": "报废",
-          "设备总数": "设备总数",
-          "台": "台",
-          "正常占比": "正常占比",
-          "需关注设备": "需关注设备",
-          "损坏/丢失/报废": "损坏/丢失/报废",
-          "数据更新于": "数据更新于",
-          "今日": "今日",
-          "农业生产结构": "农业生产结构",
-          "作物类型占比": "作物类型占比",
-          "蔬菜": "蔬菜",
-          "水果": "水果",
-          "粮食": "粮食",
-          "经济作物": "经济作物",
-          "AI 病虫害识别": "AI 病虫害识别",
-          "今日识别": "今日识别",
-          "平均置信度": "平均置信度",
-          "已处理": "已处理",
-          "虫害识别": "虫害识别",
-          "病害识别": "病害识别",
-          "识别记录": "识别记录",
-          "待处理": "待处理",
-          "蚜虫": "蚜虫",
-          "红蜘蛛": "红蜘蛛",
-          "粉虱": "粉虱",
-          "蓟马": "蓟马",
-          "叶斑病": "叶斑病",
-          "霜霉病": "霜霉病",
-          "白粉病": "白粉病",
-          "炭疽病": "炭疽病",
-          "次": "次",
-          "翻译工作量趋势": "翻译工作量趋势",
-          "周": "周",
-          "月": "月",
-          "年": "年",
-          "周一": "周一",
-          "周二": "周二",
-          "周三": "周三",
-          "周四": "周四",
-          "周五": "周五",
-          "周六": "周六",
-          "周日": "周日",
-          "完成任务数": "完成任务数"
-        },
-        en: {
-          "综合管理驾驶舱": "Integrated Management Cockpit",
-          "仪表板概览": "Dashboard Overview",
-          "在管地块": "Managed Plots",
-          "覆盖多种地块类型与种植模式": "Covers multiple plot types and planting modes",
-          "作物品类": "Crop Categories",
-          "蔬菜、水果、粮食及经济作物": "Vegetables, fruits, grains and cash crops",
-          "年度翻译任务": "Annual Translation Tasks",
-          "覆盖多语种多领域的翻译需求": "Translation needs across multiple languages and domains",
-          "语料库条目": "Corpus Entries",
-          "高质量术语与双语句对沉淀": "High-quality terminology and bilingual sentence pairs",
-          "环境监控": "Environment Monitoring",
-          "正常": "Normal",
-          "温度": "Temperature",
-          "适宜": "Comfortable",
-          "湿度": "Humidity",
-          "舒适": "Comfortable",
-          "光照: 充足": "Light: Sufficient",
-          "CO₂: 正常": "CO₂: Normal",
-          "设备状态": "Device Status",
-          "检测中": "Inspecting",
-          "借出": "Lent Out",
-          "损坏": "Damaged",
-          "丢失": "Lost",
-          "报废": "Scrapped",
-          "设备总数": "Total Devices",
-          "台": "units",
-          "正常占比": "Normal rate",
-          "需关注设备": "Need attention",
-          "损坏/丢失/报废": "Damaged/Lost/Scrapped",
-          "数据更新于": "Updated",
-          "今日": "Today",
-          "农业生产结构": "Agricultural Production Structure",
-          "作物类型占比": "Crop Type Share",
-          "蔬菜": "Vegetables",
-          "水果": "Fruits",
-          "粮食": "Grains",
-          "经济作物": "Cash Crops",
-          "AI 病虫害识别": "AI Pest & Disease Recognition",
-          "今日识别": "Detections Today",
-          "平均置信度": "Average Confidence",
-          "已处理": "Handled",
-          "虫害识别": "Insect Recognition",
-          "病害识别": "Disease Recognition",
-          "识别记录": "Recognition Records",
-          "待处理": "Pending",
-          "蚜虫": "Aphid",
-          "红蜘蛛": "Red Spider Mite",
-          "粉虱": "Whitefly",
-          "蓟马": "Thrips",
-          "叶斑病": "Leaf Spot",
-          "霜霉病": "Downy Mildew",
-          "白粉病": "Powdery Mildew",
-          "炭疽病": "Anthracnose",
-          "次": "times",
-          "翻译工作量趋势": "Translation Workload Trend",
-          "周": "Week",
-          "月": "Month",
-          "年": "Year",
-          "周一": "Mon",
-          "周二": "Tue",
-          "周三": "Wed",
-          "周四": "Thu",
-          "周五": "Fri",
-          "周六": "Sat",
-          "周日": "Sun",
-          "完成任务数": "Completed Tasks"
-        },
-        lo: {
-          "综合管理驾驶舱": "ຫ້ອງຄວບຄຸມການບໍລິຫານລວມ",
-          "仪表板概览": "ພາບລວມແຜງຄວບຄຸມ",
-          "在管地块": "ແປງນາທີ່ຄວບຄຸມ",
-          "覆盖多种地块类型与种植模式": "ຄອບຄຸມປະເພດແປງ ແລະ ຮູບແບບປູກຝັງຫຼາຍຮູບແບບ",
-          "作物品类": "ປະເພດພືດ",
-          "蔬菜、水果、粮食及经济作物": "ຜັກ, ໝາກໄມ້, ເຂົ້າ ແລະ ພືດເສດຖະກິດ",
-          "年度翻译任务": "ວຽກແປປະຈໍາປີ",
-          "覆盖多语种多领域的翻译需求": "ຮອງຮັບການແປຫຼາຍພາສາ ແລະ ຫຼາຍຂະແຫນງ",
-          "语料库条目": "ລາຍການຄັງຂໍ້ມູນພາສາ",
-          "高质量术语与双语句对沉淀": "ສະສົມຄໍາສັບ ແລະ ປະໂຫຍກສອງພາສາທີ່ມີຄຸນນະພາບສູງ",
-          "环境监控": "ການຕິດຕາມສະພາບແວດລ້ອມ",
-          "正常": "ປົກກະຕິ",
-          "温度": "ອຸນຫະພູມ",
-          "适宜": "ເໝາະສົມ",
-          "湿度": "ຄວາມຊຸ່ມ",
-          "舒适": "ນ່າສະບາຍ",
-          "光照: 充足": "ແສງ: ເພີຽງພໍ",
-          "CO₂: 正常": "CO₂: ປົກກະຕິ",
-          "设备状态": "ສະຖານະອຸປະກອນ",
-          "检测中": "ກໍາລັງກວດສອບ",
-          "借出": "ໃຫ້ຍືມ",
-          "损坏": "ເສຍຫາຍ",
-          "丢失": "ສູນເສຍ",
-          "报废": "ຕັດຈໍາໜ່າຍ",
-          "设备总数": "ຈໍານວນອຸປະກອນທັງໝົດ",
-          "台": "ເຄື່ອງ",
-          "正常占比": "ສັດສ່ວນປົກກະຕິ",
-          "需关注设备": "ຕ້ອງເອົາໃຈໃສ່",
-          "损坏/丢失/报废": "ເສຍຫາຍ/ສູນເສຍ/ຕັດຈໍາໜ່າຍ",
-          "数据更新于": "ອັບເດດຂໍ້ມູນ",
-          "今日": "ມື້ນີ້",
-          "农业生产结构": "ໂຄງສ້າງການຜະລິດກະສິກໍາ",
-          "作物类型占比": "ສັດສ່ວນປະເພດພືດ",
-          "蔬菜": "ຜັກ",
-          "水果": "ໝາກໄມ້",
-          "粮食": "ເຂົ້າ",
-          "经济作物": "ພືດເສດຖະກິດ",
-          "AI 病虫害识别": "AI ການຈໍາແນກໂລກ ແລະ ແມງສັດຕູພືດ",
-          "今日识别": "ຈໍານວນຈໍາແນກມື້ນີ້",
-          "平均置信度": "ຄ່າໝັ້ນໃຈສະເລ່ຍ",
-          "已处理": "ຈັດການແລ້ວ",
-          "虫害识别": "ຈໍາແນກແມງສັດຕູພືດ",
-          "病害识别": "ຈໍາແນກໂລກພືດ",
-          "识别记录": "ບັນທຶກການຈໍາແນກ",
-          "待处理": "ລໍຖ້າຈັດການ",
-          "蚜虫": "ແມງໄມ້ອ່ອນ",
-          "红蜘蛛": "ແມງໄມ້ແດງ",
-          "粉虱": "ແມງຟອງຂາວ",
-          "蓟马": "ແມງທຣິບ",
-          "叶斑病": "ໂລກຈຸດໃບ",
-          "霜霉病": "ໂລກຮາຝອຍ",
-          "白粉病": "ໂລກຮາຜົງຂາວ",
-          "炭疽病": "ໂລກຖ່ານປອກ",
-          "次": "ເທື່ອ",
-          "翻译工作量趋势": "ແນວໂນ້ມວຽກແປ",
-          "周": "ອາທິດ",
-          "月": "ເດືອນ",
-          "年": "ປີ",
-          "周一": "ຈ.",
-          "周二": "ອ.",
-          "周三": "ພ.",
-          "周四": "ພະ.",
-          "周五": "ສຸ.",
-          "周六": "ເສົາ",
-          "周日": "ອາທິດ",
-          "完成任务数": "ຈໍານວນວຽກສໍາເລັດ"
-        }
-      },
       // 顶部卡片静态演示数据
       statCards: [
         {
@@ -619,6 +398,10 @@ export default {
     };
   },
   computed: {
+    // 当前语言从全局设置中读取，保持与导航栏一致
+    currentLang() {
+      return this.$store.state.settings.lang || "zh";
+    },
     deviceSummary() {
       const normal = 45;
       const damaged = 3;
@@ -657,15 +440,9 @@ export default {
     });
   },
   methods: {
+    // 简单翻译函数：调用公共 locales 工具
     t(key) {
-      const pack = this.i18n[this.currentLang] || this.i18n.zh;
-      if (pack && pack[key]) {
-        return pack[key];
-      }
-      if (this.i18n.zh && this.i18n.zh[key]) {
-        return this.i18n.zh[key];
-      }
-      return key;
+      return tLang(key, this.currentLang);
     },
     setLang() {
       this.renderDeviceChart();
@@ -1194,33 +971,65 @@ $color-border: #e2e8f0;
       }
     }
 
-    .lang-switch {
-      .lang-select {
-        width: 120px;
+    .right-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
 
-        ::v-deep .el-input__inner {
-          height: 36px;
-          line-height: 36px;
-          padding: 0 32px 0 12px;
-          font-size: 15px;
-          color: $color-text-secondary;
-          border-color: $color-border;
-          border-radius: 8px;
-          transition: all 0.2s ease;
+      .right-menu-item {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 8px;
+        height: 100%;
+        font-size: 18px;
+        color: $color-text-tertiary;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        border-radius: 6px;
 
-          &:hover {
-            border-color: $color-primary;
-          }
-          &:focus {
-            border-color: $color-primary;
-            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.15);
-          }
+        svg {
+          width: 18px;
+          height: 18px;
         }
 
-        ::v-deep .el-input__suffix {
-          .el-input__suffix-inner .el-icon-arrow-up {
-            color: $color-text-tertiary;
-            font-size: 13px;
+        &.hover-effect {
+          &:hover {
+            background: rgba(0, 0, 0, 0.025);
+            color: $color-primary;
+          }
+        }
+      }
+
+      .lang-switch {
+        .lang-select {
+          width: 120px;
+
+          ::v-deep .el-input__inner {
+            height: 36px;
+            line-height: 36px;
+            padding: 0 32px 0 12px;
+            font-size: 15px;
+            color: $color-text-secondary;
+            border-color: $color-border;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+
+            &:hover {
+              border-color: $color-primary;
+            }
+            &:focus {
+              border-color: $color-primary;
+              box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.15);
+            }
+          }
+
+          ::v-deep .el-input__suffix {
+            .el-input__suffix-inner .el-icon-arrow-up {
+              color: $color-text-tertiary;
+              font-size: 13px;
+            }
           }
         }
       }

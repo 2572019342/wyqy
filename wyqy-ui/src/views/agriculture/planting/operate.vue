@@ -315,6 +315,48 @@
         </div>
       </transition>
     </div>
+    <!-- 自动执行任务条（顶部任务栏形式） -->
+    <transition name="auto-task-bar-fade">
+      <div v-if="autoTaskBarVisible" class="auto-task-bar">
+        <div class="auto-task-bar-header">
+          <span class="auto-task-bar-title">自动执行种植流程</span>
+        </div>
+        <div class="auto-task-bar-steps">
+          <div
+            v-for="(step, index) in autoTaskSteps"
+            :key="index"
+            :class="[
+              'auto-task-step',
+              { 'is-active': index === autoTaskCurrentIndex, 'is-done': index < autoTaskCurrentIndex }
+            ]"
+          >
+            <div class="auto-task-step-box">
+              <span class="auto-task-step-status">
+                <span
+                  v-if="index < autoTaskCurrentIndex"
+                  class="auto-task-step-status-icon status-done"
+                >
+                  ✔
+                </span>
+                <span
+                  v-else-if="index === autoTaskCurrentIndex"
+                  class="auto-task-step-status-icon status-active"
+                >
+                  …
+                </span>
+                <span
+                  v-else
+                  class="auto-task-step-status-icon status-pending"
+                >
+                  {{ index + 1 }}
+                </span>
+              </span>
+              <span class="auto-task-step-text">{{ step }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
     <!-- 每次操作时的半透明红色背景 + 提示文案 -->
     <transition name="auto-overlay-fade">
       <div v-if="autoStepOverlayVisible" class="auto-step-overlay">
@@ -433,7 +475,11 @@ export default {
       resizeStartTop: 0,
       resizeStartWidth: 0,
       resizeStartHeight: 0,
-      resizeDirection: "se"
+      resizeDirection: "se",
+      // 自动执行任务条
+      autoTaskBarVisible: false,
+      autoTaskSteps: [],
+      autoTaskCurrentIndex: 0
     };
   },
   computed: {
@@ -501,6 +547,13 @@ export default {
       style.left = `${left}px`;
       style.transformOrigin = "center center";
       return style;
+    },
+    // 自动执行任务条进度（百分比）
+    autoTaskProgress() {
+      const total = this.autoTaskSteps.length;
+      if (!total) return 0;
+      const index = Math.min(this.autoTaskCurrentIndex, total - 1);
+      return ((index + 1) / total) * 100;
     }
   },
   watch: {
@@ -773,33 +826,73 @@ export default {
       });
       this.assistantInput = "";
 
-      // 先插入“思考中”的占位动画消息
+      // 插入“思考中”的占位消息
       this.assistantMessages.push({
         role: "assistant",
-        content: "……正在思考，请稍等……"
+        content: "……正在思考您的需求，请稍等片刻……"
       });
       const thinkingIndex = this.assistantMessages.length - 1;
+      this.$nextTick(this.scrollAssistantToBottom);
 
-      // 模拟 AI 思考 5 秒后再更新为正式回复
+      // 5 秒思考后，逐字输出自动执行步骤说明（分层排版）
       setTimeout(() => {
-        // 防御性判断，防止数组长度变化导致越界
-        if (this.assistantMessages[thinkingIndex]) {
-          this.$set(this.assistantMessages, thinkingIndex, {
-            role: "assistant",
-            content: "在2秒后将按照您的要求进行处理"
-          });
-        } else {
-          // 如果该位置不存在了，则直接追加一条回复
-          this.assistantMessages.push({
-            role: "assistant",
-            content: "在2秒后将按照您的要求进行处理"
-          });
-        }
+        const stepDescriptions = [
+          "① 关闭当前助手窗口，并自动选中第一个可用地块；",
+          "② 跳转到“选择作物”步骤，准备匹配合适作物；",
+          "③ 在作物列表中自动选择指定的目标作物；",
+          "④ 进入“设置参数”步骤，为本次种植配置详细参数；",
+          "⑤ 自动完善种植日期、种植面积、种植密度、种子用量等关键信息；",
+          "⑥ 跳转到“确认种植”步骤，对全部信息进行最终核对；",
+          "⑦ 自动提交确认，生成本次种植记录并完成整个流程。"
+        ];
+        const fullText =
+          "【自动执行种植流程说明】\n" +
+          "\n" +
+          "一、总体说明\n" +
+          "  我会按照预设的安全流程，代替您在系统中完成本次种植操作，确保步骤清晰、可回溯。\n" +
+          "\n" +
+          "二、详细步骤\n" +
+          stepDescriptions.map(s => "  " + s).join("\n") +
+          "\n" +
+          "\n" +
+          "三、执行提醒\n" +
+          "  · 执行过程中，右上角“自动执行种植流程”任务框会同步展示当前进行到哪一步；\n" +
+          "  · 如果当前页面数据异常或缺少必要信息，部分步骤可能会自动跳过或执行失败。\n";
 
-        // 在正式回复输出 3 秒后，根据当前页面自动完成种植流程
-        setTimeout(() => {
-          this.startAutoPlantingWorkflow();
-        }, 2000);
+        // 将占位消息重置为空，由下面的打字机效果逐步填充
+        this.$set(this.assistantMessages, thinkingIndex, {
+          role: "assistant",
+          content: ""
+        });
+
+        const chars = fullText.split("");
+        const totalMs = 3000;
+        const stepMs = totalMs / chars.length;
+        let i = 0;
+        const typeWriter = () => {
+          if (!this.assistantMessages[thinkingIndex]) {
+            return;
+          }
+          if (i < chars.length) {
+            this.$set(
+              this.assistantMessages,
+              thinkingIndex,
+              Object.assign({}, this.assistantMessages[thinkingIndex], {
+                content: this.assistantMessages[thinkingIndex].content + chars[i]
+              })
+            );
+            i++;
+            this.$nextTick(this.scrollAssistantToBottom);
+            setTimeout(typeWriter, stepMs);
+          } else {
+            // 文本输出完毕后，停留 3 秒，再关闭聊天窗口并启动自动执行流程 + 顶部进度条
+            setTimeout(() => {
+              this.assistantVisible = false;
+              this.startAutoPlantingWorkflow(stepDescriptions);
+            }, 3000);
+          }
+        };
+        typeWriter();
       }, 5000);
     },
     // 显示自动点击指针：从右下角滑到目标位置，并显示半透明红色背景
@@ -857,7 +950,21 @@ export default {
       });
     },
     // 自动执行完整的种植流程
-    startAutoPlantingWorkflow() {
+    // 可选参数 stepDescriptions 用于同步右上角任务条
+    startAutoPlantingWorkflow(stepDescriptions) {
+      const defaultStepDescriptions = [
+        "关闭助手并选择第一个可用地块",
+        "跳转到选择作物步骤",
+        "选择第一个可用作物",
+        "跳转到设置参数步骤",
+        "自动填写种植参数",
+        "跳转到确认种植步骤",
+        "自动确认并提交种植"
+      ];
+      this.autoTaskSteps = stepDescriptions || defaultStepDescriptions;
+      this.autoTaskCurrentIndex = 0;
+      this.autoTaskBarVisible = true;
+
       const actions = [
         // 关闭 AI 助手并选择第一个地块
         () => {
@@ -919,7 +1026,7 @@ export default {
         // 操作完成后弹出聊天助手，4秒内逐字输出完成提示
         () => {
           this.assistantVisible = true;
-          const fullText = "我已严格按照您的要求，顺利完成本次种植操作。首先在系统界面中选中第一个地块，确认无误后点击下一步；接着在作物列表里选择第一个目标作物，核对信息后继续点击下一步；然后认真填写各项种植参数，包括种植日期、种植面积、种植密度、种子用量等关键数据，仔细检查确保准确无误后再点击下一步；最后对地块、作物及所有参数进行最终确认，提交完成整个种植流程，操作规范、步骤清晰、记录完整。";
+          const fullText = "我已严格按照您的要求，顺利完成本次种植操作。先选择指定的可用地块，再选择并匹配指定作物，接着进入设置参数环节为本次种植配置详细参数，完善填写种植日期、种植面积、种植密度、种子用量等关键信息，随后对全部信息进行最终核对确认种植，最后提交确认，完成本次种植记录并完成整个种植流程。";
           this.assistantMessages.push({ role: "assistant", content: "" });
           const idx = this.assistantMessages.length - 1;
           const totalMs = 4000;
@@ -939,10 +1046,18 @@ export default {
 
       let delay = 0;
       const interval = 2000;
-      actions.forEach((fn) => {
+      actions.forEach((fn, index) => {
         delay += interval;
         setTimeout(() => {
+          // 更新右上角任务条当前步骤
+          this.autoTaskCurrentIndex = index;
           fn.call(this);
+          // 全部步骤完成后，稍后自动隐藏任务条
+          if (index === actions.length - 1) {
+            setTimeout(() => {
+              this.autoTaskBarVisible = false;
+            }, 2500);
+          }
         }, delay);
       });
     },
@@ -1907,5 +2022,137 @@ export default {
 .auto-pointer-fade-enter,
 .auto-pointer-fade-leave-to {
   opacity: 0;
+}
+
+/* 自动执行任务条（弹窗工单样式，配色与 AI 助手一致） */
+.auto-task-bar {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  max-width: 420px;
+  z-index: 1300;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+  padding: 10px 16px 14px;
+  border: 1px solid rgba(34, 197, 94, 0.18);
+  overflow: hidden;
+}
+
+.auto-task-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.auto-task-bar-title {
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.auto-task-bar-title::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+}
+
+.auto-task-bar-steps {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.auto-task-step {
+  display: inline-flex;
+  align-items: stretch;
+  font-size: 12px;
+  color: #4b5563;
+  opacity: 0.7;
+  transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.auto-task-step-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 10px;
+  border: 1px dashed rgba(209, 213, 219, 0.95);
+  padding: 6px 10px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 55%, #ffffff 100%);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  min-width: 180px;
+}
+
+.auto-task-step-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+}
+
+.auto-task-step-status-icon {
+  font-size: 12px;
+}
+
+.status-pending {
+  color: #9ca3af;
+}
+
+.status-active {
+  color: #15803d;
+}
+
+.status-done {
+  color: #16a34a;
+}
+
+.auto-task-step-text {
+  max-width: 100%;
+  white-space: normal;
+  text-overflow: initial;
+  overflow: visible;
+  line-height: 1.5;
+  font-size: 12px;
+  color: #374151;
+}
+
+.auto-task-step.is-active {
+  color: #15803d;
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.auto-task-step.is-done {
+  color: #16a34a;
+  opacity: 0.9;
+}
+
+.auto-task-bar-fade-enter-active,
+.auto-task-bar-fade-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.auto-task-bar-fade-enter,
+.auto-task-bar-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 </style>

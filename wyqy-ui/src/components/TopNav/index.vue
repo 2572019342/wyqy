@@ -6,7 +6,7 @@
           <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
         </svg>
       </div>
-      <span class="brand-text">智控中心</span>
+      <span class="brand-text">{{ t('智控中心') }}</span>
     </div>
     
     <nav class="topnav-menu">
@@ -22,7 +22,7 @@
           :icon-class="item.meta.icon"
           class="menu-icon"
         />
-        <span class="menu-title">{{ item.meta.title }}</span>
+        <span class="menu-title">{{ t(item.meta.title) }}</span>
         <div class="active-indicator" v-if="activeMenu === item.path"></div>
       </div>
       
@@ -33,7 +33,7 @@
         @mouseenter="showMore = true"
         @mouseleave="showMore = false"
       >
-        <span class="menu-title">更多菜单</span>
+        <span class="menu-title">{{ t('更多菜单') }}</span>
         <svg class="more-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="6,9 12,15 18,9"/>
         </svg>
@@ -61,7 +61,7 @@
     <div class="topnav-right">
       <div class="status-badge">
         <span class="status-dot pulse"></span>
-        <span class="status-text">运行正常</span>
+        <span class="status-text">{{ t('运行正常') }}</span>
       </div>
     </div>
   </div>
@@ -70,6 +70,7 @@
 <script>
 import { constantRoutes } from "@/router"
 import { isHttp } from "@/utils/validate"
+import { t as tLang } from "@/utils/locales"
 
 // 隐藏侧边栏路由
 const hideList = ['/index', '/user/profile']
@@ -85,6 +86,10 @@ export default {
   computed: {
     theme() {
       return this.$store.state.settings.theme
+    },
+    // 当前界面语言
+    currentLang() {
+      return this.$store.state.settings.lang || 'zh'
     },
     // 顶部显示菜单
     topMenus() {
@@ -196,6 +201,10 @@ export default {
       } else {
         this.$store.dispatch('app/toggleSideBarHide', true)
       }
+    },
+    // 简单翻译函数（仅用于顶部品牌和菜单标题）
+    t(key) {
+      return tLang(key, this.currentLang)
     }
   }
 }

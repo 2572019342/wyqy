@@ -1,5 +1,5 @@
 <template>
-  <div class="realtime-detection-container" @keydown="handleKeyDown" tabindex="0">
+  <div class="realtime-detection-container" tabindex="0">
     <!-- AI识别状态概览 -->
     <el-row :gutter="20" class="mb20 stats-row">
       <el-col :span="6" v-for="(stat, index) in detectionStats" :key="index">
@@ -186,6 +186,112 @@
         </div>
       </div>
     </el-dialog>
+
+    <!-- openclaw 智能分析聊天框（结构、样式、内容与种植页聊天框完全一致） -->
+    <div class="ai-assistant">
+      <div class="assistant-toggle" @click="toggleOpenclawPanel">
+        <img src="/photo/picture.png" alt="AI助手" class="assistant-icon" />
+      </div>
+      <transition name="assistant-scale">
+        <div
+          v-if="openclawTaskVisible"
+          class="assistant-panel openclaw-panel"
+          @mousedown.stop
+        >
+          <div class="assistant-header">
+            <span class="assistant-title">openclaw 智能分析</span>
+            <i class="el-icon-close assistant-close" @click.stop="closeOpenclawPanel"></i>
+          </div>
+          <div ref="openclawBody" class="assistant-body">
+            <div
+              v-for="(msg, index) in openclawMessages"
+              :key="index"
+              class="assistant-message"
+              :class="'assistant-message--' + msg.role"
+            >
+              <span class="assistant-message-role">
+                <img
+                  :src="msg.role === 'user' ? '/photo/profile.jpg' : '/photo/picture.png'"
+                  :alt="msg.role === 'user' ? '我' : '助手'"
+                  class="assistant-message-avatar"
+                />
+              </span>
+              <span class="assistant-message-content">{{ msg.content }}</span>
+            </div>
+            <div v-if="openclawMessages.length === 0" class="assistant-empty">
+              我可以帮助您完成您想要的操作
+            </div>
+          </div>
+          <div class="assistant-footer">
+            <el-input
+              v-model="assistantInput"
+              type="textarea"
+              :rows="2"
+              placeholder="请输入要咨询的问题，按 Enter 发送"
+              disabled
+            />
+            <el-button type="primary" size="mini" class="assistant-send" disabled>
+              发送
+            </el-button>
+          </div>
+          <div class="assistant-resizer assistant-resizer-se"></div>
+          <div class="assistant-resizer assistant-resizer-sw"></div>
+          <div class="assistant-resizer assistant-resizer-ne"></div>
+          <div class="assistant-resizer assistant-resizer-nw"></div>
+        </div>
+      </transition>
+    </div>
+
+    <!-- Ctrl+2 弹出的 AI 聊天框（窗口形式，可自由拖拽改变大小） -->
+    <el-dialog
+      ref="aiChatDialogRef"
+      :visible.sync="aiChatDialogVisible"
+      :title="''"
+      :show-close="false"
+      :width="aiChatWidth + 'px'"
+      top="5vh"
+      append-to-body
+      custom-class="ai-chat-dialog ai-chat-dialog-window"
+      modal-class="ai-chat-modal"
+      :close-on-click-modal="false"
+      @open="onAiChatDialogOpen"
+      @close="aiChatDialogVisible = false"
+    >
+      <div class="ai-chat-dialog-body">
+        <!-- 透明拖拽区：不显示白条，但可拖动窗口 -->
+        <div
+          class="ai-chat-drag-area"
+          @mousedown.prevent="startAiChatDrag"
+        ></div>
+        <span class="ai-chat-close" @click="aiChatDialogVisible = false" title="关闭">
+          <i class="el-icon-close"></i>
+        </span>
+        <iframe
+          v-if="aiChatIframeUrl"
+          :src="aiChatIframeUrl"
+          class="ai-chat-iframe"
+          frameborder="0"
+        />
+      </div>
+      <div
+        class="ai-chat-resize-handle"
+        @mousedown.prevent="startAiChatResize"
+      ></div>
+    </el-dialog>
+
+    <!-- Ctrl+4 完成提示（屏幕中间强提示） -->
+    <transition name="ai-complete-pop">
+      <div
+        v-if="aiCompleteToastVisible"
+        class="ai-complete-toast-mask"
+        @click="aiCompleteToastVisible = false"
+      >
+        <div class="ai-complete-toast" @click.stop>
+          <img class="ai-complete-toast__icon" src="/photo/picture.png" alt="AI" />
+          <div class="ai-complete-toast__text">处理已完成，我将保持病虫害的实时识别</div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -238,7 +344,27 @@ export default {
       // 键盘监听状态
       keyListenerEnabled: true,
       // 自动刷新定时器
-      refreshTimer: null
+      refreshTimer: null,
+      // openclaw 智能分析聊天框（与种植页聊天框数据结构一致）
+      openclawTaskVisible: false,
+      openclawTaskText: 'AI 已触发报警工单，请注意查看。',
+      openclawTaskTimer: null,
+      openclawMessages: [],
+      assistantInput: '',
+      // Ctrl+2 弹出的 AI 聊天框（窗口形式，可调整大小）
+      aiChatDialogVisible: false,
+      aiChatIframeUrl: process.env.VUE_APP_AI_CHAT_URL || 'http://localhost:3000',
+      aiChatWidth: 900,
+      aiChatHeight: 560,
+      aiChatLeft: null,
+      aiChatTop: null,
+      aiChatResizing: false,
+      aiChatResizeStart: null,
+      aiChatDragging: false,
+      aiChatDragStart: null,
+      // Ctrl+4 中间提示
+      aiCompleteToastVisible: false,
+      aiCompleteToastTimer: null
     };
   },
   created() {
@@ -249,6 +375,8 @@ export default {
     this.loadRecentDetections();
   },
   mounted() {
+    // 全局监听 Ctrl+2 / Ctrl+6，不依赖容器焦点
+    document.addEventListener('keydown', this.handleKeyDown);
     // 确保容器可以获得焦点
     this.$nextTick(() => {
       const container = this.$el;
@@ -256,7 +384,6 @@ export default {
         container.setAttribute('tabindex', '0');
       }
     });
-    
     // 启动定时刷新
     this.startAutoRefresh();
 
@@ -264,9 +391,16 @@ export default {
     this.startAnalysis();
   },
   beforeDestroy() {
+    document.removeEventListener('keydown', this.handleKeyDown);
     // 清理定时器
     if (this.refreshTimer) {
       clearInterval(this.refreshTimer);
+    }
+    if (this.openclawTaskTimer) {
+      clearTimeout(this.openclawTaskTimer);
+    }
+    if (this.aiCompleteToastTimer) {
+      clearTimeout(this.aiCompleteToastTimer);
     }
   },
   methods: {
@@ -475,13 +609,22 @@ export default {
       if (!this.keyListenerEnabled) return;
       
       const isCtrlOrMeta = event.ctrlKey || event.metaKey;
-      const isKey2 = event.key === '2' || event.code === 'Digit2';
       const isKey6 = event.key === '6' || event.code === 'Digit6';
+      const isKey2 = event.key === '2' || event.code === 'Digit2';
+      const isKey4 = event.key === '4' || event.code === 'Digit4';
       
-      // Ctrl+2：快速识别
+      // Ctrl+2：弹出 AI 聊天框（显示 @聊天框 内容）
       if (isCtrlOrMeta && isKey2) {
         event.preventDefault();
-        this.quickDetect();
+        this.aiChatDialogVisible = true;
+        return;
+      }
+
+      // Ctrl+4：关闭聊天窗口，并提示处理完成
+      if (isCtrlOrMeta && isKey4) {
+        event.preventDefault();
+        this.aiChatDialogVisible = false;
+        this.showAiChatCompletedToast();
         return;
       }
       
@@ -490,6 +633,104 @@ export default {
         event.preventDefault();
         this.runRobot();
       }
+    },
+    showAiChatCompletedToast() {
+      this.aiCompleteToastVisible = true;
+      if (this.aiCompleteToastTimer) clearTimeout(this.aiCompleteToastTimer);
+      this.aiCompleteToastTimer = setTimeout(() => {
+        this.aiCompleteToastVisible = false;
+      }, 2200);
+    },
+    // AI 聊天框打开时应用尺寸与位置（首次居中）
+    onAiChatDialogOpen() {
+      if (this.aiChatLeft == null || this.aiChatTop == null) {
+        const pad = 24;
+        this.aiChatLeft = Math.max(pad, (window.innerWidth - this.aiChatWidth) / 2);
+        this.aiChatTop = Math.max(pad, (window.innerHeight - this.aiChatHeight) / 2 - 20);
+      }
+      this.$nextTick(() => this.applyAiChatDialogSize(true));
+    },
+    applyAiChatDialogSize(forceQuery = false) {
+      if (!this.aiChatDialogVisible) return;
+      if (forceQuery || !this._aiChatDialogEl) {
+        this._aiChatDialogEl = document.querySelector('.ai-chat-dialog.ai-chat-dialog-window');
+      }
+      const el = this._aiChatDialogEl;
+      if (!el) return;
+
+      // 拖拽/缩放中关闭过渡，避免“回弹/拖影”
+      if (this.aiChatDragging || this.aiChatResizing) {
+        el.classList.add('is-interacting');
+      } else {
+        el.classList.remove('is-interacting');
+      }
+
+      el.style.position = 'fixed';
+      el.style.left = this.aiChatLeft + 'px';
+      el.style.top = this.aiChatTop + 'px';
+      el.style.transform = 'none';
+      el.style.margin = '0';
+      el.style.width = this.aiChatWidth + 'px';
+      el.style.height = this.aiChatHeight + 'px';
+    },
+    startAiChatDrag(e) {
+      if (this.aiChatResizing) return;
+      this.applyAiChatDialogSize();
+      this.aiChatDragging = true;
+      this.aiChatDragStart = {
+        x: e.clientX,
+        y: e.clientY,
+        left: this.aiChatLeft,
+        top: this.aiChatTop
+      };
+      document.addEventListener('mousemove', this.doAiChatDrag);
+      document.addEventListener('mouseup', this.stopAiChatDrag);
+    },
+    doAiChatDrag(e) {
+      if (!this.aiChatDragging || !this.aiChatDragStart) return;
+      let left = this.aiChatDragStart.left + (e.clientX - this.aiChatDragStart.x);
+      let top = this.aiChatDragStart.top + (e.clientY - this.aiChatDragStart.y);
+      // 限制在视口内至少露出一部分
+      const pad = 40;
+      left = Math.max(-this.aiChatWidth + pad, Math.min(left, window.innerWidth - pad));
+      top = Math.max(-this.aiChatHeight + pad, Math.min(top, window.innerHeight - pad));
+      this.aiChatLeft = Math.round(left);
+      this.aiChatTop = Math.round(top);
+      this.applyAiChatDialogSize();
+    },
+    stopAiChatDrag() {
+      this.aiChatDragging = false;
+      this.aiChatDragStart = null;
+      document.removeEventListener('mousemove', this.doAiChatDrag);
+      document.removeEventListener('mouseup', this.stopAiChatDrag);
+    },
+    startAiChatResize(e) {
+      this.aiChatResizing = true;
+      this.applyAiChatDialogSize();
+      this.aiChatResizeStart = {
+        x: e.clientX,
+        y: e.clientY,
+        w: this.aiChatWidth,
+        h: this.aiChatHeight
+      };
+      document.addEventListener('mousemove', this.doAiChatResize);
+      document.addEventListener('mouseup', this.stopAiChatResize);
+    },
+    doAiChatResize(e) {
+      if (!this.aiChatResizing || !this.aiChatResizeStart) return;
+      const minW = 400;
+      const minH = 300;
+      let w = this.aiChatResizeStart.w + (e.clientX - this.aiChatResizeStart.x);
+      let h = this.aiChatResizeStart.h + (e.clientY - this.aiChatResizeStart.y);
+      this.aiChatWidth = Math.max(minW, Math.round(w));
+      this.aiChatHeight = Math.max(minH, Math.round(h));
+      this.applyAiChatDialogSize();
+    },
+    stopAiChatResize() {
+      this.aiChatResizing = false;
+      this.aiChatResizeStart = null;
+      document.removeEventListener('mousemove', this.doAiChatResize);
+      document.removeEventListener('mouseup', this.stopAiChatResize);
     },
     // 快速识别（Ctrl+2），不再强制选择地块和作物
     quickDetect() {
@@ -516,6 +757,16 @@ export default {
           
           // Ctrl+2 触发时修改最新种植记录的健康状况为虫害
           this.updateLatestPlantingHealthStatus();
+
+          // 打开 openclaw 风格的报警工单弹窗
+          const result = this.detectionResult || {};
+          const typeText = this.getDetectionTypeText(result.detectionType || 'pest');
+          const pestName = result.pestName || '未知病虫害';
+          const baseMessage = result.message || `检测到${typeText}：${pestName}`;
+          const recommendation = result.recommendation ? `处理建议：${result.recommendation}` : '';
+          this.showOpenclawTaskCard(
+            recommendation ? `${baseMessage}，${recommendation}` : baseMessage
+          );
         } else {
           this.$message.error(response.msg || '识别失败');
         }
@@ -526,6 +777,86 @@ export default {
         this.isAnalyzing = true;
         this.aiStatus = { type: 'warning', text: 'AI监控中...' };
       });
+    },
+    // 显示 openclaw 报警工单弹窗（模拟 AI 多步思考 + 填写完整工单）
+    showOpenclawTaskCard(message) {
+      this.openclawTaskText = message || 'AI 已触发报警工单，请注意查看。';
+      this.openclawTaskVisible = true;
+      if (this.openclawTaskTimer) {
+        clearTimeout(this.openclawTaskTimer);
+      }
+      // 重置消息列表（与种植页聊天框一致：{ role, content }）
+      this.openclawMessages = [];
+
+      // 基于当前页面已有信息，构造一个“AI 结构化思考 + 正常聊天式”示例输出（纯前端文案模拟）
+      let landName = typeof this.getSelectedLandName === 'function' ? this.getSelectedLandName() : '';
+      if (!landName || landName === '未知地块') {
+        landName = '示范田块A1';
+      }
+      let speciesName = typeof this.getSelectedSpeciesName === 'function' ? this.getSelectedSpeciesName() : '';
+      if (!speciesName || speciesName === '未知作物') {
+        speciesName = '水稻';
+      }
+
+      const dr = this.detectionResult || {};
+      const detectionTypeText = typeof this.getDetectionTypeText === 'function'
+        ? this.getDetectionTypeText(dr.detectionType || 'pest')
+        : '虫害';
+      const pestName = dr.pestName || (speciesName.indexOf('稻') !== -1 ? '稻飞虱' : '蚜虫');
+      const confidence = typeof dr.confidence === 'number' ? dr.confidence : 0.82;
+      let severity = '轻度';
+      if (confidence >= 0.85) {
+        severity = '重度';
+      } else if (confidence >= 0.6) {
+        severity = '中度';
+      }
+
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      const rnd = String(Math.floor(1000 + Math.random() * 9000));
+      const orderId = `${y}${m}${d}${rnd}`;
+      const execTime = '立即执行';
+
+      // 定义每一步的“核心结论 → 模块拆解”文案（全部字段已填好，不需要用户再修改）
+      const stepMessages = [
+        // 核心结论：先给出本次识别与处理的总体结果
+        `【核心结论】已在“${landName}”的“${speciesName}”上检测到${detectionTypeText}“${pestName}”，当前风险评估为${severity}，环境与设备条件满足作业要求，推荐立即调度作业车 Car-01 使用吡虫啉进行精准喷洒，本次任务具备可执行性。`,
+
+        // 模块一：图像与病虫害研判
+        `【模块一：图像研判】思考：当前框选区域是否为真实病虫害、属于哪一类以及轻中重程度。操作：对前端传入的图像与框选坐标进行特征比对，自动排除杂草、石块、枯叶等非病虫害目标，并结合“${speciesName}”的叶片纹理和病斑特征进行识别。输出：确认目标为${detectionTypeText}“${pestName}”，置信度约为 ${(confidence * 100).toFixed(1)}%，综合样本分布与受灾范围，将本次病虫害评估为${severity}风险，需要进入处理与调度环节。`,
+
+        // 模块二：多源信息查询验证
+        `【模块二：信息查询】思考：初步处理方案是否合理、可执行。操作：从病虫害数据库中查询“${pestName}”在“${speciesName}”上的高发阶段、典型症状与推荐药剂，得到示例方案：使用吡虫啉药剂，推荐稀释比例约 1:1000；从地块档案中读取“${landName}”的土壤类型为中性壤土且近 7 天无打药记录；从智能作业车数据库中检索到作业车 Car-01 当前空闲，已挂载农药喷洒模块且药剂余量充足；环境数据库显示当前风力 2 级、无降雨，适合开展喷洒作业。输出：验证初步方案在安全性、可行性和设备资源上均满足要求，可作为本次处理的执行方案。`,
+
+        // 模块三：删除无效信息 + 给出最终任务描述（非工单格式，而是自然语言总结）
+        `【模块三：清理与输出】思考：哪些数据和指令是无效或不可执行，需要剔除。操作：清除 1 个被识别为误检的框选目标，过滤掉忙碌或无喷洒模块的作业车记录，并删除在当前天气条件下无法立即执行的候选指令，仅保留“有效病虫害框选区域 + 可调度作业车 Car-01 + 执行时间 ${execTime}”这一组合。输出：为本次任务总结出一条清晰可执行的处理描述——在“${landName}”中由 Car-01 对“${speciesName}”上确认的“${pestName}”病虫害区域进行吡虫啉 1:1000 比例的精准喷洒作业，覆盖全部有效框选区域，作业完成后需回传执行结果，当前无需用户再补充任何信息即可直接执行。`
+      ];
+
+      const stepInterval = 2200;
+      const lastIndex = stepMessages.length - 1;
+
+      const runStep = (index) => {
+        this.openclawMessages.push({ role: 'assistant', content: stepMessages[index] });
+        this.$nextTick(() => {
+          const el = this.$refs.openclawBody;
+          if (el) el.scrollTop = el.scrollHeight;
+        });
+        if (index < lastIndex) {
+          this.openclawTaskTimer = setTimeout(() => {
+            runStep(index + 1);
+          }, stepInterval);
+        } else {
+          // 最后一步展示完成后再停留一会儿自动收起
+          this.openclawTaskTimer = setTimeout(() => {
+            this.openclawTaskVisible = false;
+            this.openclawTaskTimer = null;
+          }, 4000);
+        }
+      };
+
+      runStep(0);
     },
     /** 更新最新一条种植记录的健康状况为虫害（Ctrl+2 触发） */
     updateLatestPlantingHealthStatus() {
@@ -619,6 +950,20 @@ export default {
     handleCloseDetectionDialog() {
       this.pestDetectionDialogVisible = false;
       // 不清除 detectionResult，保留识别结果供后续查看
+    },
+    toggleOpenclawPanel() {
+      this.openclawTaskVisible = !this.openclawTaskVisible;
+      if (!this.openclawTaskVisible && this.openclawTaskTimer) {
+        clearTimeout(this.openclawTaskTimer);
+        this.openclawTaskTimer = null;
+      }
+    },
+    closeOpenclawPanel() {
+      this.openclawTaskVisible = false;
+      if (this.openclawTaskTimer) {
+        clearTimeout(this.openclawTaskTimer);
+        this.openclawTaskTimer = null;
+      }
     }
   }
 };
@@ -1339,6 +1684,449 @@ export default {
   .video-card,
   .control-panel {
     height: 420px;
+  }
+}
+
+/* openclaw 智能分析聊天框（与种植页聊天框样式、内容完全一致） */
+.ai-assistant {
+  position: fixed;
+  right: 24px;
+  bottom: 96px;
+  z-index: 1100;
+}
+
+.assistant-toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35), 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 2px solid rgba(34, 197, 94, 0.2);
+}
+
+.assistant-toggle:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(34, 197, 94, 0.4);
+}
+
+.assistant-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.openclaw-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 164px;
+  left: auto;
+  top: auto;
+  z-index: 1300;
+}
+
+.assistant-panel {
+  width: 360px;
+  max-height: 540px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(34, 197, 94, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.assistant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.assistant-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.assistant-close {
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.9;
+  padding: 4px;
+  border-radius: 8px;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.assistant-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 1;
+}
+
+.assistant-body {
+  padding: 16px;
+  background: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 30%, #f8fafc 100%);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 180px;
+}
+
+.assistant-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  width: 100%;
+  animation: msgFadeIn 0.35s ease-out;
+}
+
+@keyframes msgFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.assistant-message-role {
+  flex-shrink: 0;
+}
+
+.assistant-message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+}
+
+.assistant-message-content {
+  padding: 10px 14px;
+  border-radius: 16px;
+  max-width: 260px;
+  line-height: 1.6;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.assistant-message--user {
+  justify-content: flex-end;
+}
+
+.assistant-message--user .assistant-message-content {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 12px rgba(34, 197, 94, 0.35);
+}
+
+.assistant-message--user .assistant-message-content {
+  order: 1;
+}
+
+.assistant-message--user .assistant-message-role {
+  order: 2;
+  margin-left: 10px;
+}
+
+.assistant-message--assistant .assistant-message-content {
+  background: #ffffff;
+  color: #1f2937;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.12);
+}
+
+.assistant-empty {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+  padding: 36px 20px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 14px;
+  margin: 0 4px;
+  border: 1px dashed rgba(34, 197, 94, 0.2);
+}
+
+.assistant-footer {
+  padding: 12px 14px 14px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.assistant-footer >>> .el-textarea__inner {
+  font-size: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.assistant-footer >>> .el-textarea__inner:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
+}
+
+.assistant-send {
+  align-self: flex-end;
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 8px 20px;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25);
+}
+
+.assistant-resizer {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  cursor: se-resize;
+  background: linear-gradient(135deg, transparent 0, transparent 40%, rgba(156, 163, 175, 0.35) 40%, rgba(107, 114, 128, 0.6) 100%);
+  border-radius: 2px;
+  z-index: 2;
+}
+
+.assistant-resizer-se {
+  right: 2px;
+  bottom: 2px;
+  cursor: se-resize;
+}
+
+.assistant-resizer-sw {
+  left: 2px;
+  bottom: 2px;
+  cursor: sw-resize;
+}
+
+.assistant-resizer-ne {
+  right: 2px;
+  top: 2px;
+  cursor: ne-resize;
+}
+
+.assistant-resizer-nw {
+  left: 2px;
+  top: 2px;
+  cursor: nw-resize;
+}
+
+.assistant-scale-enter-active,
+.assistant-scale-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.assistant-scale-enter,
+.assistant-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.85);
+}
+
+.ai-chat-dialog-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background: #f5f7fa;
+  overflow: hidden;
+}
+.ai-chat-drag-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 42px;
+  cursor: move;
+  z-index: 10;
+  background: transparent;
+  user-select: none;
+}
+.ai-chat-resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  cursor: se-resize;
+  z-index: 10;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.08) 50%);
+  transition: background 160ms ease, transform 160ms ease;
+}
+.ai-chat-resize-handle:hover {
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.15) 50%);
+  transform: scale(1.06);
+}
+
+.ai-chat-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+.ai-chat-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 12;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #909399;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.ai-chat-close:hover {
+  color: #606266;
+  background: rgba(0,0,0,0.06);
+}
+.ai-chat-close:active {
+  transform: scale(0.92);
+}
+
+/* Ctrl+4 中间强提示 */
+.ai-complete-pop-enter-active,
+.ai-complete-pop-leave-active {
+  transition: opacity 220ms ease;
+}
+.ai-complete-pop-enter,
+.ai-complete-pop-leave-to {
+  opacity: 0;
+}
+.ai-complete-toast-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 3005;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 24, 39, 0.32);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.ai-complete-toast {
+  width: min(640px, calc(100vw - 48px));
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.24);
+  transform-origin: center;
+  animation: aiCompletePop 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes aiCompletePop {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.94);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+.ai-complete-toast__icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.18));
+}
+.ai-complete-toast__text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  letter-spacing: 0.2px;
+  line-height: 1.35;
+}
+</style>
+
+<!-- 可调整大小的窗口式对话框：无边框、无标题栏 -->
+<style lang="scss">
+.ai-chat-modal {
+  background-color: rgba(17, 24, 39, 0.28) !important;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: aiChatMaskIn 180ms ease-out;
+}
+@keyframes aiChatMaskIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes aiChatPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.ai-chat-dialog.ai-chat-dialog-window {
+  margin: 0 !important;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  border: none !important;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  animation: aiChatPopIn 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: box-shadow 220ms ease, opacity 220ms ease;
+
+  &.is-interacting {
+    transition: none !important;
+  }
+
+  &:not(.is-interacting):hover {
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.22);
+  }
+
+  .el-dialog__header {
+    display: none;
+  }
+  .el-dialog__body {
+    padding: 0;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
   }
 }
 </style>

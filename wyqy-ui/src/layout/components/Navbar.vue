@@ -12,9 +12,6 @@
       <template v-if="device!=='mobile'">
         <search id="header-search" class="right-menu-item" />
 
-        <el-tooltip content="源码地址" effect="dark" placement="bottom">
-          <ruo-yi-git id="ruoyi-git" class="right-menu-item hover-effect" />
-        </el-tooltip>
 
         <el-tooltip content="文档地址" effect="dark" placement="bottom">
           <ruo-yi-doc id="ruoyi-doc" class="right-menu-item hover-effect" />
@@ -25,6 +22,26 @@
         <el-tooltip content="布局大小" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
+
+        <!-- 语言选择，下拉样式与首页保持一致 -->
+        <div class="lang-switch right-menu-item">
+          <el-tooltip content="语言切换" effect="dark" placement="bottom">
+            <el-select
+              v-model="currentLang"
+              class="lang-select"
+              popper-class="lang-select-dropdown"
+              placeholder="选择语言"
+              @change="setLang"
+            >
+              <el-option
+                v-for="lang in langs"
+                :key="lang.value"
+                :label="lang.label"
+                :value="lang.value"
+              />
+            </el-select>
+          </el-tooltip>
+        </div>
 
       </template>
 
@@ -76,6 +93,16 @@ export default {
     RuoYiGit,
     RuoYiDoc
   },
+  data() {
+    return {
+      // 语言选项，与首页保持一致
+      langs: [
+        { value: "zh", label: "中" },
+        { value: "en", label: "EN" },
+        { value: "lo", label: "ລາວ" }
+      ]
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
@@ -97,6 +124,15 @@ export default {
       get() {
         return this.$store.state.settings.sidebarLogo
       }
+    },
+    // 与全局设置同步的当前语言
+    currentLang: {
+      get() {
+        return this.$store.state.settings.lang || 'zh'
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', { key: 'lang', value: val })
+      }
     }
   },
   methods: {
@@ -105,6 +141,10 @@ export default {
     },
     setLayout(event) {
       this.$emit('setLayout')
+    },
+    // 与首页保持一致的语言切换入口
+    setLang(lang) {
+      this.currentLang = lang
     },
     logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {
@@ -192,7 +232,7 @@ export default {
       display: inline-block;
       padding: 0 8px;
       height: 100%;
-      font-size: 18px;
+      font-size: 15px;
       color: #5a5e66;
       vertical-align: text-bottom;
 
@@ -237,6 +277,15 @@ export default {
           top: 25px;
           font-size: 12px;
         }
+      }
+    }
+    // 顶部语言切换宽度控制
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+
+      .lang-select {
+        width: 90px;
       }
     }
   }

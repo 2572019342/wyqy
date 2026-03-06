@@ -124,18 +124,8 @@
               
               <el-form-item v-if="translationResult.confidenceScore">
                 <div class="translation-info">
-                  <span class="info-tag confidence-tag">
-                    <i class="el-icon-success"></i>
-                    置信度: {{ (translationResult.confidenceScore * 100).toFixed(1) }}%
-                  </span>
-                  <span class="info-tag time-tag">
-                    <i class="el-icon-time"></i>
-                    耗时: {{ translationResult.processingTime }}ms
-                  </span>
-                  <span v-if="translationResult.corpusHitRate > 0" class="info-tag corpus-tag">
-                    <i class="el-icon-collection"></i>
-                    语料匹配: {{ (translationResult.corpusHitRate * 100).toFixed(1) }}%
-                  </span>
+                  
+
                 </div>
               </el-form-item>
             </el-form>
@@ -178,13 +168,13 @@
 
               <el-form-item label="目标语言">
                 <el-select v-model="fixedDocTargetLanguage" placeholder="请选择目标语言" style="width: 100%">
-                  <el-option label="老挝语" value="zh"></el-option>
-                  <el-option label="英语" value="en"></el-option>
-                  <el-option label="日语" value="ja"></el-option>
-                  <el-option label="韩语" value="ko"></el-option>
-                  <el-option label="法语" value="fr"></el-option>
-                  <el-option label="中文" value="de"></el-option>
-                  <el-option label="西班牙语" value="es"></el-option>
+                  <el-option label="小语种1" value="zh"></el-option>
+                  <el-option label="小语种2" value="en"></el-option>
+                  <el-option label="小语种3" value="ja"></el-option>
+                  <el-option label="小语种4" value="ko"></el-option>
+                  <el-option label="小语种5" value="fr"></el-option>
+                  <el-option label="小语种6" value="de"></el-option>
+                  <el-option label="小语种7" value="es"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item>
@@ -247,6 +237,8 @@ export default {
       fixedDocPath: "/photo/ເອກະສານສົ່ງມອບໂຄງການ_1.pdf",
       uploadFileName: "",
       fixedDocTargetLanguage: "zh",
+      docDownloading: false,
+      docDownloadLoading: null,
 
       // 加载状态
       loading: false,
@@ -383,17 +375,37 @@ export default {
         return
       }
 
-      // 固定下载同一个后端静态文档，无论导入什么内容
-      const a = document.createElement("a")
-      a.href = encodeURI(this.fixedDocPath)
-      a.download = "转换结果.pdf"
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+      if (this.docDownloading) {
+        return
+      }
 
-      this.$message.success(
-        `已完成转换并下载`
-      )
+      this.docDownloading = true
+      this.docDownloadLoading = this.$loading({
+        lock: true,
+        text: "正在翻译中，请稍后...",
+        background: "rgba(0, 0, 0, 0.4)",
+        customClass: "doc-download-loading"
+      })
+
+      setTimeout(() => {
+        // 固定下载同一个后端静态文档，无论导入什么内容
+        const a = document.createElement("a")
+        a.href = encodeURI(this.fixedDocPath)
+        a.download = "转换结果.pdf"
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+
+        this.$message.success(
+          `已完成转换并下载`
+        )
+        this.docDownloading = false
+
+        if (this.docDownloadLoading) {
+          this.docDownloadLoading.close()
+          this.docDownloadLoading = null
+        }
+      }, 6000)
     }
   }
 }
@@ -738,6 +750,42 @@ export default {
   color: #f57c00;
   border: 1px solid rgba(255, 179, 0, 0.35);
 }
+
+/* 文档下载 loading 文案放大加粗（特大字号） */
+:deep(.doc-download-loading .el-loading-text) {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #ffffff;
+  text-align: center;
+}
+
+/* 自定义 SVG 等待动画，替换默认 loading 图标 */
+:deep(.doc-download-loading .el-loading-spinner i) {
+  display: none;
+}
+
+:deep(.doc-download-loading .el-loading-spinner) {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 24px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'><circle cx='25' cy='25' r='20' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round' stroke-dasharray='31.4 31.4'/></svg>");
+  animation: doc-download-spinner-rotate 1s linear infinite;
+}
+
+@keyframes doc-download-spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
 
 /* 响应式适配 */
 @media (max-width: 1200px) {

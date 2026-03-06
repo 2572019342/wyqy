@@ -1,7 +1,7 @@
 import defaultSettings from '@/settings'
 import { useDynamicTitle } from '@/utils/dynamicTitle'
 
-const { sideTheme, showSettings, navType, tagsView, tagsIcon, fixedHeader, sidebarLogo, dynamicTitle, footerVisible, footerContent } = defaultSettings
+const { sideTheme, showSettings, navType, tagsView, tagsIcon, fixedHeader, sidebarLogo, dynamicTitle, footerVisible, footerContent, lang } = defaultSettings
 
 const storageSetting = JSON.parse(localStorage.getItem('layout-setting')) || ''
 const state = {
@@ -16,13 +16,29 @@ const state = {
   sidebarLogo: storageSetting.sidebarLogo === undefined ? sidebarLogo : storageSetting.sidebarLogo,
   dynamicTitle: storageSetting.dynamicTitle === undefined ? dynamicTitle : storageSetting.dynamicTitle,
   footerVisible: storageSetting.footerVisible === undefined ? footerVisible : storageSetting.footerVisible,
-  footerContent: footerContent
+  footerContent: footerContent,
+  // 界面语言（仅用于首页和菜单栏）
+  lang: storageSetting.lang || lang
 }
 const mutations = {
   CHANGE_SETTING: (state, { key, value }) => {
     if (state.hasOwnProperty(key)) {
       state[key] = value
     }
+    // 更新布局相关设置到本地存储，包含语言
+    const layoutSetting = {
+      theme: state.theme,
+      sideTheme: state.sideTheme,
+      navType: state.navType,
+      tagsView: state.tagsView,
+      tagsIcon: state.tagsIcon,
+      fixedHeader: state.fixedHeader,
+      sidebarLogo: state.sidebarLogo,
+      dynamicTitle: state.dynamicTitle,
+      footerVisible: state.footerVisible,
+      lang: state.lang
+    }
+    localStorage.setItem('layout-setting', JSON.stringify(layoutSetting))
   },
   SET_TITLE: (state, title) => {
     state.title = title

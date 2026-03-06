@@ -15,6 +15,11 @@ module.exports = {
   showSettings: true,
 
   /**
+   * 界面语言（仅用于首页和菜单栏演示）
+   */
+  lang: 'zh',
+
+  /**
    * 菜单导航模式 1、纯左侧 2、混合（左侧+顶部） 3、纯顶部
    */
   navType: 3,

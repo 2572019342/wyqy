@@ -2,10 +2,10 @@
   <el-menu class="topbar-menu" :default-active="activeMenu" :active-text-color="theme" mode="horizontal">
     <sidebar-item :key="route.path + index" v-for="(route, index) in topMenus" :item="route" :base-path="route.path" />
 
-    <el-submenu index="more" class="el-submenu__hide-arrow" v-if="moreRoutes.length > 0">
+    <!-- <el-submenu index="more" class="el-submenu__hide-arrow" v-if="moreRoutes.length > 0">
       <template slot="title">更多菜单</template>
       <sidebar-item :key="route.path + index" v-for="(route, index) in moreRoutes" :item="route" :base-path="route.path" />
-    </el-submenu>
+    </el-submenu> -->
   </el-menu>
 </template>
 
