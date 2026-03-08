@@ -290,7 +290,36 @@
                   class="assistant-message-avatar"
                 />
               </span>
-              <span class="assistant-message-content">{{ msg.content }}</span>
+              <span
+                class="assistant-message-content"
+                :class="{ 'assistant-message-content--thinking': msg.type === 'thinking' }"
+              >
+                <template v-if="msg.type === 'thinking'">
+                  <span class="assistant-thinking-loader" aria-label="思考中">
+                    <span class="wyqy-loader" :style="{ '--size': '0.44' }">
+                      <svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true">
+                        <defs>
+                          <mask :id="`wyqy-clipping-${index}`">
+                            <polygon points="0,0 100,0 100,100 0,100" fill="black"></polygon>
+                            <polygon points="25,25 75,25 50,75" fill="white"></polygon>
+                            <polygon points="50,25 75,75 25,75" fill="white"></polygon>
+                            <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                            <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                            <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                            <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                          </mask>
+                        </defs>
+                      </svg>
+                      <span
+                        class="box"
+                        :style="thinkingBoxMaskStyle(index)"
+                        aria-hidden="true"
+                      ></span>
+                    </span>
+                  </span>
+                </template>
+                <template v-else>{{ msg.content }}</template>
+              </span>
             </div>
             <div v-if="assistantMessages.length === 0" class="assistant-empty">
               我可以帮助您完成您想要的操作
@@ -829,7 +858,7 @@ export default {
       // 插入“思考中”的占位消息
       this.assistantMessages.push({
         role: "assistant",
-        content: "……正在思考您的需求，请稍等片刻……"
+        type: "thinking"
       });
       const thinkingIndex = this.assistantMessages.length - 1;
       this.$nextTick(this.scrollAssistantToBottom);
@@ -1140,6 +1169,13 @@ export default {
       this.isAssistantResizing = false;
       document.removeEventListener("mousemove", this.onAssistantResize);
       document.removeEventListener("mouseup", this.stopAssistantResize);
+    },
+    thinkingBoxMaskStyle(index) {
+      const id = `wyqy-clipping-${index}`;
+      return {
+        mask: `url(#${id})`,
+        WebkitMask: `url(#${id})`
+      };
     }
   }
 };
@@ -1819,6 +1855,139 @@ export default {
   letter-spacing: 0.02em;
   word-break: break-word;
   white-space: pre-wrap;
+}
+
+.assistant-message-content--thinking {
+  padding: 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  max-width: none;
+}
+
+.assistant-thinking-loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+/* loader.html 同款加载动画（缩小后适配聊天气泡） */
+.wyqy-loader {
+  --color-one: #ffbf48;
+  --color-two: #be4a1d;
+  --color-three: #ffbf4780;
+  --color-four: #bf4a1d80;
+  --color-five: #ffbf4740;
+  --time-animation: 2s;
+  --size: 1; /* You can change the size */
+  position: relative;
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  transform: scale(var(--size));
+  transform-origin: center center;
+  box-shadow: 0 0 25px 0 var(--color-three), 0 20px 50px 0 var(--color-four);
+  animation: wyqyLoaderColorize calc(var(--time-animation) * 3) ease-in-out infinite;
+}
+
+.wyqy-loader::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border-top: solid 1px var(--color-one);
+  border-bottom: solid 1px var(--color-two);
+  background: linear-gradient(180deg, var(--color-five), var(--color-four));
+  box-shadow: inset 0 10px 10px 0 var(--color-three), inset 0 -10px 10px 0 var(--color-four);
+}
+
+.wyqy-loader .box {
+  position: relative;
+  display: block;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(180deg, var(--color-one) 30%, var(--color-two) 70%);
+}
+
+.wyqy-loader svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.wyqy-loader svg mask {
+  filter: contrast(15);
+  animation: wyqyLoaderRoundness calc(var(--time-animation) / 2) linear infinite;
+}
+
+.wyqy-loader svg mask polygon {
+  filter: blur(7px);
+  transform-box: fill-box;
+}
+
+.wyqy-loader svg mask polygon:nth-child(1) {
+  transform-origin: 75% 25%;
+  transform: rotate(90deg);
+}
+
+.wyqy-loader svg mask polygon:nth-child(2) {
+  transform-origin: 50% 50%;
+  animation: wyqyLoaderRotation var(--time-animation) linear infinite reverse;
+}
+
+.wyqy-loader svg mask polygon:nth-child(3) {
+  transform-origin: 50% 60%;
+  animation: wyqyLoaderRotation var(--time-animation) linear infinite;
+  animation-delay: calc(var(--time-animation) / -3);
+}
+
+.wyqy-loader svg mask polygon:nth-child(4) {
+  transform-origin: 40% 40%;
+  animation: wyqyLoaderRotation var(--time-animation) linear infinite reverse;
+}
+
+.wyqy-loader svg mask polygon:nth-child(5) {
+  transform-origin: 40% 40%;
+  animation: wyqyLoaderRotation var(--time-animation) linear infinite reverse;
+  animation-delay: calc(var(--time-animation) / -2);
+}
+
+.wyqy-loader svg mask polygon:nth-child(6) {
+  transform-origin: 60% 40%;
+  animation: wyqyLoaderRotation var(--time-animation) linear infinite;
+}
+
+.wyqy-loader svg mask polygon:nth-child(7) {
+  transform-origin: 60% 40%;
+  animation: wyqyLoaderRotation var(--time-animation) linear infinite;
+  animation-delay: calc(var(--time-animation) / -1.5);
+}
+
+@keyframes wyqyLoaderRotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes wyqyLoaderRoundness {
+  0% { filter: contrast(15); }
+  20% { filter: contrast(3); }
+  40% { filter: contrast(3); }
+  60% { filter: contrast(15); }
+  100% { filter: contrast(15); }
+}
+
+@keyframes wyqyLoaderColorize {
+  0% { filter: hue-rotate(0deg); }
+  20% { filter: hue-rotate(-30deg); }
+  40% { filter: hue-rotate(-60deg); }
+  60% { filter: hue-rotate(-90deg); }
+  80% { filter: hue-rotate(-45deg); }
+  100% { filter: hue-rotate(0deg); }
 }
 
 .assistant-message--user {

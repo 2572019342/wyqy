@@ -16,7 +16,7 @@
               <i class="el-icon-delete"></i> 清空
             </el-button>
           </div>
-          
+
           <div class="card-body">
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
               <el-form-item label="语言" prop="sourceLanguage">
@@ -31,7 +31,7 @@
                   <el-option label="西班牙语" value="es"></el-option>
                 </el-select>
               </el-form-item>
-              
+
               <el-form-item label="领域" prop="domainType">
                 <el-select v-model="form.domainType" placeholder="请选择领域类型" style="width: 100%">
                   <el-option label="通用" value="general"></el-option>
@@ -41,7 +41,7 @@
                   <el-option label="法律" value="legal"></el-option>
                 </el-select>
               </el-form-item>
-              
+
               <el-form-item label="原文" prop="sourceText">
                 <el-input
                   v-model="form.sourceText"
@@ -54,7 +54,7 @@
                   class="custom-textarea"
                 ></el-input>
               </el-form-item>
-              
+
               <el-form-item>
                 <el-button class="translate-btn" @click="handleTranslate" :loading="loading" size="medium">
                   <i class="el-icon-s-promotion"></i> 翻译
@@ -67,7 +67,7 @@
           </div>
         </div>
       </el-col>
-      
+
       <!-- 右侧：译文显示区 -->
       <el-col :span="12">
         <div class="translation-card target-card">
@@ -94,7 +94,7 @@
               </el-button>
             </div>
           </div>
-          
+
           <div class="card-body">
             <el-form label-width="80px">
               <el-form-item label="语言">
@@ -108,7 +108,7 @@
                   <el-option label="西班牙语" value="es"></el-option>
                 </el-select>
               </el-form-item>
-              
+
               <el-form-item label="译文">
                 <el-input
                   v-model="translationResult.targetText"
@@ -121,10 +121,10 @@
                   show-word-limit
                 ></el-input>
               </el-form-item>
-              
+
               <el-form-item v-if="translationResult.confidenceScore">
                 <div class="translation-info">
-                  
+
 
                 </div>
               </el-form-item>
@@ -204,14 +204,14 @@ export default {
         domainType: "general",
         translationType: "auto"
       },
-      
+
       // 表单校验
       rules: {
         sourceText: [
           { required: true, message: "原文不能为空", trigger: "blur" }
         ]
       },
-      
+
       // 翻译结果
       translationResult: {
         targetText: "",
@@ -224,14 +224,14 @@ export default {
 
       fixedTranslationText: `近段时间基地出现了以下难题需要解决：
 
-1.基地太大，作物种类多，人力拍照识别数量多、工作量大，周期长。
+1.种植基地面积大，农作物种类多，人工拍照识别数量多、工作量大、周期长。
 
-2.发现虫害之后，处理不及时，病虫害快速蔓延造成损失。
+2.检测出农作物病虫害后，因为处理不及时，导致病虫害快速蔓延造成损失。
 
-3.农民劳作的时候不能查看PC端的农业数据。`,
+3.农民劳作过程中不能查看电脑端的实时监测数据，管理效率低。`,
 
       obfuscatedTranslationText:
-        "㱥ᅴﬆﬓﬦ﬩שׂשּׂאַאָאּבּגּדּהּוּזּ﬷טּיּךּכּלּ﬽מּ﬿㱥ᅴﬆﬓﬦ﬩שׂשּׂאַאָאּבּגּדּהּוּזּ﬷טּיּךּכּלּ﬽מּ﬿㱥ᅴ㱥ᅴﬆﬓﬦ﬩שׂשּׂאַאָאּבּגּדּהּוּזּ﬷טּיּךּכּלּ﬽מּ﬿",
+        "近段时间天上地下出现了一霞的难难问题需要处储理：\n\n1. 基地面积很大，作物种类多多一闪，人嘞拍照监测数量多、工作繁重，周期场。\n\n2. 发见虫害之后，处理不及时，病冲慢扩散造成损失。\n\n3. 弄明干活的时候不能查看 PC 端的农业数据。",
 
       // 文档固定下载相关
       fixedDocPath: "/photo/ເອກະສານສົ່ງມອບໂຄງການ_1.pdf",
@@ -242,10 +242,10 @@ export default {
 
       // 加载状态
       loading: false,
-      
+
       // 是否已点击译文标题区域（控制显示正常内容还是乱码）
       isRevealed: false,
-      
+
       // 语言映射
       languageMap: {
         'auto': '自动',
@@ -270,12 +270,12 @@ export default {
             clearTimeout(this.translateTimer)
             this.translateTimer = null
           }
-          
+
           // 模拟2秒延迟
           this.translateTimer = setTimeout(() => {
             // 根据isRevealed状态决定显示乱码还是正常内容
             const shouldShowObfuscated = !this.isRevealed
-            
+
             this.translationResult = {
               targetText: shouldShowObfuscated ? this.obfuscatedTranslationText : this.fixedTranslationText,
               confidenceScore: 0.95,
@@ -287,7 +287,7 @@ export default {
               targetLanguage: this.form.targetLanguage,
               status: "0"
             }
-            
+
             this.$message.success(shouldShowObfuscated ? "翻译完成" : "翻译完成")
             this.loading = false
             this.translateTimer = null
@@ -301,24 +301,24 @@ export default {
       // 只设置已点击状态，不立即显示内容
       this.isRevealed = true
     },
-    
+
     /** 交换语言 */
     handleSwap() {
       if (this.form.sourceLanguage === 'auto') {
         this.$message.warning("自动检测语言无法交换")
         return
       }
-      
+
       const temp = this.form.sourceLanguage
       this.form.sourceLanguage = this.form.targetLanguage
       this.form.targetLanguage = temp
-      
+
       // 交换文本内容
       const tempText = this.form.sourceText
       this.form.sourceText = this.translationResult.targetText
       this.translationResult.targetText = tempText
     },
-    
+
     /** 清空原文 */
     clearSource() {
       this.form.sourceText = ""
@@ -329,12 +329,12 @@ export default {
       // 重置点击状态
       this.isRevealed = false
     },
-    
+
     /** 清空译文 */
     clearTarget() {
       this.translationResult.targetText = ""
     },
-    
+
     /** 复制译文 */
     copyTarget() {
       if (this.translationResult.targetText) {
@@ -347,17 +347,17 @@ export default {
         this.$message.warning("没有可复制的内容")
       }
     },
-    
+
     /** 原文输入事件 */
     onSourceInput() {
       // 可以在这里添加自动翻译逻辑
     },
-    
+
     /** 目标语言改变事件 */
     onTargetLanguageChange() {
       // 如果有原文，可以自动重新翻译
     },
-    
+
     /** 获取语言名称 */
     getLanguageName(code) {
       return this.languageMap[code] || code

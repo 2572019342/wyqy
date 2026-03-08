@@ -655,11 +655,11 @@ export default {
       };
       return tagMap[status] || 'info';
     },
-    // 获取置信度颜色
+    // 获取置信度颜色（清新绿色系）
     getConfidenceColor(confidence) {
-      if (confidence >= 0.8) return '#2E7D32';
-      if (confidence >= 0.6) return '#E65100';
-      return '#C62828';
+      if (confidence >= 0.8) return '#3e7f6a';
+      if (confidence >= 0.6) return '#5ca996';
+      return '#b7ded2';
     },
     // 获取置信度等级
     getConfidenceLevel(confidence) {
@@ -667,23 +667,23 @@ export default {
       if (confidence >= 0.6) return 'medium';
       return 'low';
     },
-    // 获取置信度渐变色
+    // 获取置信度渐变色（统一为绿色深浅）
     getConfidenceGradient(confidence) {
       if (confidence >= 0.8) {
         return [
-          { color: '#2E7D32', percentage: 0 },
-          { color: '#66BB6A', percentage: 100 }
+          { color: '#3e7f6a', percentage: 0 },
+          { color: '#89cbb9', percentage: 100 }
         ];
       }
       if (confidence >= 0.6) {
         return [
-          { color: '#E65100', percentage: 0 },
-          { color: '#FF9800', percentage: 100 }
+          { color: '#5ca996', percentage: 0 },
+          { color: '#b7ded2', percentage: 100 }
         ];
       }
       return [
-        { color: '#C62828', percentage: 0 },
-        { color: '#EF5350', percentage: 100 }
+        { color: '#b7ded2', percentage: 0 },
+        { color: '#edf7f4', percentage: 100 }
       ];
     },
     // 获取置信度描述
@@ -765,8 +765,20 @@ export default {
 
 <style scoped>
 .ai-pest-detection-container {
+  /* 主题色（清新绿色系，主色 #89cbb9） */
+  --wyqy-c1: #3e7f6a;   /* 深主色 */
+  --wyqy-c2: #5ca996;   /* 主色偏深 */
+  --wyqy-c3: #89cbb9;   /* 主色 */
+  --wyqy-c4: #b7ded2;   /* 浅主色 */
+  --wyqy-c5: #edf7f4;   /* 最浅背景 */
+
   padding: 24px;
-  background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 50%, #E3F2FD 100%);
+  background: linear-gradient(
+    135deg,
+    var(--wyqy-c5) 0%,
+    rgba(137, 203, 185, 0.22) 50%,
+    rgba(137, 203, 185, 0.08) 100%
+  );
   min-height: calc(100vh - 84px);
   position: relative;
   overflow-x: hidden;
@@ -779,7 +791,7 @@ export default {
   left: 0;
   right: 0;
   height: 300px;
-  background: linear-gradient(135deg, rgba(46, 125, 50, 0.08) 0%, rgba(2, 119, 189, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(137, 203, 185, 0.16) 0%, rgba(183, 222, 210, 0.12) 100%);
   z-index: 0;
   pointer-events: none;
 }
@@ -792,52 +804,52 @@ export default {
 
 .stat-card {
   position: relative;
-  background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   border-radius: 16px;
   padding: 24px 20px;
   color: white;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.25);
+  box-shadow: 0 8px 24px rgba(62, 127, 106, 0.24);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stat-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 16px 40px rgba(46, 125, 50, 0.4);
+  box-shadow: 0 16px 40px rgba(62, 127, 106, 0.32);
 }
 
 .stat-card-0 {
-  background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
 }
 
 .stat-card-1 {
-  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
+  background: linear-gradient(135deg, var(--wyqy-c2) 0%, var(--wyqy-c3) 100%);
 }
 
 .stat-card-2 {
-  background: linear-gradient(135deg, #C62828 0%, #EF5350 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c3) 100%);
 }
 
 .stat-card-3 {
-  background: linear-gradient(135deg, #0277BD 0%, #03A9F4 100%);
+  background: linear-gradient(135deg, var(--wyqy-c3) 0%, var(--wyqy-c2) 100%);
 }
 
 .stat-card-0:hover {
-  box-shadow: 0 16px 40px rgba(46, 125, 50, 0.4);
+  box-shadow: 0 16px 40px rgba(62, 127, 106, 0.32);
 }
 
 .stat-card-1:hover {
-  box-shadow: 0 16px 40px rgba(230, 81, 0, 0.4);
+  box-shadow: 0 16px 40px rgba(92, 169, 150, 0.32);
 }
 
 .stat-card-2:hover {
-  box-shadow: 0 16px 40px rgba(198, 40, 40, 0.4);
+  box-shadow: 0 16px 40px rgba(62, 127, 106, 0.30);
 }
 
 .stat-card-3:hover {
-  box-shadow: 0 16px 40px rgba(2, 119, 189, 0.4);
+  box-shadow: 0 16px 40px rgba(92, 169, 150, 0.30);
 }
 
 .stat-content {
@@ -907,7 +919,7 @@ export default {
 }
 
 .video-card >>> .el-card__header {
-  background: linear-gradient(135deg, #2E7D32 0%, #43A047 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   color: white;
   padding: 18px 24px;
   border-bottom: none;
@@ -991,14 +1003,14 @@ export default {
   position: absolute;
   top: 20px;
   left: 20px;
-  background: linear-gradient(135deg, rgba(230, 81, 0, 0.95) 0%, rgba(255, 152, 0, 0.95) 100%);
+  background: linear-gradient(135deg, var(--wyqy-c2) 0%, var(--wyqy-c3) 100%);
   color: white;
   padding: 12px 18px;
   border-radius: 25px;
   display: flex;
   align-items: center;
   animation: pulse 1.5s infinite;
-  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(92, 169, 150, 0.30);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10;
@@ -1043,7 +1055,7 @@ export default {
 }
 
 .control-panel >>> .el-card__header {
-  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   color: white;
   padding: 18px 24px;
   border-bottom: none;
@@ -1063,11 +1075,11 @@ export default {
 }
 
 .result-item {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f4f7f6 100%);
   border-radius: 12px;
   padding: 14px 16px;
   margin-bottom: 12px;
-  border-left: 4px solid #2E7D32;
+  border-left: 4px solid var(--wyqy-c2);
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   cursor: pointer;
@@ -1079,30 +1091,30 @@ export default {
 }
 
 .result-pest {
-  border-left-color: #E65100;
-  background: linear-gradient(135deg, #FFF3E0 0%, #ffffff 100%);
+  border-left-color: var(--wyqy-c3);
+  background: linear-gradient(135deg, rgba(237, 247, 244, 0.9) 0%, #ffffff 100%);
 }
 
 .result-pest:hover {
-  background: linear-gradient(135deg, #FFE0B2 0%, #FFF3E0 100%);
+  background: linear-gradient(135deg, rgba(183, 222, 210, 0.24) 0%, #ffffff 100%);
 }
 
 .result-disease {
-  border-left-color: #C62828;
-  background: linear-gradient(135deg, #FFEBEE 0%, #ffffff 100%);
+  border-left-color: var(--wyqy-c1);
+  background: linear-gradient(135deg, rgba(137, 203, 185, 0.18) 0%, #ffffff 100%);
 }
 
 .result-disease:hover {
-  background: linear-gradient(135deg, #FFCDD2 0%, #FFEBEE 100%);
+  background: linear-gradient(135deg, rgba(137, 203, 185, 0.24) 0%, #ffffff 100%);
 }
 
 .result-healthy {
-  border-left-color: #2E7D32;
-  background: linear-gradient(135deg, #E8F5E9 0%, #ffffff 100%);
+  border-left-color: var(--wyqy-c2);
+  background: linear-gradient(135deg, rgba(237, 247, 244, 0.95) 0%, #ffffff 100%);
 }
 
 .result-healthy:hover {
-  background: linear-gradient(135deg, #C8E6C9 0%, #E8F5E9 100%);
+  background: linear-gradient(135deg, rgba(183, 222, 210, 0.24) 0%, #ffffff 100%);
 }
 
 .result-header {
@@ -1137,9 +1149,9 @@ export default {
   text-align: center;
   color: #909399;
   padding: 40px 20px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(237, 247, 244, 0.95) 0%, #ffffff 100%);
   border-radius: 12px;
-  border: 2px dashed #e4e7ed;
+  border: 2px dashed rgba(137, 203, 185, 0.75);
 }
 
 .no-results i {
@@ -1166,7 +1178,7 @@ export default {
 }
 
 .records-card >>> .el-card__header {
-  background: linear-gradient(135deg, #0277BD 0%, #03A9F4 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   color: white;
   padding: 18px 24px;
   border-bottom: none;
@@ -1204,7 +1216,7 @@ export default {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(46, 125, 50, 0.1);
+  border: 1px solid rgba(62, 127, 106, 0.16);
 }
 
 .search-section >>> .el-form-item {
@@ -1220,8 +1232,8 @@ export default {
 
 .search-section >>> .el-input__inner:focus,
 .search-section >>> .el-select .el-input__inner:focus {
-  border-color: #2E7D32;
-  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
+  border-color: var(--wyqy-c1);
+  box-shadow: 0 0 0 2px rgba(62, 127, 106, 0.14);
 }
 
 .search-section >>> .el-button {
@@ -1231,13 +1243,13 @@ export default {
 }
 
 .search-section >>> .el-button--primary {
-  background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   border: none;
 }
 
 .search-section >>> .el-button--primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 4px 12px rgba(62, 127, 106, 0.30);
 }
 
 /* 类型标签样式 */
@@ -1250,18 +1262,18 @@ export default {
 }
 
 .type-disease {
-  background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
-  color: #C62828;
+  background: linear-gradient(135deg, rgba(137, 203, 185, 0.16) 0%, #ffffff 100%);
+  color: var(--wyqy-c1);
 }
 
 .type-pest {
-  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-  color: #E65100;
+  background: linear-gradient(135deg, rgba(183, 222, 210, 0.18) 0%, #ffffff 100%);
+  color: var(--wyqy-c2);
 }
 
 .type-healthy {
-  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-  color: #2E7D32;
+  background: linear-gradient(135deg, rgba(237, 247, 244, 0.95) 0%, #ffffff 100%);
+  color: var(--wyqy-c2);
 }
 
 /* 状态标签样式 */
@@ -1274,18 +1286,18 @@ export default {
 }
 
 .status-pending {
-  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-  color: #E65100;
+  background: linear-gradient(135deg, rgba(183, 222, 210, 0.18) 0%, #ffffff 100%);
+  color: var(--wyqy-c2);
 }
 
 .status-processing {
-  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
-  color: #0277BD;
+  background: linear-gradient(135deg, rgba(237, 247, 244, 0.95) 0%, #ffffff 100%);
+  color: var(--wyqy-c1);
 }
 
 .status-completed {
-  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-  color: #2E7D32;
+  background: linear-gradient(135deg, rgba(237, 247, 244, 0.95) 0%, #ffffff 100%);
+  color: var(--wyqy-c1);
 }
 
 /* 识别结果弹窗样式 */
@@ -1305,7 +1317,7 @@ export default {
 }
 
 .result-dialog-content {
-  background: linear-gradient(135deg, #f8fff8 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #f8fffb 0%, #ffffff 100%);
   min-height: 500px;
 }
 
@@ -1313,11 +1325,11 @@ export default {
   display: flex;
   align-items: center;
   padding: 35px 35px 25px;
-  background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   color: white;
   position: relative;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 10px 30px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 10px 30px rgba(62, 127, 106, 0.32);
 }
 
 .result-icon-enhanced {
@@ -1336,15 +1348,15 @@ export default {
 }
 
 .result-icon-enhanced.result-pest {
-  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
+  background: linear-gradient(135deg, var(--wyqy-c2) 0%, var(--wyqy-c3) 100%);
 }
 
 .result-icon-enhanced.result-disease {
-  background: linear-gradient(135deg, #C62828 0%, #EF5350 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
 }
 
 .result-icon-enhanced.result-healthy {
-  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, var(--wyqy-c2) 0%, var(--wyqy-c3) 100%);
 }
 
 .result-title-section {
@@ -1416,17 +1428,17 @@ export default {
 }
 
 .confidence-value.confidence-high {
-  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, #3e7f6a 0%, #89cbb9 100%);
   color: white;
 }
 
 .confidence-value.confidence-medium {
-  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
+  background: linear-gradient(135deg, #5ca996 0%, #b7ded2 100%);
   color: white;
 }
 
 .confidence-value.confidence-low {
-  background: linear-gradient(135deg, #C62828 0%, #EF5350 100%);
+  background: linear-gradient(135deg, #b7ded2 0%, #edf7f4 100%);
   color: white;
 }
 
@@ -1440,17 +1452,17 @@ export default {
   line-height: 1.6;
   font-style: italic;
   padding: 15px;
-  background: #f8f9fa;
+  background: #f4f7f6;
   border-radius: 10px;
-  border-left: 4px solid #2E7D32;
+  border-left: 4px solid var(--wyqy-c2);
 }
 
 .recommendation-section {
   padding: 30px 35px;
-  background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+  background: linear-gradient(135deg, #f5fbf8 0%, #ffffff 100%);
   margin: 25px;
   border-radius: 16px;
-  border-left: 5px solid #E65100;
+  border-left: 5px solid var(--wyqy-c2);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
@@ -1464,14 +1476,14 @@ export default {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   margin-right: 15px;
   font-size: 20px;
-  box-shadow: 0 6px 20px rgba(230, 81, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(62, 127, 106, 0.30);
 }
 
 .recommendation-title {
@@ -1500,19 +1512,19 @@ export default {
   font-size: 15px;
   color: #606266;
   padding: 12px;
-  background: rgba(230, 81, 0, 0.1);
+  background: rgba(137, 203, 185, 0.12);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .recommendation-content .recommendation-tips .tip-item:hover {
-  background: rgba(230, 81, 0, 0.2);
+  background: rgba(137, 203, 185, 0.18);
   transform: translateX(5px);
 }
 
 .recommendation-content .recommendation-tips .tip-item i {
   margin-right: 10px;
-  color: #E65100;
+  color: var(--wyqy-c2);
   font-size: 16px;
 }
 
@@ -1529,13 +1541,13 @@ export default {
 }
 
 .confirm-btn {
-  background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   border: none;
   padding: 15px 40px;
   font-size: 17px;
   font-weight: 600;
   border-radius: 30px;
-  box-shadow: 0 8px 25px rgba(46, 125, 50, 0.4);
+  box-shadow: 0 8px 25px rgba(62, 127, 106, 0.40);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -1543,7 +1555,7 @@ export default {
 
 .confirm-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(46, 125, 50, 0.5);
+  box-shadow: 0 12px 30px rgba(62, 127, 106, 0.50);
 }
 
 .cancel-btn {
@@ -1559,10 +1571,10 @@ export default {
 }
 
 .cancel-btn:hover {
-  border-color: #2E7D32;
-  color: #2E7D32;
+  border-color: var(--wyqy-c1);
+  color: var(--wyqy-c1);
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(46, 125, 50, 0.2);
+  box-shadow: 0 8px 20px rgba(62, 127, 106, 0.20);
 }
 
 /* 表格美化 */
@@ -1572,10 +1584,10 @@ export default {
 }
 
 .ai-pest-detection-container >>> .el-table th {
-  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-  color: #2E7D32;
+  background: linear-gradient(135deg, var(--wyqy-c5) 0%, var(--wyqy-c4) 100%);
+  color: var(--wyqy-c1);
   font-weight: 600;
-  border-bottom: 2px solid #A5D6A7;
+  border-bottom: 2px solid var(--wyqy-c4);
 }
 
 .ai-pest-detection-container >>> .el-table td {
@@ -1587,13 +1599,13 @@ export default {
 }
 
 .ai-pest-detection-container >>> .el-table tbody tr:hover {
-  background: linear-gradient(135deg, #f8fff8 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #f8fffb 0%, #ffffff 100%);
   transform: scale(1.01);
-  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.1);
+  box-shadow: 0 2px 8px rgba(62, 127, 106, 0.10);
 }
 
 .ai-pest-detection-container >>> .el-table tbody tr:hover td {
-  border-bottom-color: #66BB6A;
+  border-bottom-color: var(--wyqy-c3);
 }
 
 /* 分页美化 */
@@ -1679,13 +1691,13 @@ export default {
 
 .recent-results::-webkit-scrollbar-thumb,
 .control-panel >>> .el-card__body::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   border-radius: 10px;
 }
 
 .recent-results::-webkit-scrollbar-thumb:hover,
 .control-panel >>> .el-card__body::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+  background: linear-gradient(135deg, var(--wyqy-c2) 0%, var(--wyqy-c1) 100%);
 }
 
 /* 响应式设计 */

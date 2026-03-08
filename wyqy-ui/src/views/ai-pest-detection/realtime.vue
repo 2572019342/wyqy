@@ -35,8 +35,8 @@
               </div>
               <div class="video-container">
                 <div class="video-wrapper">
-                  <iframe 
-                    :src="droneVideoStreamUrl" 
+                  <iframe
+                    :src="droneVideoStreamUrl"
                     class="video-stream"
                     @error="handleVideoError('drone')"
                     @load="handleVideoLoad('drone')"
@@ -82,8 +82,8 @@
               </div>
               <div class="video-container">
                 <div class="video-wrapper">
-                  <iframe 
-                    :src="carVideoStreamUrl" 
+                  <iframe
+                    :src="carVideoStreamUrl"
                     class="video-stream"
                     @error="handleVideoError('car')"
                     @load="handleVideoLoad('car')"
@@ -121,8 +121,8 @@
           <!-- 最近识别结果列表 -->
           <div class="recent-results">
             <div class="result-list" v-if="recentDetections.length > 0">
-              <div 
-                v-for="detection in recentDetections" 
+              <div
+                v-for="detection in recentDetections"
                 :key="detection.detectionId"
                 class="result-item"
                 :class="'result-' + detection.detectionType"
@@ -147,10 +147,10 @@
     </el-row>
 
     <!-- 识别结果提示框（识别到虫害/病害） -->
-    <el-dialog 
-      :visible.sync="pestDetectionDialogVisible" 
-      width="600px" 
-      append-to-body 
+    <el-dialog
+      :visible.sync="pestDetectionDialogVisible"
+      width="600px"
+      append-to-body
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
@@ -219,7 +219,7 @@
               <span class="assistant-message-content">{{ msg.content }}</span>
             </div>
             <div v-if="openclawMessages.length === 0" class="assistant-empty">
-              我可以帮助您完成您想要的操作
+              我可以帮助您完成您想要的操作11
             </div>
           </div>
           <div class="assistant-footer">
@@ -255,7 +255,7 @@
       modal-class="ai-chat-modal"
       :close-on-click-modal="false"
       @open="onAiChatDialogOpen"
-      @close="aiChatDialogVisible = false"
+      @close="onAiChatDialogClose"
     >
       <div class="ai-chat-dialog-body">
         <!-- 透明拖拽区：不显示白条，但可拖动窗口 -->
@@ -444,6 +444,8 @@ export default {
         ];
       });
     },
+
+
     // 加载最近识别结果
     loadRecentDetections() {
       const queryParams = {
@@ -507,7 +509,7 @@ export default {
         landName: this.getSelectedLandName(),
         speciesName: this.getSelectedSpeciesName()
       };
-      
+
       detectPest(params).then(response => {
         if (response.code === 200) {
           this.detectionResult = response.data;
@@ -531,7 +533,7 @@ export default {
         this.$message.warning('请先选择地块和作物');
         return;
       }
-      
+
       this.$message.info('正在截图并识别...');
       this.performDetection();
     },
@@ -607,12 +609,12 @@ export default {
     // 键盘事件处理
     handleKeyDown(event) {
       if (!this.keyListenerEnabled) return;
-      
+
       const isCtrlOrMeta = event.ctrlKey || event.metaKey;
       const isKey6 = event.key === '6' || event.code === 'Digit6';
       const isKey2 = event.key === '2' || event.code === 'Digit2';
       const isKey4 = event.key === '4' || event.code === 'Digit4';
-      
+
       // Ctrl+2：弹出 AI 聊天框（显示 @聊天框 内容）
       if (isCtrlOrMeta && isKey2) {
         event.preventDefault();
@@ -627,7 +629,7 @@ export default {
         this.showAiChatCompletedToast();
         return;
       }
-      
+
       // Ctrl+6：启动机器人
       if (isCtrlOrMeta && isKey6) {
         event.preventDefault();
@@ -648,7 +650,17 @@ export default {
         this.aiChatLeft = Math.max(pad, (window.innerWidth - this.aiChatWidth) / 2);
         this.aiChatTop = Math.max(pad, (window.innerHeight - this.aiChatHeight) / 2 - 20);
       }
-      this.$nextTick(() => this.applyAiChatDialogSize(true));
+      this.$nextTick(() => {
+        this.applyAiChatDialogSize(true);
+        // 发送暂停消息到iframe
+        this.sendPauseMessageToIframe();
+      });
+    },
+    // AI 聊天框关闭时的处理
+    onAiChatDialogClose() {
+      this.aiChatDialogVisible = false;
+      // 发送恢复消息到iframe
+      this.sendResumeMessageToIframe();
     },
     applyAiChatDialogSize(forceQuery = false) {
       if (!this.aiChatDialogVisible) return;
@@ -672,6 +684,28 @@ export default {
       el.style.margin = '0';
       el.style.width = this.aiChatWidth + 'px';
       el.style.height = this.aiChatHeight + 'px';
+    },
+    sendPauseMessageToIframe() {
+      this.$nextTick(() => {
+        const iframe = document.querySelector('.ai-chat-iframe');
+        if (iframe && iframe.contentWindow) {
+          try {
+            iframe.contentWindow.postMessage({ type: 'PAUSE_VIDEO' }, '*');
+          } catch (e) {
+            console.log('无法发送暂停消息到iframe:', e);
+          }
+        }
+      });
+    },
+    sendResumeMessageToIframe() {
+      const iframe = document.querySelector('.ai-chat-iframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage({ type: 'RESUME_VIDEO' }, '*');
+        } catch (e) {
+          console.log('无法发送恢复消息到iframe:', e);
+        }
+      }
     },
     startAiChatDrag(e) {
       if (this.aiChatResizing) return;
@@ -745,7 +779,7 @@ export default {
         landName: this.getSelectedLandName(),
         speciesName: this.getSelectedSpeciesName()
       };
-      
+
       detectPest(params).then(response => {
         if (response.code === 200) {
           // 保存本次识别结果
@@ -754,7 +788,7 @@ export default {
           // 弹出识别结果提示框
           this.pestDetectionDialogVisible = true;
           this.getDetectionStatistics();
-          
+
           // Ctrl+2 触发时修改最新种植记录的健康状况为虫害
           this.updateLatestPlantingHealthStatus();
 
@@ -861,7 +895,7 @@ export default {
     /** 更新最新一条种植记录的健康状况为虫害（Ctrl+2 触发） */
     updateLatestPlantingHealthStatus() {
       console.log('开始更新最新种植记录的健康状况为虫害');
-      
+
       // 获取所有种植记录，取最新一条
       listPlanting({
         pageNum: 1,
@@ -875,24 +909,24 @@ export default {
             }
             return 0;
           });
-          
+
           const latestPlanting = sortedList[0];
           console.log('找到最新种植记录:', latestPlanting);
-          
+
           // 获取完整的种植记录信息
           getPlanting(latestPlanting.plantingId).then(response => {
             const plantingRecord = response.data;
-            
+
             // 更新健康状况为虫害
             const oldHealthStatus = plantingRecord.healthStatus;
             plantingRecord.healthStatus = 'pest';
-            
+
             console.log('准备更新健康状况:', {
               plantingId: plantingRecord.plantingId,
               oldStatus: oldHealthStatus,
               newStatus: plantingRecord.healthStatus
             });
-            
+
             // 调用更新API
             updatePlanting(plantingRecord).then(() => {
               console.log('✅ 健康状况已更新为虫害');
@@ -929,9 +963,10 @@ export default {
     },
     // 获取置信度颜色
     getConfidenceColor(confidence) {
-      if (confidence >= 0.8) return '#2E7D32';
-      if (confidence >= 0.6) return '#E65100';
-      return '#C62828';
+      // 统一为清新绿色系
+      if (confidence >= 0.8) return '#3e7f6a';
+      if (confidence >= 0.6) return '#5ca996';
+      return '#b7ded2';
     },
     // 格式化置信度
     formatConfidence(percentage) {
@@ -971,8 +1006,24 @@ export default {
 
 <style scoped>
 .realtime-detection-container {
+  /* 主题色（清新绿色系） */
+  --wyqy-c1: #059669;   /* 深主色 */
+  --wyqy-c2: #10B981;   /* 主色 */
+  --wyqy-c3: #34D399;   /* 浅主色 */
+  --wyqy-c4: #6EE7B7;   /* 更浅主色 */
+  --wyqy-c5: #ECFDF5;   /* 最浅背景 */
+  --wyqy-surface: #ffffff;
+  --wyqy-text: #111827;
+  --wyqy-text-muted: #6b7280;
+  --wyqy-shadow: rgba(5, 150, 105, 0.18);
+
   padding: 24px;
-  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 50%, #e0f2f1 100%);
+  background: linear-gradient(
+    135deg,
+    var(--wyqy-c5) 0%,
+    rgba(110, 231, 183, 0.22) 50%,
+    rgba(52, 211, 153, 0.08) 100%
+  );
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
@@ -986,7 +1037,7 @@ export default {
   left: 0;
   right: 0;
   height: 260px;
-  background: linear-gradient(135deg, rgba(46, 125, 50, 0.08) 0%, rgba(102, 187, 106, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(110, 231, 183, 0.16) 0%, rgba(236, 253, 245, 0.12) 100%);
   z-index: 0;
   pointer-events: none;
 }
@@ -1016,39 +1067,39 @@ export default {
 }
 
 .stat-card-0 {
-  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
-  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.3);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
+  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.26);
 }
 
 .stat-card-0:hover {
-  box-shadow: 0 16px 36px rgba(46, 125, 50, 0.4);
+  box-shadow: 0 16px 36px rgba(5, 150, 105, 0.34);
 }
 
 .stat-card-1 {
-  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
-  box-shadow: 0 8px 24px rgba(230, 81, 0, 0.3);
+  background: linear-gradient(135deg, var(--wyqy-c2) 0%, var(--wyqy-c3) 100%);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.26);
 }
 
 .stat-card-1:hover {
-  box-shadow: 0 16px 36px rgba(230, 81, 0, 0.4);
+  box-shadow: 0 16px 36px rgba(16, 185, 129, 0.34);
 }
 
 .stat-card-2 {
-  background: linear-gradient(135deg, #C62828 0%, #EF5350 100%);
-  box-shadow: 0 8px 24px rgba(198, 40, 40, 0.3);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c3) 100%);
+  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.24);
 }
 
 .stat-card-2:hover {
-  box-shadow: 0 16px 36px rgba(198, 40, 40, 0.4);
+  box-shadow: 0 16px 36px rgba(5, 150, 105, 0.32);
 }
 
 .stat-card-3 {
-  background: linear-gradient(135deg, #0277BD 0%, #4FC3F7 100%);
-  box-shadow: 0 8px 24px rgba(2, 119, 189, 0.3);
+  background: linear-gradient(135deg, var(--wyqy-c3) 0%, var(--wyqy-c2) 100%);
+  box-shadow: 0 8px 24px rgba(52, 211, 153, 0.22);
 }
 
 .stat-card-3:hover {
-  box-shadow: 0 16px 36px rgba(2, 119, 189, 0.4);
+  box-shadow: 0 16px 36px rgba(52, 211, 153, 0.30);
 }
 
 .stat-content {
@@ -1138,7 +1189,7 @@ export default {
 }
 
 .video-card >>> .el-card__header {
-  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   color: white;
   padding: 18px 24px;
   border-bottom: none;
@@ -1146,17 +1197,17 @@ export default {
 
 .video-card >>> .el-card__body {
   padding: 16px;
-  background: #ffffff;
+  background: var(--wyqy-surface);
   height: calc(100% - 60px);
   box-sizing: border-box;
 }
 
 .video-card--drone >>> .el-card__header {
-  background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
 }
 
 .video-card--car >>> .el-card__header {
-  background: linear-gradient(135deg, #0D47A1 0%, #42A5F5 100%);
+  background: linear-gradient(135deg, var(--wyqy-c3) 0%, var(--wyqy-c2) 100%);
 }
 
 .card-header {
@@ -1185,26 +1236,29 @@ export default {
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
 .status-tag.status-success {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .status-tag.status-warning {
-  background: #FFF3E0;
-  color: #E65100;
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .status-tag.status-info {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .status-tag.status-danger {
-  background: #FFEBEE;
-  color: #C62828;
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .video-container {
@@ -1254,21 +1308,21 @@ export default {
 .loading-spinner i {
   font-size: 32px;
   margin-bottom: 10px;
-  color: #66BB6A;
+  color: var(--wyqy-c3);
 }
 
 .ai-indicator {
   position: absolute;
   top: 20px;
   left: 20px;
-  background: linear-gradient(135deg, #E65100 0%, #FF9800 100%);
+  background: linear-gradient(135deg, var(--wyqy-c2) 0%, var(--wyqy-c3) 100%);
   color: white;
   padding: 10px 16px;
   border-radius: 24px;
   display: flex;
   align-items: center;
   animation: ai-pulse 1.5s infinite;
-  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.30);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10;
@@ -1309,25 +1363,25 @@ export default {
   background: rgba(255,255,255,0.95);
   border-radius: 12px;
   padding: 14px 16px;
-  border-left: 4px solid #2E7D32;
+  border-left: 4px solid var(--wyqy-c2);
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   min-width: 220px;
   backdrop-filter: blur(10px);
 }
 
 .detection-pest {
-  border-left-color: #E65100;
-  background: linear-gradient(135deg, rgba(255, 243, 224, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-left-color: var(--wyqy-c3);
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
 }
 
 .detection-disease {
-  border-left-color: #C62828;
-  background: linear-gradient(135deg, rgba(255, 235, 238, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-left-color: var(--wyqy-c1);
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.20) 0%, rgba(255, 255, 255, 0.95) 100%);
 }
 
 .detection-healthy {
-  border-left-color: #2E7D32;
-  background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-left-color: var(--wyqy-c2);
+  background: linear-gradient(135deg, rgba(110, 231, 183, 0.24) 0%, rgba(255, 255, 255, 0.95) 100%);
 }
 
 .detection-label {
@@ -1365,7 +1419,7 @@ export default {
 }
 
 .control-panel >>> .el-card__header {
-  background: linear-gradient(135deg, #5D4037 0%, #8D6E63 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 100%);
   color: white;
   padding: 16px 22px;
   border-bottom: none;
@@ -1374,7 +1428,7 @@ export default {
 
 .control-panel >>> .el-card__body {
   padding: 22px;
-  background: #ffffff;
+  background: var(--wyqy-surface);
   height: calc(100% - 56px);
   overflow-y: auto;
   box-sizing: border-box;
@@ -1395,11 +1449,11 @@ export default {
 }
 
 .result-item {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f4f7f6 100%);
   border-radius: 12px;
   padding: 14px 16px;
   margin-bottom: 12px;
-  border-left: 4px solid #2E7D32;
+  border-left: 4px solid var(--wyqy-c2);
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   cursor: pointer;
@@ -1411,30 +1465,30 @@ export default {
 }
 
 .result-pest {
-  border-left-color: #E65100;
-  background: linear-gradient(135deg, #FFF8E1 0%, #ffffff 100%);
+  border-left-color: var(--wyqy-c3);
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.95) 0%, #ffffff 100%);
 }
 
 .result-pest:hover {
-  background: linear-gradient(135deg, #FFF3E0 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(110, 231, 183, 0.24) 0%, #ffffff 100%);
 }
 
 .result-disease {
-  border-left-color: #C62828;
-  background: linear-gradient(135deg, #FFEBEE 0%, #ffffff 100%);
+  border-left-color: var(--wyqy-c1);
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.18) 0%, #ffffff 100%);
 }
 
 .result-disease:hover {
-  background: linear-gradient(135deg, #FFCDD2 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.24) 0%, #ffffff 100%);
 }
 
 .result-healthy {
-  border-left-color: #2E7D32;
-  background: linear-gradient(135deg, #E8F5E9 0%, #ffffff 100%);
+  border-left-color: var(--wyqy-c2);
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.95) 0%, #ffffff 100%);
 }
 
 .result-healthy:hover {
-  background: linear-gradient(135deg, #C8E6C9 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(110, 231, 183, 0.24) 0%, #ffffff 100%);
 }
 
 .result-header {
@@ -1453,7 +1507,7 @@ export default {
 .result-confidence {
   font-size: 12px;
   color: #666;
-  background: #f5f5f5;
+  background: rgba(241, 241, 254, 0.9);
   padding: 2px 8px;
   border-radius: 10px;
 }
@@ -1473,9 +1527,9 @@ export default {
   text-align: center;
   color: #999;
   padding: 40px 20px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.95) 0%, #ffffff 100%);
   border-radius: 12px;
-  border: 2px dashed #e0e0e0;
+  border: 2px dashed rgba(52, 211, 153, 0.75);
 }
 
 .no-results i {
@@ -1489,7 +1543,7 @@ export default {
 .pest-detection-dialog >>> .el-dialog {
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 24px 60px rgba(198, 40, 40, 0.35);
+  box-shadow: 0 24px 60px rgba(5, 150, 105, 0.26);
 }
 
 .pest-detection-dialog >>> .el-dialog__header {
@@ -1498,7 +1552,7 @@ export default {
 
 .pest-detection-dialog >>> .el-dialog__body {
   padding: 0;
-  background: linear-gradient(135deg, #E65100 0%, #FF6D00 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c3) 100%);
 }
 
 .pest-detection-content {
@@ -1608,7 +1662,7 @@ export default {
 
 .confirm-btn {
   background: white !important;
-  color: #E65100 !important;
+  color: var(--wyqy-c1) !important;
   border: none !important;
   border-radius: 28px !important;
   padding: 13px 38px !important;
@@ -1668,7 +1722,7 @@ export default {
     width: 100%;
     margin-bottom: 20px;
   }
-  
+
   .el-col-8 {
     width: 100%;
   }
@@ -1699,20 +1753,20 @@ export default {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
-  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35), 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(145deg, #ffffff 0%, var(--wyqy-c5) 100%);
+  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.22), 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   overflow: hidden;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-  border: 2px solid rgba(34, 197, 94, 0.2);
+  border: 2px solid rgba(52, 211, 153, 0.7);
 }
 
 .assistant-toggle:hover {
   transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 12px 32px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 12px 32px rgba(5, 150, 105, 0.28);
 }
 
 .assistant-icon {
@@ -1735,7 +1789,7 @@ export default {
   max-height: 540px;
   background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(34, 197, 94, 0.08);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(52, 211, 153, 0.18);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1747,9 +1801,9 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+  background: linear-gradient(135deg, var(--wyqy-c1) 0%, var(--wyqy-c2) 55%, var(--wyqy-c3) 100%);
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.30);
 }
 
 .assistant-title {
@@ -1775,7 +1829,7 @@ export default {
 
 .assistant-body {
   padding: 16px;
-  background: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 30%, #f8fafc 100%);
+  background: linear-gradient(180deg, var(--wyqy-c5) 0%, rgba(110, 231, 183, 0.22) 35%, #ffffff 100%);
   overflow-y: auto;
   flex: 1;
   min-height: 180px;
@@ -1833,10 +1887,10 @@ export default {
 }
 
 .assistant-message--user .assistant-message-content {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, var(--wyqy-c2) 0%, var(--wyqy-c3) 100%);
   color: #ffffff;
   border-bottom-right-radius: 4px;
-  box-shadow: 0 2px 12px rgba(34, 197, 94, 0.35);
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.28);
 }
 
 .assistant-message--user .assistant-message-content {
@@ -1853,7 +1907,7 @@ export default {
   color: #1f2937;
   border-bottom-left-radius: 4px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.26);
 }
 
 .assistant-empty {
@@ -1865,7 +1919,7 @@ export default {
   background: rgba(255, 255, 255, 0.6);
   border-radius: 14px;
   margin: 0 4px;
-  border: 1px dashed rgba(34, 197, 94, 0.2);
+  border: 1px dashed rgba(52, 211, 153, 0.9);
 }
 
 .assistant-footer {
@@ -1885,8 +1939,8 @@ export default {
 }
 
 .assistant-footer >>> .el-textarea__inner:focus {
-  border-color: #22c55e;
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
+  border-color: var(--wyqy-c2);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.18);
 }
 
 .assistant-send {
@@ -1894,7 +1948,7 @@ export default {
   border-radius: 10px;
   font-weight: 600;
   padding: 8px 20px;
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.24);
 }
 
 .assistant-resizer {
@@ -1950,7 +2004,7 @@ export default {
   display: flex;
   align-items: stretch;
   justify-content: center;
-  background: #f5f7fa;
+  background: var(--wyqy-c5);
   overflow: hidden;
 }
 .ai-chat-drag-area {

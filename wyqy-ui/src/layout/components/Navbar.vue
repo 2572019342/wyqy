@@ -99,7 +99,18 @@ export default {
       langs: [
         { value: "zh", label: "中" },
         { value: "en", label: "EN" },
-        { value: "lo", label: "ລາວ" }
+        { value: "lo", label: "ລາວ" },
+        { value: "ja", label: "日本語" },
+        { value: "ko", label: "한국어" },
+        { value: "th", label: "ไทย" },
+        { value: "vi", label: "Tiếng Việt" },
+        { value: "ms", label: "Bahasa Melayu" },
+        { value: "id", label: "Bahasa Indonesia" },
+        { value: "fr", label: "Français" },
+        { value: "de", label: "Deutsch" },
+        { value: "es", label: "Español" },
+        { value: "ru", label: "Русский" },
+        { value: "ar", label: "العربية" }
       ]
     }
   },
