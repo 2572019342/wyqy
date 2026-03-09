@@ -766,7 +766,7 @@ export default {
 <style scoped>
 .ai-pest-detection-container {
   /* 主题色（清新绿色系，主色 #89cbb9） */
-  --wyqy-c1: #3e7f6a;   /* 深主色 */
+  --wyqy-c1: #72f5cb;   /* 深主色 */
   --wyqy-c2: #5ca996;   /* 主色偏深 */
   --wyqy-c3: #89cbb9;   /* 主色 */
   --wyqy-c4: #b7ded2;   /* 浅主色 */
@@ -811,13 +811,13 @@ export default {
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(62, 127, 106, 0.24);
+  box-shadow: 0 8px 24px rgba(136, 210, 187, 0.24);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stat-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 16px 40px rgba(62, 127, 106, 0.32);
+  box-shadow: 0 16px 40px rgba(130, 235, 202, 0.32));
 }
 
 .stat-card-0 {
