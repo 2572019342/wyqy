@@ -5,17 +5,17 @@ const mockData = {
     const records = []
     const pestTypes = ['pest', 'disease']
     const pestNames = [
-      '蚜虫', '红蜘蛛', '白粉病', '霜霉病', '炭疽病', 
+      '蚜虫', '红蜘蛛', '白粉病', '霜霉病', '炭疽病',
       '菜青虫', '潜叶蝇', '锈病', '枯萎病', '疫病'
     ]
     const landNames = ['东区1号田', '西区2号田', '南区3号田', '北区4号田', '温室A区']
     const speciesNames = ['番茄', '黄瓜', '辣椒', '白菜', '茄子']
-    
+
     for (let i = 0; i < pageSize; i++) {
       const id = (pageNum - 1) * pageSize + i + 1
       const pestType = pestTypes[Math.floor(Math.random() * pestTypes.length)]
       const pestName = pestNames[Math.floor(Math.random() * pestNames.length)]
-      
+
       records.push({
         detectionId: id,
         landId: Math.floor(Math.random() * 5) + 1,
@@ -33,7 +33,7 @@ const mockData = {
         imageUrl: `https://picsum.photos/seed/pest${id}/300/200.jpg`
       })
     }
-    
+
     return {
       code: 200,
       msg: '查询成功',
@@ -41,7 +41,7 @@ const mockData = {
       total: 100 // 模拟总数
     }
   },
-  
+
   // 生成统计数据
   generateMockStats: () => {
     return {
@@ -67,16 +67,16 @@ const mockData = {
       }
     }
   },
-  
+
   // 生成视频流信息
   generateVideoStream: () => {
     return {
       code: 200,
       msg: '查询成功',
       data: {
-        videoUrl: 'http://192.168.1.103:8080/live/drone.flv',
-        streamUrl: 'http://192.168.1.103:8080/live/drone.flv',
-        snapshotUrl: 'http://192.168.1.103:8080/snapshot/drone.jpg'
+        videoUrl: 'http://192.168.1.109:8080/live/drone.flv',
+        streamUrl: 'http://192.168.1.109:8080/live/drone.flv',
+        snapshotUrl: 'http://192.168.1.109:8080/snapshot/drone.jpg'
       }
     }
   }
@@ -142,17 +142,17 @@ export function detectPest(data) {
   return delay(1000).then(() => {
     const pestTypes = ['pest', 'disease']
     const pestNames = [
-      '蚜虫', '红蜘蛛', '白粉病', '霜霉病', '炭疽病', 
+      '蚜虫', '红蜘蛛', '白粉病', '霜霉病', '炭疽病',
       '菜青虫', '潜叶蝇', '锈病', '枯萎病', '疫病'
     ]
-    
+
     const detectionType = pestTypes[Math.floor(Math.random() * pestTypes.length)]
     const pestName = pestNames[Math.floor(Math.random() * pestNames.length)]
     const confidence = (0.75 + Math.random() * 0.24).toFixed(2)
-    
+
     // 固定推荐处理方案为对坏掉的果子进行采摘
     const recommendation = '对坏掉的果子进行采摘'
-    
+
     return {
       code: 200,
       msg: '识别成功',

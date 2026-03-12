@@ -34,8 +34,8 @@
           </div>
           <div class="video-container">
             <div class="video-wrapper">
-              <iframe 
-                :src="videoStreamUrl" 
+              <iframe
+                :src="videoStreamUrl"
                 class="video-stream"
                 @error="handleVideoError"
                 @load="handleVideoLoad"
@@ -75,8 +75,8 @@
           <!-- 最近识别结果列表 -->
           <div class="recent-results">
             <div class="result-list" v-if="recentDetections.length > 0">
-              <div 
-                v-for="detection in recentDetections" 
+              <div
+                v-for="detection in recentDetections"
                 :key="detection.detectionId"
                 class="result-item"
                 :class="'result-' + detection.detectionType"
@@ -159,8 +159,8 @@
         <el-table-column label="病虫害" align="center" prop="pestName" />
         <el-table-column label="置信度" align="center" prop="confidence">
           <template slot-scope="scope">
-            <el-progress 
-              :percentage="Math.round(scope.row.confidence * 100)" 
+            <el-progress
+              :percentage="Math.round(scope.row.confidence * 100)"
               :color="getConfidenceColor(scope.row.confidence)"
               :show-text="true"
               :format="formatConfidence"
@@ -240,10 +240,10 @@
     </el-dialog>
 
     <!-- 识别结果弹窗 -->
-    <el-dialog 
-      title="" 
-      :visible.sync="resultDialogVisible" 
-      width="650px" 
+    <el-dialog
+      title=""
+      :visible.sync="resultDialogVisible"
+      width="650px"
       :close-on-click-modal="false"
       center
       class="ai-result-dialog"
@@ -273,8 +273,8 @@
             </span>
           </div>
           <div class="confidence-progress-wrapper">
-            <el-progress 
-              :percentage="Math.round(detectionResult.confidence * 100)" 
+            <el-progress
+              :percentage="Math.round(detectionResult.confidence * 100)"
               :color="getConfidenceGradient(detectionResult.confidence)"
               :stroke-width="12"
               :show-text="false"
@@ -374,7 +374,7 @@ export default {
       // 统计数据
       detectionStats: [],
       // 视频流相关
-      videoStreamUrl: "http://192.168.1.103:1145/play_drone.html",
+      videoStreamUrl: "http://192.168.1.109:1145/play_drone.html",
       videoConnected: false,
       isAnalyzing: false,
       aiStatus: {
@@ -485,7 +485,7 @@ export default {
     startAnalysis() {
       this.isAnalyzing = true;
       this.aiStatus = { type: 'warning', text: 'AI监控中...' };
-      
+
       // 不再自动执行识别，只是显示监控状态
       // 用户需要按 Ctrl+2 才会触发识别
     },
@@ -502,7 +502,7 @@ export default {
         landName: this.getSelectedLandName(),
         speciesName: this.getSelectedSpeciesName()
       };
-      
+
       detectPest(params).then(response => {
         if (response.code === 200) {
           this.detectionResult = response.data;
@@ -561,11 +561,11 @@ export default {
     // 键盘事件处理
     handleKeyDown(event) {
       if (!this.keyListenerEnabled) return;
-      
+
       // 监听 Ctrl+2 键
       const isCtrlOrMeta = event.ctrlKey || event.metaKey;
       const isKey2 = event.key === '2' || event.code === 'Digit2';
-      
+
       if (isCtrlOrMeta && isKey2) {
         event.preventDefault();
         this.quickDetect();
@@ -577,12 +577,12 @@ export default {
         this.$message.info('AI正在识别中，请稍候...');
         return;
       }
-      
-      
+
+
       // 设置识别状态
       this.isAnalyzing = true;
       this.aiStatus = { type: 'warning', text: 'AI识别中...' };
-      
+
       // 直接执行识别，不等待3秒
       const params = {
         landId: this.detectionForm.landId,
@@ -590,7 +590,7 @@ export default {
         landName: this.getSelectedLandName(),
         speciesName: this.getSelectedSpeciesName()
       };
-      
+
       detectPest(params).then(response => {
         if (response.code === 200) {
           this.detectionResult = response.data;
@@ -1706,23 +1706,23 @@ export default {
     width: 100%;
     margin-bottom: 20px;
   }
-  
+
   .el-col-8 {
     width: 100%;
   }
-  
+
   .ai-pest-detection-container {
     padding: 16px;
   }
-  
+
   .stat-card {
     margin-bottom: 16px;
   }
-  
+
   .stat-value {
     font-size: 28px;
   }
-  
+
   .stat-icon {
     font-size: 24px;
     width: 48px;

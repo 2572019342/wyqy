@@ -75,13 +75,9 @@
           </div>
           
           <div class="stats-row">
-            <div class="stat-item">
-              <span class="stat-number">10K+</span>
-              <span class="stat-label">活跃用户</span>
-            </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
-              <span class="stat-number">500+</span>
+              <span class="stat-number">10+</span>
               <span class="stat-label">合作农场</span>
             </div>
             <div class="stat-divider"></div>

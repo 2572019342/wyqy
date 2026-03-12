@@ -26,7 +26,7 @@ import wyqy.common.core.page.TableDataInfo;
 
 /**
  * AI病虫害识别Controller
- * 
+ *
  * @author ruoyi
  * @date 2025-01-30
  */
@@ -104,7 +104,7 @@ public class AiPestDetectionController extends BaseController
     {
         return toAjax(aiPestDetectionService.deleteAiPestDetectionByDetectionIds(detectionIds));
     }
-    
+
     /**
      * AI病虫害识别 - 模拟识别接口
      */
@@ -114,20 +114,20 @@ public class AiPestDetectionController extends BaseController
     public AjaxResult detect(@RequestBody Map<String, Object> params)
     {
         try {
-            Long landId = params.get("landId") != null ? 
+            Long landId = params.get("landId") != null ?
                 Long.valueOf(params.get("landId").toString()) : null;
-            Long speciesId = params.get("speciesId") != null ? 
+            Long speciesId = params.get("speciesId") != null ?
                 Long.valueOf(params.get("speciesId").toString()) : null;
-            String landName = params.get("landName") != null ? 
+            String landName = params.get("landName") != null ?
                 params.get("landName").toString() : "未知地块";
-            String speciesName = params.get("speciesName") != null ? 
+            String speciesName = params.get("speciesName") != null ?
                 params.get("speciesName").toString() : "未知作物";
-            
+
 
             Random random = new Random();
             String[] pestTypes = {"pest", "disease"};
             String[] pestNames = {
-                 
+
                 "菜青虫"
             };
             String[] recommendations = {
@@ -137,13 +137,13 @@ public class AiPestDetectionController extends BaseController
                 "建议人工捕捉，使用天敌防治，保持田间清洁",
                 "建议加强水肥管理，提高植株抗性，使用保护性杀菌剂"
             };
-            
+
             // 随机选择病虫害类型和名称
             String detectionType = pestTypes[random.nextInt(pestTypes.length)];
             String pestName = pestNames[random.nextInt(pestNames.length)];
             String recommendation = recommendations[random.nextInt(recommendations.length)];
             Double confidence = 0.75 + random.nextDouble() * 0.24; // 0.75-0.99的置信度
-            
+
             // 创建识别记录
             AiPestDetection detection = new AiPestDetection();
             detection.setLandId(landId);
@@ -158,10 +158,10 @@ public class AiPestDetectionController extends BaseController
             detection.setRecommendation(recommendation);
             detection.setIsProcessed("0");
             detection.setDetectionTime(new java.util.Date());
-            
+
             // 保存到数据库
             int result = aiPestDetectionService.insertAiPestDetection(detection);
-            
+
             if (result > 0) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
@@ -171,7 +171,7 @@ public class AiPestDetectionController extends BaseController
                 response.put("confidence", confidence);
                 response.put("recommendation", recommendation);
                 response.put("message", "识别到" + (detectionType.equals("pest") ? "虫害" : "病害") + "：" + pestName);
-                
+
                 return success(response);
             } else {
                 return error("识别失败，请重试");
@@ -180,7 +180,7 @@ public class AiPestDetectionController extends BaseController
             return error("识别失败：" + e.getMessage());
         }
     }
-    
+
     /**
      * 获取视频流地址
      */
@@ -189,12 +189,12 @@ public class AiPestDetectionController extends BaseController
     public AjaxResult getVideoStream()
     {
         Map<String, Object> result = new HashMap<>();
-        result.put("videoUrl", "http://192.168.1.103:1145/play_drone.html");
-        result.put("streamUrl", "http://192.168.1.103:1145/play_drone.html");
-        result.put("snapshotUrl", "http://192.168.1.103:1145/play_drone.html");
+        result.put("videoUrl", "http://192.168.1.109:1145/play_drone.html");
+        result.put("streamUrl", "http://192.168.1.109:1145/play_drone.html");
+        result.put("snapshotUrl", "http://192.168.1.109:1145/play_drone.html");
         return success(result);
     }
-    
+
     /**
      * 获取识别统计
      */
@@ -204,7 +204,7 @@ public class AiPestDetectionController extends BaseController
     {
         return success(aiPestDetectionService.getDetectionStats());
     }
-    
+
     /**
      * 标记为已处理
      */

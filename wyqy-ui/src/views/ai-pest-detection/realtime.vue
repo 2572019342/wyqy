@@ -319,8 +319,8 @@ export default {
         speciesName: null
       },
       // 视频流相关
-      droneVideoStreamUrl: "http://192.168.1.103:1145/play_drone.html",
-      carVideoStreamUrl: "http://192.168.1.103:1145/play_car.html",
+      droneVideoStreamUrl: "http://192.168.1.109:1145/play_drone.html",
+      carVideoStreamUrl: "http://192.168.1.109:1145/play_car.html",
       droneVideoConnected: false,
       carVideoConnected: false,
       carVideoStatus: {
